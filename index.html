@@ -851,36 +851,56 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
         <div class="m-det"><div class="m-det-l">Location</div><div class="m-det-v" id="m-loc2">—</div></div>
         <div class="m-det"><div class="m-det-l">Status</div><div class="m-det-v" id="m-status2" style="color:var(--gold)">Available</div></div>
       </div>
-      <div id="pay-sec" class="on"><button onclick="sec('preview')" style="background:none;border:none;font-family:'Jost',sans-serif;font-size:.7rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;padding:.5rem 0;-webkit-tap-highlight-color:transparent;margin-bottom:.25rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to listing</button>
-        <div class="divider"></div>
-        <div class="mpesa-row">
-          <div class="mpesa-logo"><span>M-PESA</span></div>
-          <div class="mpesa-info"><strong>Lipa Na M-Pesa — Ksh 250</strong>Pay once to unlock the caretaker's phone number for this listing.</div>
+      <div id="pay-sec" class="on">
+        <button onclick="sec('preview')" style="background:none;border:none;font-family:'Jost',sans-serif;font-size:.7rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;padding:.5rem 0 .75rem;-webkit-tap-highlight-color:transparent">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to listing
+        </button>
+        <!-- luxury dark fee card -->
+        <div style="background:var(--dark);border-radius:4px;padding:1.5rem;margin-bottom:1.25rem;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(184,149,90,.04) 24px,rgba(184,149,90,.04) 25px),repeating-linear-gradient(90deg,transparent,transparent 24px,rgba(184,149,90,.04) 24px,rgba(184,149,90,.04) 25px);pointer-events:none"></div>
+          <div style="position:relative;z-index:1">
+            <div style="font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(184,149,90,.65);margin-bottom:.45rem">One-time Contact Fee</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2.6rem;color:#fff;font-weight:300;line-height:1;margin-bottom:.35rem">Ksh 250</div>
+            <div style="font-size:.72rem;color:rgba(255,255,255,.38);line-height:1.65">Instantly reveals the caretaker's phone number.<br/>Pay once — valid forever for this listing.</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:.85rem;padding-top:.85rem;border-top:1px solid rgba(184,149,90,.14)">
+              <div style="background:#00A650;border-radius:3px;padding:4px 10px;font-size:.7rem;font-weight:700;color:#fff;letter-spacing:.04em;flex-shrink:0">M-PESA</div>
+              <span style="font-size:.72rem;color:rgba(255,255,255,.42)">Lipa Na M-Pesa &middot; Safaricom STK Push</span>
+            </div>
+          </div>
         </div>
-        <div class="fee-row">
-          <div>
-  <div style="font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">One-time Contact Fee</div>
-  <div class="fee-num">Ksh 250</div>
-  <div style="font-size:.68rem;color:var(--ok,#2D6A4F);margin-top:.3rem;display:flex;align-items:center;gap:4px">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    Photos &amp; details always free
-  </div>
-</div>
-          <div class="fee-note">Get the caretaker's phone number instantly. Photos are always free.</div>
-        </div>
-        <div class="ph-wrap">
+        <!-- phone label + input -->
+        <div style="font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem">Your Safaricom Number</div>
+        <div class="ph-wrap" style="margin-bottom:1rem">
           <div class="ph-pre">
-            <svg width="20" height="13" viewBox="0 0 20 13"><rect width="6.67" height="13" fill="#006600"/><rect x="6.67" width="6.66" height="13" fill="#fff"/><rect x="13.33" width="6.67" height="13" fill="#BB0000"/></svg>
+            <svg width="22" height="15" viewBox="0 0 22 15" style="border-radius:1px;flex-shrink:0">
+              <rect width="22" height="5" fill="#006600"/>
+              <rect y="5" width="22" height="5" fill="#BB0000"/>
+              <rect y="10" width="22" height="5" fill="#000000"/>
+              <rect y="4.5" width="22" height="1" fill="#fff"/>
+              <rect y="9.5" width="22" height="1" fill="#fff"/>
+              <ellipse cx="11" cy="7.5" rx="2.2" ry="3.8" fill="#fff" opacity=".9"/>
+              <ellipse cx="11" cy="7.5" rx="1.4" ry="3.4" fill="#BB0000"/>
+              <line x1="11" y1="3.5" x2="11" y2="11.5" stroke="#000" stroke-width=".7"/>
+              <line x1="9.2" y1="7.5" x2="12.8" y2="7.5" stroke="#000" stroke-width=".5"/>
+            </svg>
             +254
           </div>
           <input type="tel" id="ph-inp" placeholder="7XX XXX XXX" maxlength="9" inputmode="numeric" autocomplete="tel-national"/>
         </div>
-        <button class="btn btn-gold btn-full" onclick="pay()">
+        <!-- trust badges -->
+        <div style="display:flex;gap:1.25rem;margin-bottom:1.1rem;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--muted)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Secure payment</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--muted)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Instant unlock</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--muted)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Verified listing</span>
+        </div>
+        <!-- CTA -->
+        <button class="btn btn-gold btn-full" onclick="pay()" style="height:52px;font-size:.78rem;letter-spacing:.12em;border-radius:3px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="3"/></svg>
-          Send STK Push — Ksh 250
+          Send M-Pesa STK Push
         </button>
-        <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:.65rem">After payment, the caretaker's number is revealed instantly. Call to arrange a viewing.</p>
+        <p style="font-size:.67rem;color:var(--muted);text-align:center;margin-top:.65rem;line-height:1.6">Check your phone for the M-Pesa prompt &amp; enter your PIN.<br/>The caretaker's number appears here instantly.</p>
       </div>
+      
       <div id="wait-sec">
         <div class="divider"></div>
         <div style="text-align:center;padding:1.5rem 0">
