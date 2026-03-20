@@ -1219,25 +1219,118 @@ function showStep(step) {
   document.getElementById('payStep3').classList.toggle('active', step === 'step3');
 }
 
-function startPayment() { showStep('step1'); }
+function startPayment() {
+  if (!currentUser) { window.location.href = 'login.html'; return; }
+  showStep('step1');
+}
 function cancelPayment() { showStep('main'); }
 
-function sendSTK() {
+let activePaymentId = null;
+let pollInterval = null;
+
+async function sendSTK() {
   const phone = document.getElementById('phoneInput').value.trim();
-  if (!phone || phone.length < 9) {
-    alert('Please enter a valid Safaricom number.');
+  if (!phone || !/^07\d{8}$/.test(phone)) {
+    alert('Enter a valid Safaricom number e.g. 0712345678');
     return;
   }
-  showStep('step2');
-  // Simulate STK push confirmation after 3.5s
-  setTimeout(() => {
-    showStep('step3');
-    document.getElementById('successIcon').style.display = 'block';
-    document.getElementById('caretakerName').textContent = currentListing.caretaker;
-    document.getElementById('caretakerPhone').textContent = currentListing.phone;
-    document.getElementById('callBtn').href = `tel:${currentListing.phone.replace(/\s/g,'')}`;
-    document.getElementById('contactRevealed').style.display = 'block';
-  }, 3500);
+
+  const btn = document.querySelector('#payStep1 .mpesa-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    // 1. Create a pending payment record in Supabase
+    const { data: payment, error: payErr } = await sb.from('payments').insert({
+      user_id: currentUser.id,
+      listing_id: currentListing.id,
+      phone,
+      amount: 250,
+      status: 'pending'
+    }).select().single();
+
+    if (payErr) throw new Error(payErr.message);
+    activePaymentId = payment.id;
+
+    // 2. Call Netlify function to trigger STK push
+    const res = await fetch('/api/mpesa-stk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        phone,
+        listing_id: currentListing.id,
+        user_id: currentUser.id,
+        amount: 250
+      })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error || 'STK push failed');
+
+    // 3. Save checkout_request_id so callback can match it
+    await sb.from('payments').update({
+      checkout_request_id: data.checkout_request_id
+    }).eq('id', activePaymentId);
+
+    showStep('step2');
+    startPolling();
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Send STK Push — Ksh 250';
+    alert('Payment error: ' + err.message);
+  }
+}
+
+function startPolling() {
+  let attempts = 0;
+  const maxAttempts = 24; // Poll for 2 minutes
+  pollInterval = setInterval(async () => {
+    attempts++;
+    if (attempts > maxAttempts) {
+      clearInterval(pollInterval);
+      showStep('step1');
+      alert('Payment timed out. Please try again.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/mpesa-check?payment_id=${activePaymentId}`);
+      const data = await res.json();
+
+      if (data.status === 'confirmed') {
+        clearInterval(pollInterval);
+        await revealContact();
+      } else if (data.status === 'failed') {
+        clearInterval(pollInterval);
+        showStep('step1');
+        alert('Payment was cancelled or failed. Please try again.');
+      }
+    } catch (e) { /* keep polling */ }
+  }, 5000); // Check every 5 seconds
+}
+
+async function revealContact() {
+  // Fetch caretaker contact (RLS only allows this after confirmed payment)
+  const { data: contact } = await sb
+    .from('caretaker_contacts')
+    .select('caretaker_name, phone')
+    .eq('listing_id', currentListing.id)
+    .single();
+
+  showStep('step3');
+  document.getElementById('successIcon').style.display = 'block';
+
+  if (contact) {
+    document.getElementById('caretakerName').textContent = contact.caretaker_name;
+    document.getElementById('caretakerPhone').textContent = contact.phone;
+    document.getElementById('callBtn').href = `tel:${contact.phone.replace(/\s/g,'')}`;
+  } else {
+    document.getElementById('caretakerName').textContent = 'Caretaker';
+    document.getElementById('caretakerPhone').textContent = 'Contact admin for details';
+  }
+  document.getElementById('contactRevealed').style.display = 'block';
 }
 
 function showContact() {
