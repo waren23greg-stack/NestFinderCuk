@@ -439,6 +439,24 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   .stat-n { font-size: 1.7rem !important; }
 }
 
+
+/* ── GALLERY LIGHTBOX ── */
+.gallery-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.gallery-ov.open{opacity:1;pointer-events:all}
+.gallery-wrap{position:relative;max-width:min(860px,95vw);width:100%;padding:0 3rem}
+.gallery-img{width:100%;max-height:80svh;object-fit:contain;display:block;border-radius:4px}
+.gallery-close{position:absolute;top:-2.5rem;right:0;width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gallery-close svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
+.gallery-prev,.gallery-next{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s}
+.gallery-prev{left:0}.gallery-next{right:0}
+.gallery-prev:hover,.gallery-next:hover{background:rgba(255,255,255,.22)}
+.gallery-prev svg,.gallery-next svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:1rem}
+.gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:background .2s}
+.gallery-dot.on{background:#fff}
+.gallery-counter{text-align:center;font-size:.72rem;color:rgba(255,255,255,.45);letter-spacing:.1em;margin-top:.6rem}
+.gallery-title{text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;margin-bottom:1rem}
+
 </style>
 </head>
 <body>
@@ -629,6 +647,26 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   </div>
 </nav>
 
+
+<!-- PHOTO GALLERY LIGHTBOX -->
+<div class="gallery-ov" id="gallery-ov" onclick="bgCloseGallery(event)">
+  <div class="gallery-wrap">
+    <div class="gallery-title" id="gallery-title"></div>
+    <button class="gallery-close" onclick="closeGallery()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img class="gallery-img" id="gallery-img" src="" alt=""/>
+    <button class="gallery-prev" onclick="galleryNav(-1)">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="gallery-next" onclick="galleryNav(1)">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <div class="gallery-dots" id="gallery-dots"></div>
+    <div class="gallery-counter" id="gallery-counter"></div>
+  </div>
+</div>
+
 <!-- MODAL -->
 <div class="overlay" id="overlay" onclick="bgClose(event)">
   <div class="modal">
@@ -738,7 +776,7 @@ async function initAuth(){
 async function doSignOut(){await sb.auth.signOut();location.reload();}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeModal();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeModal();closeGallery();} if(document.getElementById('gallery-ov').classList.contains('open')){if(e.key==='ArrowLeft')galleryNav(-1);if(e.key==='ArrowRight')galleryNav(1);}});
 
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0}return h;}
 function photo(l){
@@ -748,24 +786,11 @@ function photo(l){
 }
 
 async function load(){
-  console.log('[NF] Starting load...');
-  console.log('[NF] Supabase URL:', SURL);
   const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
-  console.log('[NF] Data:', data);
-  console.log('[NF] Error:', error);
-  if(error){
-    console.error('[NF] DB ERROR:', error.message, error.code, error.hint);
-    document.getElementById('lg').innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p style="color:#e57373">DB Error: '+error.message+'</p></div>';
-    return;
-  }
-  if(!data||!data.length){
-    console.warn('[NF] No data returned — empty array');
-    emptyState();return;
-  }
+  if(error||!data){emptyState();return;}
   listings=data;
   document.getElementById('stat-n').textContent=data.length;
   render(data);
-  console.log('[NF] Rendered', data.length, 'listings');
 }
 
 function render(list){
@@ -778,8 +803,8 @@ function render(list){
     const amen=[];
     if(l.water_included)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M12 2C8.69 2 6 4.69 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.31-2.69-6-6-6z"/></svg>Water</div>`);
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
-    return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both" onclick="openListing('${l.id}')">
-  <div class="lcard-img">
+    return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both">
+  <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
     <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
     <div class="lcard-badge ${l.available?'avail':''}">${l.available?'Available':'Taken'}</div>
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
@@ -853,6 +878,54 @@ function toast(msg,type=''){
   document.getElementById('toast-txt').textContent=msg;
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);
 }
+
+/* ── GALLERY ── */
+let galPhotos=[],galIdx=0;
+function openGallery(id){
+  const l=listings.find(x=>x.id===id);if(!l)return;
+  // collect all photos — use uploaded ones or fallback pool
+  const pool=PHOTOS[l.type]||PHOTOS.default;
+  galPhotos=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,3)];
+  galIdx=0;
+  document.getElementById('gallery-title').textContent=l.title;
+  renderGalleryImg();
+  document.getElementById('gallery-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function renderGalleryImg(){
+  const img=document.getElementById('gallery-img');
+  img.src=galPhotos[galIdx];
+  img.alt='Photo '+(galIdx+1);
+  document.getElementById('gallery-counter').textContent=(galIdx+1)+' / '+galPhotos.length;
+  // dots
+  const dots=document.getElementById('gallery-dots');
+  dots.innerHTML=galPhotos.map((_,i)=>`<div class="gallery-dot${i===galIdx?' on':''}" onclick="galJump(${i})"></div>`).join('');
+  // hide arrows if only 1 photo
+  document.querySelector('.gallery-prev').style.display=galPhotos.length<2?'none':'';
+  document.querySelector('.gallery-next').style.display=galPhotos.length<2?'none':'';
+}
+function galleryNav(dir){
+  galIdx=(galIdx+dir+galPhotos.length)%galPhotos.length;
+  renderGalleryImg();
+}
+function galJump(i){galIdx=i;renderGalleryImg();}
+function closeGallery(){
+  document.getElementById('gallery-ov').classList.remove('open');
+  document.body.style.overflow='';
+}
+function bgCloseGallery(e){if(e.target===e.currentTarget)closeGallery();}
+
+// swipe support for gallery
+(()=>{
+  let sx=0;
+  const ov=document.getElementById('gallery-ov');
+  ov.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
+  ov.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>50){galleryNav(dx<0?1:-1);}
+  },{passive:true});
+})();
+
 initAuth();load();
 </script>
 </body>
