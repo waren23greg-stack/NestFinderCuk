@@ -748,11 +748,24 @@ function photo(l){
 }
 
 async function load(){
+  console.log('[NF] Starting load...');
+  console.log('[NF] Supabase URL:', SURL);
   const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
-  if(error||!data){emptyState();return;}
+  console.log('[NF] Data:', data);
+  console.log('[NF] Error:', error);
+  if(error){
+    console.error('[NF] DB ERROR:', error.message, error.code, error.hint);
+    document.getElementById('lg').innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p style="color:#e57373">DB Error: '+error.message+'</p></div>';
+    return;
+  }
+  if(!data||!data.length){
+    console.warn('[NF] No data returned — empty array');
+    emptyState();return;
+  }
   listings=data;
   document.getElementById('stat-n').textContent=data.length;
   render(data);
+  console.log('[NF] Rendered', data.length, 'listings');
 }
 
 function render(list){
