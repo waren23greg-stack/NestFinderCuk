@@ -538,23 +538,66 @@ async function saveListing(){
   const cname=document.getElementById('f-cname').value.trim();
   const cphone=document.getElementById('f-cphone').value.trim();
   if(!cname||!cphone){toast('Add caretaker contact','err');return;}
+
+  // Show saving state on button
+  const saveBtn=document.querySelector('#ov .btn-gold');
+  const origTxt=saveBtn.innerHTML;
+  saveBtn.disabled=true;
+  saveBtn.innerHTML='<div class="spin-small" style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Uploading photos…';
+
+  // Upload all photos IN PARALLEL (much faster than sequential)
   let photoUrls=[...existingPhotos];
-  for(const f of photoFiles){
-    const ext=f.name.split('.').pop();
-    const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-    const {error:uerr}=await sb.storage.from('house-photos').upload(path,f);
-    if(uerr){toast('Photo upload failed: '+uerr.message,'err');return;}
-    const {data:{publicUrl}}=sb.storage.from('house-photos').getPublicUrl(path);
-    photoUrls.push(publicUrl);
+  if(photoFiles.length){
+    toast('Uploading '+photoFiles.length+' photo'+(photoFiles.length>1?'s':'')+'…');
+    const uploads=photoFiles.map(async f=>{
+      const ext=f.name.split('.').pop().toLowerCase().replace('jpeg','jpg');
+      const path=`listings/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const {error:uerr}=await sb.storage.from('house-photos').upload(path,f,{cacheControl:'3600',upsert:false});
+      if(uerr)throw new Error('Upload failed: '+uerr.message);
+      return sb.storage.from('house-photos').getPublicUrl(path).data.publicUrl;
+    });
+    try{
+      const urls=await Promise.all(uploads);
+      photoUrls=[...photoUrls,...urls];
+    }catch(err){
+      toast(err.message,'err');
+      saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;
+    }
   }
-  const payload={title,type:document.getElementById('f-type').value,price,location:loc,description:document.getElementById('f-desc').value.trim(),water_included:document.getElementById('f-water').checked,wifi_available:document.getElementById('f-wifi').checked,available:document.getElementById('f-avail').checked,photos:photoUrls};
+
+  saveBtn.innerHTML='<div class="spin-small" style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Saving listing…';
+
+  const payload={title,type:document.getElementById('f-type').value,price,location:loc,
+    description:document.getElementById('f-desc').value.trim(),
+    water_included:document.getElementById('f-water').checked,
+    wifi_available:document.getElementById('f-wifi').checked,
+    available:document.getElementById('f-avail').checked,photos:photoUrls};
+
   const eid=document.getElementById('edit-id').value;
   let lid=eid;
-  if(eid){const {error}=await sb.from('listings').update(payload).eq('id',eid);if(error){toast('Update failed: '+error.message,'err');return;}}
-  else{const {data,error}=await sb.from('listings').insert(payload).select().single();if(error){toast('Insert failed: '+error.message,'err');return;}lid=data.id;}
-  const {error:cerr}=await sb.from('caretaker_contacts').upsert({listing_id:lid,caretaker_name:cname,phone:cphone},{onConflict:'listing_id'});
-  if(cerr){toast('Caretaker save failed: '+cerr.message,'err');return;}
-  toast(eid?'Listing updated!':'Listing added!');closeModal();loadListings();loadDash();
+
+  if(eid){
+    const {error}=await sb.from('listings').update(payload).eq('id',eid);
+    if(error){toast('Update failed: '+error.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
+  }else{
+    const {data,error}=await sb.from('listings').insert(payload).select().single();
+    if(error){toast('Save failed: '+error.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
+    lid=data.id;
+  }
+
+  // Save caretaker — try upsert first, fall back to delete+insert if no constraint yet
+  const {error:cerr}=await sb.from('caretaker_contacts')
+    .upsert({listing_id:lid,caretaker_name:cname,phone:cphone},{onConflict:'listing_id',ignoreDuplicates:false});
+  if(cerr){
+    // Fallback: delete old then insert fresh
+    await sb.from('caretaker_contacts').delete().eq('listing_id',lid);
+    const {error:cerr2}=await sb.from('caretaker_contacts').insert({listing_id:lid,caretaker_name:cname,phone:cphone});
+    if(cerr2){toast('Caretaker save failed: '+cerr2.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
+  }
+
+  saveBtn.disabled=false;saveBtn.innerHTML=origTxt;
+  toast(eid?'Listing updated!':'Listing saved! ✓');
+  closeModal();loadListings();loadDash();
 }
 
 async function delListing(id){
