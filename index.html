@@ -71,7 +71,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 
 /* HERO */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;padding-bottom:8vh;overflow:hidden;padding-top:var(--nav-h)}
-.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#16130E 0%,#2A2318 55%,#181410 100%)}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(145deg,#1A1409 0%,#2D2218 35%,#16130E 60%,#0E0B07 100%)}
 .hero-img{position:absolute;right:0;top:0;width:56%;height:100%;object-fit:cover;opacity:.32}
 .hero-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(22,19,14,1) 30%,rgba(22,19,14,.4) 65%,rgba(22,19,14,.85) 100%)}
 .hero-glow{position:absolute;bottom:0;left:0;width:40%;height:50%;background:radial-gradient(ellipse at bottom left,rgba(184,149,90,.08) 0%,transparent 70%)}
@@ -387,6 +387,58 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   .fee-row{flex-direction:column;gap:.2rem;align-items:flex-start}
   .fee-note{text-align:left;max-width:100%}
 }
+
+/* ═══ ANDROID/CHROME FIXES ═══ */
+/* Force hide nav-mid and show ham below 900px — overrides everything */
+@media (max-width: 900px) {
+  nav { padding: 0 1rem !important; }
+  .nav-mid { display: none !important; }
+  .ham { display: flex !important; }
+  #nav-hello { display: none !important; }
+}
+/* hero image - always full width, just vary opacity */
+.hero-img { width: 100% !important; }
+@media (min-width: 901px) {
+  .hero-img { width: 56% !important; opacity: .32 !important; }
+}
+@media (max-width: 900px) {
+  .hero-img { opacity: .15 !important; }
+  .hero-overlay { background: rgba(22,19,14,.88) !important; }
+}
+/* hero centre on mobile */
+@media (max-width: 600px) {
+  .hero { align-items: center !important; padding-bottom: 4vh !important; }
+  .hero-content { padding: 0 1rem !important; }
+  .hero h1 { font-size: 2.2rem !important; }
+  .hero-btns { flex-direction: column !important; }
+  .hero-btns .btn { width: 100% !important; height: 52px !important; font-size: .82rem !important; }
+}
+/* bottom nav - clean, no text crowding */
+@media (max-width: 640px) {
+  .bot-nav { display: block !important; }
+  footer { padding-bottom: calc(60px + env(safe-area-inset-bottom,0px)) !important; }
+}
+
+
+/* Mobile hero enhancement - always looks beautiful */
+@media (max-width: 900px) {
+  .hero-bg {
+    background: linear-gradient(145deg,#1A1409 0%,#2D2218 35%,#16130E 60%,#0E0B07 100%) !important;
+  }
+  .hero-glow {
+    width: 100% !important;
+    height: 60% !important;
+    background: radial-gradient(ellipse at 20% 80%, rgba(184,149,90,.12) 0%, rgba(184,149,90,.04) 40%, transparent 70%) !important;
+  }
+  /* nav sign-in button smaller on mobile */
+  #nav-in { padding: 7px 14px !important; font-size: .68rem !important; letter-spacing: .08em !important; }
+  /* hero eyebrow gold line shorter on mobile */
+  .hero-eyebrow::before { width: 16px !important; }
+  /* stats row on mobile */
+  .hero-rule { gap: 1.75rem !important; }
+  .stat-n { font-size: 1.7rem !important; }
+}
+
 </style>
 </head>
 <body>
