@@ -7,6 +7,7 @@
 <title>NestFinder CUK — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;
@@ -234,6 +235,17 @@ h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15
   .overlay.open .modal{transform:translateY(0)}
   .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border2);border-radius:2px;margin:.75rem auto -.25rem}
 }
+
+/* analytics chart */
+.chart-wrap{padding:1.25rem 1.35rem}
+canvas{max-height:220px}
+/* availability toggle */
+.avail-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.avail-track{width:34px;height:19px;background:var(--border2);border-radius:10px;position:relative;transition:background .2s;flex-shrink:0}
+.avail-track.on{background:var(--gold)}
+.avail-knob{position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.avail-track.on .avail-knob{transform:translateX(15px)}
+
 </style>
 </head>
 <body>
@@ -302,6 +314,10 @@ h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15
           <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-label">Students</div><div class="stat-val" id="s-students">—</div><div class="stat-sub">registered users</div></div>
           <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="stat-label">Revenue</div><div class="stat-val" id="s-rev">—</div><div class="stat-sub">viewing fees</div></div>
         </div>
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="card-head"><div class="card-title">Revenue — Last 7 Days</div></div>
+          <div class="chart-wrap"><canvas id="rev-chart"></canvas></div>
+        </div>
         <div class="card">
           <div class="card-head"><div class="card-title">Recent Payments</div><button class="btn btn-ghost btn-sm" onclick="tab('payments',null)">View All</button></div>
           <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Listing</th><th>M-Pesa Ref</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recent-pay"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
@@ -319,7 +335,7 @@ h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15
       <!-- PAYMENTS -->
       <div id="t-payments" class="tab">
         <div class="card">
-          <div class="card-head"><div class="card-title">All Payments</div></div>
+          <div class="card-head"><div class="card-title">All Payments</div><button class="btn btn-ghost btn-sm" onclick="exportCSV()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button></div>
           <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>M-Pesa Ref</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="pay-tbl"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
         </div>
       </div>
@@ -394,6 +410,77 @@ let user=null,photoFiles=[],existingPhotos=[],listingsCache=[];
 function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('show');}
 function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
 
+
+/* ── REVENUE CHART ── */
+let revChart=null;
+async function drawRevenueChart(){
+  const {data}=await sb.from('payments').select('amount,created_at').eq('status','confirmed').order('created_at',{ascending:true});
+  // build last 7 days
+  const days=[];
+  const totals=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const label=d.toLocaleDateString('en-KE',{weekday:'short',day:'numeric'});
+    const ds=d.toISOString().slice(0,10);
+    const dayTotal=(data||[]).filter(p=>p.created_at.slice(0,10)===ds).reduce((s,p)=>s+(p.amount||0),0);
+    days.push(label);totals.push(dayTotal);
+  }
+  const ctx=document.getElementById('rev-chart');if(!ctx)return;
+  if(revChart)revChart.destroy();
+  revChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels:days,datasets:[{
+      label:'Revenue (Ksh)',data:totals,
+      backgroundColor:'rgba(184,149,90,.35)',
+      borderColor:'rgba(184,149,90,.85)',
+      borderWidth:1.5,borderRadius:3
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Ksh '+ctx.parsed.y.toLocaleString()}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:'#8A8070'}},
+        y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'#8A8070',callback:v=>'Ksh '+v.toLocaleString()},beginAtZero:true}
+      }
+    }
+  });
+}
+
+/* ── AVAILABILITY TOGGLE ── */
+async function toggleAvail(id,newVal){
+  const {error}=await sb.from('listings').update({available:newVal}).eq('id',id);
+  if(error){toast('Update failed','err');return;}
+  toast(newVal?'Marked as Available':'Marked as Taken');
+  loadListings();loadDash();
+}
+
+/* ── EXPORT CSV ── */
+async function exportCSV(){
+  const {data}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
+  if(!data?.length){toast('No payments to export','err');return;}
+  const rows=[['Date','Student','Phone','Listing','M-Pesa Ref','Amount','Status']];
+  data.forEach(p=>{
+    rows.push([
+      new Date(p.created_at).toLocaleDateString(),
+      p.profiles?.full_name||'',
+      p.phone||'',
+      p.listings?.title||'',
+      p.mpesa_ref||'',
+      p.amount||0,
+      p.status||''
+    ]);
+  });
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('
+');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='nestfinder-payments-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();URL.revokeObjectURL(url);
+  toast('CSV exported!');
+}
+
+
 async function init(){
   const {data:{user:u}}=await sb.auth.getUser();
   if(!u){showGuard();return;}
@@ -430,6 +517,7 @@ async function loadDash(){
   document.getElementById('s-avail').textContent=ps?.length||0;
   document.getElementById('s-students').textContent=stu?.length||0;
   document.getElementById('s-rev').textContent='Ksh '+((rev||[]).reduce((a,p)=>a+(p.amount||0),0)).toLocaleString();
+  drawRevenueChart();
   const {data:rp}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(6);
   const tb=document.getElementById('recent-pay');
   if(!rp?.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">No payments yet</td></tr>`;return;}
@@ -444,7 +532,9 @@ async function loadListings(){
   tb.innerHTML=data.map(l=>{
     const ph=l.photos?.[0];
     const img=ph?`<img src="${ph}" class="thumb" alt=""/>`:`<div class="thumb-ph"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
-    return `<tr><td>${img}</td><td style="font-weight:500;max-width:150px">${l.title}</td><td>${TL[l.type]||l.type}</td><td>Ksh ${(l.price||0).toLocaleString()}</td><td style="color:var(--muted);max-width:120px">${l.location}</td><td><span class="badge ${l.available?'badge-green':'badge-amber'}">${l.available?'Available':'Taken'}</span></td><td><div class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button><button class="btn btn-danger" onclick="delListing('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Del</button></div></td></tr>`;
+    return `<tr><td>${img}</td><td style="font-weight:500;max-width:140px">${l.title}</td><td>${TL[l.type]||l.type}</td><td>Ksh ${(l.price||0).toLocaleString()}</td><td style="color:var(--muted);max-width:110px">${l.location}</td>
+    <td><div class="avail-toggle" onclick="toggleAvail('${l.id}',${!l.available})" title="Toggle availability"><div class="avail-track${l.available?' on':''}"><div class="avail-knob"></div></div><span style="font-size:.7rem;color:var(--muted)">${l.available?'Available':'Taken'}</span></div></td>
+    <td><div class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button><button class="btn btn-danger" onclick="delListing('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Del</button></div></td></tr>`;
   }).join('');
 }
 

@@ -471,6 +471,56 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 /* hint */
 .gallery-hint{position:absolute;bottom:5.5rem;left:50%;transform:translateX(-50%);font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:.08em;pointer-events:none;white-space:nowrap;transition:opacity .4s}
 
+
+/* ── FAVOURITES PAGE ── */
+.favs-page{display:none;padding:4rem var(--px);max-width:var(--max-w);margin:0 auto}
+.favs-page.on{display:block}
+.main-listings{display:block}
+.main-listings.hidden{display:none}
+
+/* ── SHARE BUTTON ── */
+.share-btn{position:absolute;bottom:9px;left:9px;background:rgba(253,249,244,.92);border:1px solid var(--border);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--t);z-index:3;-webkit-tap-highlight-color:transparent}
+.share-btn svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:1.8;transition:stroke var(--t)}
+.share-btn:hover svg,.share-btn:active svg{stroke:var(--gold)}
+
+/* ── WHATSAPP + SHARE in modal success ── */
+.cb-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.9rem}
+.btn-wa{background:#25D366;color:#fff;height:46px;border-radius:2px;font-size:.72rem;letter-spacing:.08em}
+.btn-wa:hover{background:#20BA5A}
+.btn-share-modal{background:transparent;border:1px solid var(--border2);color:var(--ink);height:46px;border-radius:2px;font-size:.72rem;letter-spacing:.08em}
+.btn-share-modal:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── REVIEWS ── */
+.reviews-section{margin-top:1.2rem}
+.reviews-title{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+.review-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem;max-height:200px;overflow-y:auto}
+.review-item{background:#fff;border:1px solid var(--border);padding:.75rem 1rem}
+.review-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem}
+.review-author{font-size:.74rem;font-weight:500;color:var(--dark)}
+.review-date{font-size:.62rem;color:var(--muted)}
+.review-stars{display:flex;gap:2px;margin-bottom:.3rem}
+.review-star{width:11px;height:11px;fill:var(--gold);stroke:none}
+.review-star.empty{fill:var(--border2)}
+.review-text{font-size:.76rem;color:var(--ink);line-height:1.55}
+.review-form{background:var(--linen);border:1px solid var(--border);padding:1rem}
+.review-form-label{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;display:block}
+.star-picker{display:flex;gap:4px;margin-bottom:.75rem}
+.star-pick{width:26px;height:26px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.star-pick svg{width:100%;height:100%;fill:var(--border2);stroke:none;transition:fill .15s}
+.star-pick.on svg,.star-pick:hover svg{fill:var(--gold)}
+.review-textarea{width:100%;height:72px;padding:8px 10px;background:#fff;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:.82rem;color:var(--dark);outline:none;resize:none;transition:border-color var(--t)}
+.review-textarea:focus{border-color:var(--gold)}
+.review-submit{margin-top:.65rem;width:100%;height:40px;background:var(--dark);color:#fff;border:none;font-family:'Jost',sans-serif;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--t);border-radius:2px}
+.review-submit:hover{background:var(--dark3)}
+.avg-rating{display:flex;align-items:center;gap:6px;margin-bottom:.4rem}
+.avg-stars{display:flex;gap:2px}
+.avg-num{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--dark)}
+.avg-count{font-size:.68rem;color:var(--muted)}
+
+/* ── RATING ON CARD ── */
+.lcard-rating{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
+.lcard-rating svg{width:10px;height:10px;fill:var(--gold);stroke:none}
+
 </style>
 </head>
 <body>
@@ -483,6 +533,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   </a>
   <div class="nav-mid">
     <a href="#listings">Listings</a>
+    <a href="#" onclick="showFavs();return false">Favourites</a>
     <a href="#how">How It Works</a>
     <a href="#trust">Safety</a>
   </div>
@@ -502,6 +553,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   <div class="drawer-panel">
     <div class="drawer-links">
       <a href="#listings" onclick="closeDrawer()">Listings</a>
+      <a href="#" onclick="showFavs();closeDrawer();return false">Favourites</a>
       <a href="#how" onclick="closeDrawer()">How It Works</a>
       <a href="#trust" onclick="closeDrawer()">Safety</a>
     </div>
@@ -536,6 +588,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   </div>
 </section>
 
+<div id="main-listings" class="main-listings">
 <!-- SEARCH -->
 <div class="searchbar">
   <div class="searchbar-inner">
@@ -614,6 +667,24 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   </div>
 </div>
 
+
+<!-- FAVOURITES PAGE -->
+<div class="favs-page" id="favs-page">
+  <div class="sec-header">
+    <div>
+      <p class="sec-label">Saved Listings</p>
+      <h2 class="sec-title">My Favourites</h2>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="hideFavs()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back to All
+    </button>
+  </div>
+  <div class="lg" id="favs-grid"></div>
+</div>
+
+</div><!-- end main-listings -->
+
 <!-- HOW IT WORKS -->
 <section id="how" class="how">
   <div class="how-inner">
@@ -657,7 +728,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <a href="#" class="bnb" onclick="window.scrollTo({top:0,behavior:'smooth'});return false"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Home</a>
     <a href="#listings" class="bnb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search</a>
     <a href="login.html" class="bnb gold" id="bot-in"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Sign In</a>
-    <a href="#trust" class="bnb"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety</a>
+    <a href="#" class="bnb" onclick="showFavs();return false"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Saved</a>
   </div>
 </nav>
 
@@ -766,10 +837,42 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
           <div class="cb-label">Contact Unlocked — Call to Arrange Viewing</div>
           <div class="cb-name" id="cb-name">—</div>
           <div class="cb-phone" id="cb-phone">—</div>
-          <a id="cb-call" href="#" class="btn btn-gold btn-full" style="margin-top:1.1rem">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 011.72 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>
-            Call Caretaker Now
-          </a>
+          <div class="cb-actions">
+            <a id="cb-call" href="#" class="btn btn-gold">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 011.72 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>
+              Call Now
+            </a>
+            <a id="cb-wa" href="#" target="_blank" class="btn btn-wa">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+          <button class="btn btn-share-modal btn-full" style="margin-top:8px" onclick="shareCurrentListing()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share This Listing
+          </button>
+        </div>
+        <div class="reviews-section" id="reviews-section">
+          <div class="divider"></div>
+          <div class="avg-rating" id="avg-rating" style="display:none">
+            <div class="avg-stars" id="avg-stars"></div>
+            <div class="avg-num" id="avg-num"></div>
+            <div class="avg-count" id="avg-count"></div>
+          </div>
+          <div class="reviews-title">Student Reviews</div>
+          <div class="review-list" id="review-list"><div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.75rem">No reviews yet — be the first!</div></div>
+          <div class="review-form" id="review-form">
+            <span class="review-form-label">Rate this listing</span>
+            <div class="star-picker" id="star-picker">
+              <div class="star-pick" data-v="1" onclick="pickStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="star-pick" data-v="2" onclick="pickStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="star-pick" data-v="3" onclick="pickStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="star-pick" data-v="4" onclick="pickStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+              <div class="star-pick" data-v="5" onclick="pickStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            </div>
+            <textarea class="review-textarea" id="review-txt" placeholder="Share your experience with this listing…"></textarea>
+            <button class="review-submit" onclick="submitReview()">Submit Review</button>
+          </div>
         </div>
       </div>
     </div>
@@ -830,8 +933,8 @@ async function load(){
   render(data);
 }
 
-function render(list){
-  const g=document.getElementById('lg'),c=document.getElementById('res-count');
+function render(list,g){
+  g=g||document.getElementById('lg');const c=document.getElementById('res-count');
   if(!list.length){g.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p>No listings match your search</p></div>`;c.textContent='';return;}
   c.textContent=list.length+' listing'+(list.length!==1?'s':'')+' found';
   const favs=JSON.parse(localStorage.getItem('nf-favs')||'[]');
@@ -845,11 +948,12 @@ function render(list){
     <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
     <div class="lcard-badge ${l.available?'avail':''}">${l.available?'Available':'Taken'}</div>
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
+    <div class="share-btn" onclick="shareCard(event,'${l.id}')" role="button" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
     <div class="lcard-fav ${favs.includes(l.id)?'on':''}" id="fav-${l.id}" onclick="fav(event,'${l.id}')" role="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
   </div>
   <div class="lcard-body">
     <div class="lcard-type">${TL[l.type]||l.type}</div>
-    <div class="lcard-title">${l.title}</div>
+    ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${l.title}</div>
     <div class="lcard-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.location}</div>
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
     <div class="lcard-foot">
@@ -907,7 +1011,17 @@ async function checkPay(){
 }
 async function showContact(lid){
   const {data}=await sb.from('caretaker_contacts').select('caretaker_name,phone').eq('listing_id',lid).maybeSingle();
-  if(data){document.getElementById('cb-name').textContent=data.caretaker_name;document.getElementById('cb-phone').textContent=data.phone;document.getElementById('cb-call').href='tel:'+data.phone;sec('succ');toast('Contact unlocked!');}
+  if(data){
+    document.getElementById('cb-name').textContent=data.caretaker_name;
+    document.getElementById('cb-phone').textContent=data.phone;
+    document.getElementById('cb-call').href='tel:'+data.phone;
+    setWhatsApp(data.phone,data.caretaker_name);
+    sec('succ');
+    toast('Contact unlocked!');
+    loadReviews(lid);
+    pickedStar=0;
+    document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
+  }
 }
 function toast(msg,type=''){
   const t=document.getElementById('toast');
@@ -1080,7 +1194,156 @@ document.getElementById('gallery-stage').addEventListener('wheel',e=>{
   },{passive:true});
 })();
 
-initAuth();load();
+
+/* ══════════════════════════════════════════
+   RATINGS CACHE
+══════════════════════════════════════════ */
+let ratings={};
+
+async function loadRatings(){
+  const {data}=await sb.from('reviews').select('listing_id,rating');
+  if(!data)return;
+  ratings={};
+  data.forEach(r=>{
+    if(!ratings[r.listing_id])ratings[r.listing_id]={sum:0,count:0};
+    ratings[r.listing_id].sum+=r.rating;
+    ratings[r.listing_id].count++;
+  });
+  Object.keys(ratings).forEach(id=>{
+    ratings[id].avg=ratings[id].sum/ratings[id].count;
+  });
+}
+
+/* ══════════════════════════════════════════
+   FAVOURITES PAGE
+══════════════════════════════════════════ */
+function showFavs(){
+  if(!user){toast('Sign in to view your saved listings','err');return;}
+  const favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
+  const favListings=listings.filter(l=>favIds.includes(l.id));
+  const grid=document.getElementById('favs-grid');
+  if(!favListings.length){
+    grid.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg><p>No saved listings yet — tap the heart on any listing</p></div>`;
+  }else{
+    render(favListings,grid);
+  }
+  document.getElementById('favs-page').classList.add('on');
+  document.getElementById('main-listings').classList.add('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function hideFavs(){
+  document.getElementById('favs-page').classList.remove('on');
+  document.getElementById('main-listings').classList.remove('hidden');
+}
+
+/* ══════════════════════════════════════════
+   SHARE
+══════════════════════════════════════════ */
+function shareCard(e,id){
+  e.stopPropagation();
+  const l=listings.find(x=>x.id===id);if(!l)return;
+  doShare(l);
+}
+
+function shareCurrentListing(){
+  if(cur)doShare(cur);
+}
+
+function doShare(l){
+  const url=window.location.origin+window.location.pathname+'?listing='+l.id;
+  const text=`Check out this listing on NestFinder CUK: ${l.title} — Ksh ${(l.price||0).toLocaleString()}/mo in ${l.location}`;
+  if(navigator.share){
+    navigator.share({title:l.title,text,url}).catch(()=>{});
+  }else{
+    navigator.clipboard.writeText(url).then(()=>toast('Link copied to clipboard!'));
+  }
+}
+
+// Open listing from URL param
+(()=>{
+  const p=new URLSearchParams(window.location.search);
+  const lid=p.get('listing');
+  if(lid){
+    const tryOpen=()=>{
+      if(listings.length){openListing(lid);}
+      else{setTimeout(tryOpen,300);}
+    };
+    setTimeout(tryOpen,500);
+  }
+})();
+
+/* ══════════════════════════════════════════
+   WHATSAPP
+══════════════════════════════════════════ */
+function setWhatsApp(phone,name){
+  const clean=phone.replace(/\D/g,'');
+  const intl=clean.startsWith('0')?'254'+clean.slice(1):clean.startsWith('254')?clean:'254'+clean;
+  const msg=encodeURIComponent(`Hello ${name}, I found your listing on NestFinder CUK and I'm interested in viewing the house. Could we arrange a time?`);
+  document.getElementById('cb-wa').href=`https://wa.me/${intl}?text=${msg}`;
+}
+
+/* ══════════════════════════════════════════
+   REVIEWS
+══════════════════════════════════════════ */
+let pickedStar=0;
+
+function pickStar(v){
+  pickedStar=v;
+  document.querySelectorAll('.star-pick').forEach((el,i)=>{
+    el.classList.toggle('on',i<v);
+  });
+}
+
+async function loadReviews(lid){
+  const {data}=await sb.from('reviews').select('*,profiles(full_name)').eq('listing_id',lid).order('created_at',{ascending:false});
+  const list=document.getElementById('review-list');
+  const avgEl=document.getElementById('avg-rating');
+  if(!data||!data.length){
+    list.innerHTML='<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.75rem">No reviews yet — be the first!</div>';
+    avgEl.style.display='none';
+    return;
+  }
+  // avg
+  const avg=data.reduce((s,r)=>s+r.rating,0)/data.length;
+  document.getElementById('avg-stars').innerHTML=Array.from({length:5},(_,i)=>`<svg class="review-star${i<Math.round(avg)?'':' empty'}" viewBox="0 0 24 24" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('');
+  document.getElementById('avg-num').textContent=avg.toFixed(1);
+  document.getElementById('avg-count').textContent=`(${data.length} review${data.length>1?'s':''})`;
+  avgEl.style.display='flex';
+  list.innerHTML=data.map(r=>`<div class="review-item">
+    <div class="review-head"><span class="review-author">${r.profiles?.full_name||'Student'}</span><span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span></div>
+    <div class="review-stars">${Array.from({length:5},(_,i)=>`<svg class="review-star${i<r.rating?'':' empty'}" viewBox="0 0 24 24" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}</div>
+    <div class="review-text">${r.comment||''}</div>
+  </div>`).join('');
+  // hide form if already reviewed
+  if(user){
+    const mine=data.find(r=>r.user_id===user.id);
+    document.getElementById('review-form').style.display=mine?'none':'';
+  }
+}
+
+async function submitReview(){
+  if(!user){toast('Sign in to leave a review','err');return;}
+  if(!pickedStar){toast('Please select a star rating','err');return;}
+  const comment=document.getElementById('review-txt').value.trim();
+  const {error}=await sb.from('reviews').upsert({
+    listing_id:cur.id,user_id:user.id,rating:pickedStar,comment
+  },{onConflict:'listing_id,user_id'});
+  if(error){toast('Review failed: '+error.message,'err');return;}
+  toast('Review submitted — thank you!');
+  document.getElementById('review-txt').value='';
+  pickedStar=0;
+  document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
+  loadReviews(cur.id);
+  // refresh ratings cache
+  if(!ratings[cur.id])ratings[cur.id]={sum:0,count:0,avg:0};
+  ratings[cur.id].count++;
+  ratings[cur.id].sum+=pickedStar;
+  ratings[cur.id].avg=ratings[cur.id].sum/ratings[cur.id].count;
+}
+
+
+initAuth();load();loadRatings();
 </script>
 </body>
 </html>
