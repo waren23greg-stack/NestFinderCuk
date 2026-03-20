@@ -1130,11 +1130,21 @@ async function pay(){
   if(raw.length<9){toast('Enter a valid Safaricom number','err');return;}
   const phone='254'+raw.replace(/^0/,'');sec('wait');
   try{
-    const r=await fetch('/api/mpesa-stk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,listing_id:cur.id,user_id:user.id})});
+    // Create pending payment in Supabase first
+    const {data:pmnt,error:pe}=await sb.from('payments').insert({user_id:user.id,listing_id:cur.id,phone:raw,amount:250,status:'pending'}).select().single();
+    if(pe){sec('pay');toast('Could not create payment — '+pe.message,'err');return;}
+    payId=pmnt.id;
+    // Trigger STK push
+    const r=await fetch('/api/mpesa-stk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,listing_id:cur.id,user_id:user.id,payment_id:pmnt.id,amount:250})});
     const d=await r.json();
-    if(d.CheckoutRequestID){payId=d.payment_id;poll=setInterval(checkPay,4000);}
-    else{sec('pay');toast(d.error||'STK push failed — try again','err');}
-  }catch{sec('pay');toast('Network error','err');}
+    if(d.success&&d.checkout_request_id){
+      await sb.from('payments').update({checkout_request_id:d.checkout_request_id}).eq('id',pmnt.id);
+      poll=setInterval(checkPay,4000);
+    } else {
+      await sb.from('payments').update({status:'failed'}).eq('id',pmnt.id);
+      sec('pay');toast(d.error||'STK push failed — try again','err');
+    }
+  }catch(e){sec('pay');toast('Network error: '+e.message,'err');}
 }
 async function checkPay(){
   if(!payId)return;
