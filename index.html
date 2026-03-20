@@ -441,21 +441,35 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 
 
 /* ── GALLERY LIGHTBOX ── */
-.gallery-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.gallery-ov{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;flex-direction:column;user-select:none}
 .gallery-ov.open{opacity:1;pointer-events:all}
-.gallery-wrap{position:relative;max-width:min(860px,95vw);width:100%;padding:0 3rem}
-.gallery-img{width:100%;max-height:80svh;object-fit:contain;display:block;border-radius:4px}
-.gallery-close{position:absolute;top:-2.5rem;right:0;width:36px;height:36px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.gallery-close svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2}
-.gallery-prev,.gallery-next{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .2s}
-.gallery-prev{left:0}.gallery-next{right:0}
-.gallery-prev:hover,.gallery-next:hover{background:rgba(255,255,255,.22)}
-.gallery-prev svg,.gallery-next svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
-.gallery-dots{display:flex;justify-content:center;gap:6px;margin-top:1rem}
-.gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:background .2s}
-.gallery-dot.on{background:#fff}
-.gallery-counter{text-align:center;font-size:.72rem;color:rgba(255,255,255,.45);letter-spacing:.1em;margin-top:.6rem}
-.gallery-title{text-align:center;font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;margin-bottom:1rem}
+/* top bar */
+.gallery-bar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;flex-shrink:0}
+.gallery-bar-title{font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(255,255,255,.8);letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw}
+.gallery-bar-right{display:flex;align-items:center;gap:8px}
+.gallery-bar-counter{font-size:.7rem;color:rgba(255,255,255,.4);letter-spacing:.1em}
+.g-btn{width:36px;height:36px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .18s;flex-shrink:0}
+.g-btn:hover,.g-btn:active{background:rgba(255,255,255,.22)}
+.g-btn svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2}
+/* zoom controls */
+.gallery-zoom-bar{position:absolute;bottom:5rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.12);border-radius:3px;padding:5px 8px;z-index:3}
+.gallery-zoom-bar .g-btn{width:30px;height:30px;background:transparent;border:none}
+.zoom-level{font-size:.68rem;color:rgba(255,255,255,.55);letter-spacing:.06em;min-width:36px;text-align:center}
+/* image stage */
+.gallery-stage{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.gallery-img-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;will-change:transform}
+.gallery-img{max-width:100%;max-height:100%;object-fit:contain;display:block;pointer-events:none;transition:opacity .25s;border-radius:2px}
+.gallery-img.loading{opacity:.3}
+/* prev/next */
+.gallery-prev,.gallery-next{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:46px;height:46px}
+.gallery-prev{left:.75rem}.gallery-next{right:.75rem}
+/* thumbnails strip */
+.gallery-strip{flex-shrink:0;padding:.6rem 1rem;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;background:rgba(0,0,0,.5)}
+.gallery-strip::-webkit-scrollbar{display:none}
+.g-thumb{width:56px;height:44px;object-fit:cover;cursor:pointer;opacity:.45;transition:opacity .18s;border:1.5px solid transparent;border-radius:2px;flex-shrink:0}
+.g-thumb.on{opacity:1;border-color:var(--gold,#B8955A)}
+/* hint */
+.gallery-hint{position:absolute;bottom:5.5rem;left:50%;transform:translateX(-50%);font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:.08em;pointer-events:none;white-space:nowrap;transition:opacity .4s}
 
 </style>
 </head>
@@ -649,22 +663,45 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 
 
 <!-- PHOTO GALLERY LIGHTBOX -->
-<div class="gallery-ov" id="gallery-ov" onclick="bgCloseGallery(event)">
-  <div class="gallery-wrap">
-    <div class="gallery-title" id="gallery-title"></div>
-    <button class="gallery-close" onclick="closeGallery()">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <img class="gallery-img" id="gallery-img" src="" alt=""/>
-    <button class="gallery-prev" onclick="galleryNav(-1)">
+<div class="gallery-ov" id="gallery-ov">
+  <!-- top bar -->
+  <div class="gallery-bar">
+    <div class="gallery-bar-title" id="gallery-title"></div>
+    <div class="gallery-bar-right">
+      <span class="gallery-bar-counter" id="gallery-counter"></span>
+      <button class="g-btn" onclick="resetZoom()" title="Reset zoom" id="g-reset" style="display:none">
+        <svg viewBox="0 0 24 24"><path d="M3.05 11A9 9 0 1112 21M3 3v6h6"/></svg>
+      </button>
+      <button class="g-btn" onclick="closeGallery()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- image stage -->
+  <div class="gallery-stage" id="gallery-stage">
+    <div class="gallery-img-wrap" id="gallery-img-wrap">
+      <img class="gallery-img" id="gallery-img" src="" alt=""/>
+    </div>
+    <button class="gallery-prev g-btn" onclick="galleryNav(-1)" id="g-prev">
       <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
     </button>
-    <button class="gallery-next" onclick="galleryNav(1)">
+    <button class="gallery-next g-btn" onclick="galleryNav(1)" id="g-next">
       <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
-    <div class="gallery-dots" id="gallery-dots"></div>
-    <div class="gallery-counter" id="gallery-counter"></div>
+    <div class="gallery-hint" id="gallery-hint">Pinch or scroll to zoom · Swipe to navigate</div>
   </div>
+  <!-- zoom bar -->
+  <div class="gallery-zoom-bar">
+    <button class="g-btn" onclick="zoomStep(-1)" title="Zoom out">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+    </button>
+    <span class="zoom-level" id="zoom-level">100%</span>
+    <button class="g-btn" onclick="zoomStep(1)" title="Zoom in">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+    </button>
+  </div>
+  <!-- thumbnails strip -->
+  <div class="gallery-strip" id="gallery-strip"></div>
 </div>
 
 <!-- MODAL -->
@@ -879,50 +916,167 @@ function toast(msg,type=''){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
-/* ── GALLERY ── */
+/* ── GALLERY with pinch zoom + pan + scroll zoom ── */
 let galPhotos=[],galIdx=0;
+let galScale=1,galX=0,galY=0;
+const MIN_SCALE=1,MAX_SCALE=4;
+
 function openGallery(id){
   const l=listings.find(x=>x.id===id);if(!l)return;
-  // collect all photos — use uploaded ones or fallback pool
   const pool=PHOTOS[l.type]||PHOTOS.default;
-  galPhotos=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,3)];
+  // Use full-res Unsplash URLs (remove size constraints for zoom quality)
+  galPhotos=(l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,3)])
+    .map(u=>u.replace(/\?w=\d+/,'?w=1600').replace(/&q=\d+/,'&q=95'));
   galIdx=0;
   document.getElementById('gallery-title').textContent=l.title;
+  resetZoom();
   renderGalleryImg();
   document.getElementById('gallery-ov').classList.add('open');
   document.body.style.overflow='hidden';
+  // fade hint
+  setTimeout(()=>{const h=document.getElementById('gallery-hint');if(h)h.style.opacity='0';},3000);
 }
+
 function renderGalleryImg(){
   const img=document.getElementById('gallery-img');
+  img.classList.add('loading');
+  img.onload=()=>img.classList.remove('loading');
   img.src=galPhotos[galIdx];
   img.alt='Photo '+(galIdx+1);
   document.getElementById('gallery-counter').textContent=(galIdx+1)+' / '+galPhotos.length;
-  // dots
-  const dots=document.getElementById('gallery-dots');
-  dots.innerHTML=galPhotos.map((_,i)=>`<div class="gallery-dot${i===galIdx?' on':''}" onclick="galJump(${i})"></div>`).join('');
-  // hide arrows if only 1 photo
-  document.querySelector('.gallery-prev').style.display=galPhotos.length<2?'none':'';
-  document.querySelector('.gallery-next').style.display=galPhotos.length<2?'none':'';
+  // thumbnails
+  const strip=document.getElementById('gallery-strip');
+  strip.innerHTML=galPhotos.map((p,i)=>`<img class="g-thumb${i===galIdx?' on':''}" src="${p.replace('w=1600','w=160')}" onclick="galJump(${i})" loading="lazy"/>`).join('');
+  strip.style.display=galPhotos.length<2?'none':'flex';
+  document.getElementById('g-prev').style.display=galPhotos.length<2?'none':'flex';
+  document.getElementById('g-next').style.display=galPhotos.length<2?'none':'flex';
+  applyTransform();
 }
+
 function galleryNav(dir){
+  if(galScale>1){resetZoom();return;}
   galIdx=(galIdx+dir+galPhotos.length)%galPhotos.length;
   renderGalleryImg();
 }
-function galJump(i){galIdx=i;renderGalleryImg();}
+function galJump(i){galIdx=i;resetZoom();renderGalleryImg();}
+
+function applyTransform(){
+  const w=document.getElementById('gallery-img-wrap');
+  w.style.transform=`translate(${galX}px,${galY}px) scale(${galScale})`;
+  document.getElementById('zoom-level').textContent=Math.round(galScale*100)+'%';
+  document.getElementById('g-reset').style.display=galScale>1.05?'':'none';
+}
+
+function clampPan(){
+  const stage=document.getElementById('gallery-stage');
+  const img=document.getElementById('gallery-img');
+  const sw=stage.clientWidth,sh=stage.clientHeight;
+  const iw=img.naturalWidth||img.clientWidth,ih=img.naturalHeight||img.clientHeight;
+  const rw=Math.min(sw,iw)*galScale,rh=Math.min(sh,ih)*galScale;
+  const maxX=Math.max(0,(rw-sw)/2);
+  const maxY=Math.max(0,(rh-sh)/2);
+  galX=Math.max(-maxX,Math.min(maxX,galX));
+  galY=Math.max(-maxY,Math.min(maxY,galY));
+}
+
+function zoomStep(dir){
+  const steps=[1,1.5,2,3,4];
+  let idx=steps.findIndex(s=>s>=galScale-0.05);
+  idx=Math.max(0,Math.min(steps.length-1,idx+dir));
+  galScale=steps[idx];
+  if(galScale===1){galX=0;galY=0;}
+  clampPan();applyTransform();
+}
+
+function resetZoom(){galScale=1;galX=0;galY=0;applyTransform();}
+
 function closeGallery(){
   document.getElementById('gallery-ov').classList.remove('open');
   document.body.style.overflow='';
+  resetZoom();
+  const h=document.getElementById('gallery-hint');if(h)h.style.opacity='1';
 }
-function bgCloseGallery(e){if(e.target===e.currentTarget)closeGallery();}
 
-// swipe support for gallery
+// ── SCROLL WHEEL ZOOM ──
+document.getElementById('gallery-stage').addEventListener('wheel',e=>{
+  e.preventDefault();
+  const delta=e.deltaY>0?-0.15:0.15;
+  galScale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,galScale+delta));
+  if(galScale===1){galX=0;galY=0;}
+  clampPan();applyTransform();
+},{passive:false});
+
+// ── MOUSE DRAG TO PAN ──
 (()=>{
-  let sx=0;
-  const ov=document.getElementById('gallery-ov');
-  ov.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;},{passive:true});
-  ov.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>50){galleryNav(dx<0?1:-1);}
+  let dragging=false,lastX=0,lastY=0;
+  const stage=document.getElementById('gallery-stage');
+  stage.addEventListener('mousedown',e=>{
+    if(galScale<=1)return;
+    dragging=true;lastX=e.clientX;lastY=e.clientY;
+    stage.style.cursor='grabbing';
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    galX+=e.clientX-lastX;galY+=e.clientY-lastY;
+    lastX=e.clientX;lastY=e.clientY;
+    clampPan();applyTransform();
+  });
+  window.addEventListener('mouseup',()=>{dragging=false;document.getElementById('gallery-stage').style.cursor='';});
+  // double-click to zoom
+  stage.addEventListener('dblclick',e=>{
+    if(galScale>1){resetZoom();}
+    else{
+      galScale=2.5;
+      const rect=stage.getBoundingClientRect();
+      galX=(rect.width/2-(e.clientX-rect.left))*0.8;
+      galY=(rect.height/2-(e.clientY-rect.top))*0.8;
+      clampPan();
+    }
+    applyTransform();
+  });
+})();
+
+// ── TOUCH: SWIPE + PINCH ZOOM + DRAG PAN ──
+(()=>{
+  const stage=document.getElementById('gallery-stage');
+  let t0=[],lastDist=0,lastMx=0,lastMy=0,moved=false;
+
+  function dist(a,b){return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+  function mid(a,b){return{x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};}
+
+  stage.addEventListener('touchstart',e=>{
+    t0=Array.from(e.touches);moved=false;
+    if(t0.length===2){lastDist=dist(t0[0],t0[1]);}
+    if(t0.length===1){lastMx=t0[0].clientX;lastMy=t0[0].clientY;}
+  },{passive:true});
+
+  stage.addEventListener('touchmove',e=>{
+    const tc=Array.from(e.touches);
+    if(tc.length===2){
+      e.preventDefault();
+      const d=dist(tc[0],tc[1]);
+      const factor=d/lastDist;
+      galScale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,galScale*factor));
+      lastDist=d;
+      // pan to pinch midpoint
+      const m=mid(tc[0],tc[1]);
+      galX+=(m.x-lastMx)*0.5;galY+=(m.y-lastMy)*0.5;
+      lastMx=m.x;lastMy=m.y;
+      clampPan();applyTransform();moved=true;
+    } else if(tc.length===1&&galScale>1){
+      e.preventDefault();
+      galX+=tc[0].clientX-lastMx;galY+=tc[0].clientY-lastMy;
+      lastMx=tc[0].clientX;lastMy=tc[0].clientY;
+      clampPan();applyTransform();moved=true;
+    }
+  },{passive:false});
+
+  let swipeStartX=0;
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===1)swipeStartX=e.touches[0].clientX;},{passive:true});
+  stage.addEventListener('touchend',e=>{
+    if(moved)return;
+    const dx=e.changedTouches[0].clientX-swipeStartX;
+    if(Math.abs(dx)>50&&galScale<=1){galleryNav(dx<0?1:-1);}
   },{passive:true});
 })();
 
