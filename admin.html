@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NestFinder CUK — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-deep: #085041;
+    --green-light: #E1F5EE;
+    --green-mid: #9FE1CB;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --bg: #f3f4f6;
+    --white: #ffffff;
+    --border: #e5e7eb;
+    --sidebar-w: 240px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:var(--sidebar-w); background:var(--green-deep); display:flex;
+    flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:50;
+  }
+  .sidebar-logo {
+    padding:1.5rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.08);
+    font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; color:white;
+  }
+  .sidebar-logo span { color:#FAC775; }
+  .sidebar-logo small { display:block; font-size:0.7rem; color:rgba(255,255,255,0.4); font-weight:400; margin-top:2px; }
+  .sidebar-nav { flex:1; padding:1rem 0.75rem; display:flex; flex-direction:column; gap:4px; }
+  .nav-item {
+    display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0.9rem;
+    border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.65);
+    font-size:0.88rem; font-weight:500; transition:all 0.15s; border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-item:hover { background:rgba(255,255,255,0.08); color:white; }
+  .nav-item.active { background:var(--green); color:white; }
+  .nav-item .icon { font-size:1rem; width:20px; text-align:center; }
+  .sidebar-footer {
+    padding:1rem 0.75rem; border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .sign-out-btn {
+    width:100%; padding:0.6rem 0.9rem; background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6);
+    font-family:'DM Sans',sans-serif; font-size:0.85rem; cursor:pointer; transition:all 0.15s;
+  }
+  .sign-out-btn:hover { background:rgba(220,38,38,0.2); color:#fca5a5; border-color:rgba(220,38,38,0.3); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  .topbar {
+    background:white; border-bottom:1px solid var(--border); padding:0 2rem;
+    height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40;
+  }
+  .topbar h1 { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text); }
+  .admin-badge {
+    background:var(--green-light); color:var(--green-dark); font-size:0.75rem;
+    font-weight:600; padding:0.25rem 0.75rem; border-radius:100px;
+  }
+  .content { padding:2rem; flex:1; }
+
+  /* STATS */
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem; }
+  .stat-card {
+    background:white; border-radius:14px; border:1px solid var(--border);
+    padding:1.25rem; transition:box-shadow 0.2s;
+  }
+  .stat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+  .stat-label { font-size:0.78rem; color:var(--text-muted); font-weight:500; margin-bottom:0.4rem; }
+  .stat-value { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--text); }
+  .stat-sub { font-size:0.75rem; color:var(--green); margin-top:0.2rem; }
+
+  /* SECTION HEADER */
+  .section-head {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;
+  }
+  .section-head h2 { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; }
+  .add-btn {
+    background:var(--green); color:white; border:none; padding:0.6rem 1.2rem;
+    border-radius:10px; font-family:'Syne',sans-serif; font-weight:600; font-size:0.85rem;
+    cursor:pointer; transition:background 0.2s; display:flex; align-items:center; gap:0.4rem;
+  }
+  .add-btn:hover { background:var(--green-dark); }
+
+  /* TABLE */
+  .table-wrap { background:white; border-radius:14px; border:1px solid var(--border); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:var(--bg); }
+  th { padding:0.75rem 1rem; text-align:left; font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  td { padding:0.85rem 1rem; font-size:0.88rem; border-top:1px solid var(--border); vertical-align:middle; }
+  tr:hover td { background:#f9fafb; }
+  .badge {
+    display:inline-block; padding:0.2rem 0.65rem; border-radius:100px;
+    font-size:0.72rem; font-weight:600;
+  }
+  .badge-single { background:#E1F5EE; color:#085041; }
+  .badge-bedsitter { background:#FAEEDA; color:#633806; }
+  .badge-one { background:#E6F1FB; color:#042C53; }
+  .badge-available { background:#E1F5EE; color:#085041; }
+  .badge-taken { background:#fef2f2; color:#991b1b; }
+  .badge-confirmed { background:#E1F5EE; color:#085041; }
+  .badge-pending { background:#FAEEDA; color:#633806; }
+  .badge-failed { background:#fef2f2; color:#991b1b; }
+  .action-btn {
+    padding:0.3rem 0.75rem; border-radius:7px; font-size:0.78rem; font-weight:500;
+    cursor:pointer; transition:all 0.15s; border:1px solid;
+  }
+  .edit-btn { background:var(--green-light); color:var(--green-dark); border-color:var(--green-mid); }
+  .edit-btn:hover { background:var(--green-mid); }
+  .del-btn { background:var(--red-light); color:var(--red); border-color:#fecaca; margin-left:4px; }
+  .del-btn:hover { background:#fee2e2; }
+
+  /* PHOTO THUMBS */
+  .photo-thumbs { display:flex; gap:4px; }
+  .photo-thumb {
+    width:36px; height:36px; border-radius:6px; object-fit:cover;
+    background:var(--green-light); display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem; color:var(--green-dark); font-weight:500; overflow:hidden;
+  }
+  .photo-thumb img { width:100%; height:100%; object-fit:cover; }
+
+  /* MODAL */
+  .overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:200; align-items:center; justify-content:center; padding:1rem;
+  }
+  .overlay.open { display:flex; }
+  .modal {
+    background:white; border-radius:20px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.15);
+    animation:slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-head {
+    padding:1.5rem 1.5rem 0; display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; background:white; z-index:1; padding-bottom:1rem;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-head h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; }
+  .modal-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted); }
+  .modal-body { padding:1.5rem; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-group { margin-bottom:1rem; }
+  .form-group label { display:block; font-size:0.82rem; font-weight:500; margin-bottom:0.35rem; color:var(--text); }
+  .form-group input, .form-group select, .form-group textarea {
+    width:100%; padding:0.7rem 0.9rem; border:1.5px solid var(--border);
+    border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem;
+    color:var(--text); background:white; outline:none; transition:border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--green); }
+  .form-group textarea { resize:vertical; min-height:80px; }
+  .checkbox-row { display:flex; gap:1.5rem; margin-bottom:1rem; }
+  .checkbox-label { display:flex; align-items:center; gap:0.5rem; font-size:0.88rem; cursor:pointer; }
+  .checkbox-label input[type=checkbox] { width:16px; height:16px; accent-color:var(--green); }
+
+  /* PHOTO UPLOAD */
+  .upload-zone {
+    border:2px dashed var(--border); border-radius:12px; padding:1.5rem;
+    text-align:center; cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--green); background:var(--green-light); }
+  .upload-zone p { font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; }
+  .upload-icon { font-size:1.8rem; }
+  .upload-previews { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
+  .preview-item {
+    width:72px; height:72px; border-radius:8px; overflow:hidden; position:relative;
+    border:1px solid var(--border);
+  }
+  .preview-item img { width:100%; height:100%; object-fit:cover; }
+  .preview-item .remove-photo {
+    position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6);
+    color:white; border:none; border-radius:50%; width:18px; height:18px;
+    font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* SAVE BTN */
+  .save-btn {
+    width:100%; padding:0.85rem; background:var(--green); color:white; border:none;
+    border-radius:10px; font-family:'Syne',sans-serif; font-weight:700; font-size:0.95rem;
+    cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+  }
+  .save-btn:hover:not(:disabled) { background:var(--green-dark); }
+  .save-btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .spinner-sm { width:18px; height:18px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; background:var(--green-deep);
+    color:white; padding:0.85rem 1.25rem; border-radius:12px; font-size:0.88rem;
+    font-weight:500; z-index:999; transform:translateY(80px); opacity:0;
+    transition:all 0.3s; pointer-events:none;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.error { background:var(--red); }
+
+  /* PAGE SECTIONS */
+  .page { display:none; }
+  .page.active { display:block; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:3rem; color:var(--text-muted); }
+  .empty-state .icon { font-size:2.5rem; margin-bottom:0.75rem; }
+
+  /* ACCESS DENIED */
+  .access-denied { display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:1rem; }
+
+  @media(max-width:768px) {
+    .sidebar { transform:translateX(-100%); }
+    .main { margin-left:0; }
+    .form-row { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ACCESS DENIED (shown if not admin) -->
+<div id="accessDenied" style="display:none;position:fixed;inset:0;background:white;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
+  <div style="font-size:3rem;">🔒</div>
+  <h2 style="font-family:'Syne',sans-serif;font-size:1.4rem;">Admin Access Only</h2>
+  <p style="color:var(--text-muted);font-size:0.9rem;">This page is restricted to administrators.</p>
+  <a href="login.html" style="background:var(--green);color:white;padding:0.7rem 1.5rem;border-radius:10px;text-decoration:none;font-family:'Syne',sans-serif;font-weight:600;">Go to Login</a>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    Nest<span>Finder</span> CUK
+    <small>Admin Panel</small>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('listings')">
+      <span class="icon">🏠</span> Listings
+    </button>
+    <button class="nav-item" onclick="showPage('payments')">
+      <span class="icon">💳</span> Payments
+    </button>
+    <button class="nav-item" onclick="showPage('users')">
+      <span class="icon">👥</span> Students
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="topbar">
+    <h1 id="pageTitle">Dashboard</h1>
+    <span class="admin-badge">Admin</span>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-label">Total Listings</div><div class="stat-value" id="statListings">—</div><div class="stat-sub">Active houses</div></div>
+        <div class="stat-card"><div class="stat-label">Available Now</div><div class="stat-value" id="statAvailable">—</div><div class="stat-sub">Ready to view</div></div>
+        <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value" id="statStudents">—</div><div class="stat-sub">Registered users</div></div>
+        <div class="stat-card"><div class="stat-label">Total Payments</div><div class="stat-value" id="statPayments">—</div><div class="stat-sub">Viewing fees collected</div></div>
+      </div>
+
+      <div class="section-head">
+        <h2>Recent Payments</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="recentPaymentsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="page" id="page-listings">
+      <div class="section-head">
+        <h2>House Listings</h2>
+        <button class="add-btn" onclick="openListingModal()">+ Add Listing</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Photos</th><th>Title</th><th>Type</th><th>Price</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="listingsBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div>Loading listings...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div class="section-head"><h2>All Payments</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="paymentsBody"><tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="page" id="page-users">
+      <div class="section-head"><h2>Registered Students</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+          <tbody id="usersBody"><tr><td colspan="5"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- LISTING MODAL -->
+<div class="overlay" id="listingOverlay" onclick="closeOnBg(event,'listingOverlay')">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add New Listing</h3>
+      <button class="modal-close" onclick="closeModal('listingOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editingId">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="fTitle" placeholder="e.g. Cosy Single Room — Karen">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="fType">
+            <option value="single">Single Room</option>
+            <option value="bedsitter">Bedsitter</option>
+            <option value="one-bedroom">One Bedroom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly Price (Ksh)</label>
+          <input type="number" id="fPrice" placeholder="e.g. 4500">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="fLocation" placeholder="e.g. Karen Road, 10 min walk">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="fDescription" placeholder="Describe the house — size, condition, surroundings..."></textarea>
+      </div>
+
+      <div class="checkbox-row">
+        <label class="checkbox-label"><input type="checkbox" id="fWater"> Water Included</label>
+        <label class="checkbox-label"><input type="checkbox" id="fWifi"> WiFi Available</label>
+        <label class="checkbox-label"><input type="checkbox" id="fAvailable" checked> Available Now</label>
+      </div>
+
+      <div class="form-group">
+        <label>Caretaker Name</label>
+        <input type="text" id="fCaretakerName" placeholder="e.g. Mama Wanjiku">
+      </div>
+      <div class="form-group">
+        <label>Caretaker Phone</label>
+        <input type="tel" id="fCaretakerPhone" placeholder="07XXXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label>House Photos (max 6)</label>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <div class="upload-icon">📷</div>
+          <p>Click to upload or drag & drop photos here</p>
+          <p style="font-size:0.75rem;margin-top:0.25rem;">JPG, PNG — max 5MB each</p>
+        </div>
+        <input type="file" id="photoInput" multiple accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+        <div class="upload-previews" id="uploadPreviews"></div>
+      </div>
+
+      <div id="formError" style="background:var(--red-light);border:1px solid #fecaca;border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--red);display:none;margin-bottom:1rem;"></div>
+
+      <button class="save-btn" id="saveBtn" onclick="saveListing()">
+        <div class="spinner-sm" id="saveSpinner"></div>
+        <span id="saveBtnText">Save Listing</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://mtycapgbtvpczvswpjpo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ikfawEkiP9A6I9Exk0xN-w_JgqsG7-C';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentAdmin = null;
+let pendingPhotos = [];
+let existingPhotos = [];
+
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+
+  const { data: profile } = await sb.from('profiles').select('role,full_name').eq('id', session.user.id).single();
+
+  if (!profile || profile.role !== 'admin') {
+    document.getElementById('accessDenied').style.display = 'flex';
+    return;
+  }
+
+  currentAdmin = session.user;
+  loadDashboard();
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelector(`[onclick="showPage('${name}')"]`).classList.add('active');
+  const titles = { dashboard:'Dashboard', listings:'House Listings', payments:'Payments', users:'Students' };
+  document.getElementById('pageTitle').textContent = titles[name];
+  if (name === 'listings') loadListings();
+  if (name === 'payments') loadPayments();
+  if (name === 'users') loadUsers();
+}
+
+function toast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+async function loadDashboard() {
+  const [l, p, u] = await Promise.all([
+    sb.from('listings').select('id,available', {count:'exact'}),
+    sb.from('payments').select('id,status', {count:'exact'}),
+    sb.from('profiles').select('id', {count:'exact'}).eq('role','student')
+  ]);
+
+  document.getElementById('statListings').textContent = l.count ?? 0;
+  document.getElementById('statAvailable').textContent = (l.data||[]).filter(x=>x.available).length;
+  document.getElementById('statStudents').textContent = u.count ?? 0;
+  const confirmed = (p.data||[]).filter(x=>x.status==='confirmed');
+  document.getElementById('statPayments').textContent = 'Ksh ' + (confirmed.length * 250).toLocaleString();
+
+  const { data: payments } = await sb.from('payments')
+    .select('*, profiles(full_name), listings(title)')
+    .order('created_at', {ascending:false}).limit(8);
+
+  const tbody = document.getElementById('recentPaymentsBody');
+  if (!payments?.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
+  tbody.innerHTML = payments.map(p => `
+    <tr>
+      <td>${p.profiles?.full_name || '—'}</td>
+      <td>${p.listings?.title || '—'}</td>
+      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+      <td style="font-family:monospace;font-size:0.8rem;">${p.mpesa_ref || '—'}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td>${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+    </tr>`).join('');
+}
+
+async function loadListings() {
+  const { data } = await sb.from('listings').select('*').order('created_at', {ascending:false});
+  const tbody = document.getElementById('listingsBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🏠</div>No listings yet. Add your first one!</div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(h => `
+    <tr>
+      <td>
+        <div class="photo-thumbs">
+          ${(h.photos||[]).slice(0,3).map(url=>`<div class="photo-thumb"><img src="${url}" onerror="this.parentElement.textContent='📷'"></div>`).join('')}
+          ${!(h.photos||[]).length ? '<div class="photo-thumb">📷</div>' : ''}
+        </div>
+      </td>
+      <td style="font-weight:500;max-width:180px;">${h.title}</td>
+      <td><span class="badge badge-${h.type==='one-bedroom'?'one':h.type}">${h.type}</span></td>
+      <td>Ksh ${h.price.toLocaleString()}</td>
+      <td style="font-size:0.82rem;color:var(--text-muted);">${h.location}</td>
+      <td><span class="badge ${h.available?'badge-available':'badge-taken'}">${h.available?'Available':'Taken'}</span></td>
+      <td>
+        <button class="action-btn edit-btn" onclick="editListing('${h.id}')">Edit</button>
+        <button class="action-btn del-btn" onclick="deleteListing('${h.id}','${h.title.replace(/'/g,'')}')">Delete</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadPayments() {
+  const { data } = await sb.from('payments')
+    .select('*, profiles(full_name), listings(title)')
+    .order('created_at', {ascending:false});
+
+  const tbody = document.getElementById('paymentsBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td>${p.profiles?.full_name || '—'}</td>
+      <td>${p.phone || '—'}</td>
+      <td style="max-width:160px;font-size:0.82rem;">${p.listings?.title || '—'}</td>
+      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+      <td style="font-family:monospace;font-size:0.78rem;">${p.mpesa_ref || '—'}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td style="font-size:0.82rem;">${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+      <td>
+        ${p.status==='pending' ? `<button class="action-btn edit-btn" onclick="confirmPayment('${p.id}')">Confirm</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+async function confirmPayment(id) {
+  const { error } = await sb.from('payments').update({status:'confirmed'}).eq('id', id);
+  if (error) { toast('Failed to confirm', true); return; }
+  toast('Payment confirmed ✓');
+  loadPayments();
+}
+
+async function loadUsers() {
+  const { data } = await sb.from('profiles').select('*').order('created_at', {ascending:false});
+  const tbody = document.getElementById('usersBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">👥</div>No students yet.</div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td style="font-weight:500;">${u.full_name || '—'}</td>
+      <td>${u.phone || '—'}</td>
+      <td><span class="badge ${u.role==='admin'?'badge-one':'badge-available'}">${u.role}</span></td>
+      <td style="font-size:0.82rem;">${new Date(u.created_at).toLocaleDateString('en-KE')}</td>
+      <td>
+        ${u.role !== 'admin' ? `<button class="action-btn edit-btn" onclick="makeAdmin('${u.id}')">Make Admin</button>` : '<span style="font-size:0.78rem;color:var(--text-muted);">Admin</span>'}
+      </td>
+    </tr>`).join('');
+}
+
+async function makeAdmin(id) {
+  if (!confirm('Make this user an admin? They will have full access.')) return;
+  await sb.from('profiles').update({role:'admin'}).eq('id', id);
+  toast('User is now an admin');
+  loadUsers();
+}
+
+function openListingModal(data=null) {
+  document.getElementById('editingId').value = '';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fType').value = 'single';
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fLocation').value = '';
+  document.getElementById('fDescription').value = '';
+  document.getElementById('fWater').checked = false;
+  document.getElementById('fWifi').checked = false;
+  document.getElementById('fAvailable').checked = true;
+  document.getElementById('fCaretakerName').value = '';
+  document.getElementById('fCaretakerPhone').value = '';
+  document.getElementById('modalTitle').textContent = 'Add New Listing';
+  document.getElementById('saveBtnText').textContent = 'Save Listing';
+  pendingPhotos = [];
+  existingPhotos = [];
+  renderPreviews();
+  document.getElementById('formError').style.display = 'none';
+  document.getElementById('listingOverlay').classList.add('open');
+}
+
+async function editListing(id) {
+  const { data: h } = await sb.from('listings').select('*').eq('id', id).single();
+  const { data: c } = await sb.from('caretaker_contacts').select('*').eq('listing_id', id).single();
+
+  document.getElementById('editingId').value = id;
+  document.getElementById('fTitle').value = h.title;
+  document.getElementById('fType').value = h.type;
+  document.getElementById('fPrice').value = h.price;
+  document.getElementById('fLocation').value = h.location;
+  document.getElementById('fDescription').value = h.description || '';
+  document.getElementById('fWater').checked = h.water_included;
+  document.getElementById('fWifi').checked = h.wifi_available;
+  document.getElementById('fAvailable').checked = h.available;
+  document.getElementById('fCaretakerName').value = c?.caretaker_name || '';
+  document.getElementById('fCaretakerPhone').value = c?.phone || '';
+  document.getElementById('modalTitle').textContent = 'Edit Listing';
+  document.getElementById('saveBtnText').textContent = 'Update Listing';
+  pendingPhotos = [];
+  existingPhotos = h.photos || [];
+  renderPreviews();
+  document.getElementById('formError').style.display = 'none';
+  document.getElementById('listingOverlay').classList.add('open');
+}
+
+function handlePhotoSelect(e) {
+  const files = Array.from(e.target.files);
+  const total = existingPhotos.length + pendingPhotos.length + files.length;
+  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
+  pendingPhotos.push(...files);
+  renderPreviews();
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  const total = existingPhotos.length + pendingPhotos.length + files.length;
+  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
+  pendingPhotos.push(...files);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const container = document.getElementById('uploadPreviews');
+  const existingHtml = existingPhotos.map((url, i) => `
+    <div class="preview-item">
+      <img src="${url}">
+      <button class="remove-photo" onclick="removeExisting(${i})">✕</button>
+    </div>`).join('');
+  const pendingHtml = pendingPhotos.map((f, i) => `
+    <div class="preview-item">
+      <img src="${URL.createObjectURL(f)}">
+      <button class="remove-photo" onclick="removePending(${i})">✕</button>
+    </div>`).join('');
+  container.innerHTML = existingHtml + pendingHtml;
+}
+
+function removeExisting(i) { existingPhotos.splice(i, 1); renderPreviews(); }
+function removePending(i) { pendingPhotos.splice(i, 1); renderPreviews(); }
+
+function showFormError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function saveListing() {
+  const title = document.getElementById('fTitle').value.trim();
+  const type = document.getElementById('fType').value;
+  const price = parseInt(document.getElementById('fPrice').value);
+  const location = document.getElementById('fLocation').value.trim();
+  const description = document.getElementById('fDescription').value.trim();
+  const water_included = document.getElementById('fWater').checked;
+  const wifi_available = document.getElementById('fWifi').checked;
+  const available = document.getElementById('fAvailable').checked;
+  const caretakerName = document.getElementById('fCaretakerName').value.trim();
+  const caretakerPhone = document.getElementById('fCaretakerPhone').value.trim();
+  const editingId = document.getElementById('editingId').value;
+
+  if (!title || !price || !location) { showFormError('Title, price, and location are required.'); return; }
+  if (!caretakerName || !caretakerPhone) { showFormError('Caretaker name and phone are required.'); return; }
+
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('saveSpinner').style.display = 'block';
+  document.getElementById('saveBtnText').textContent = 'Saving...';
+  document.getElementById('formError').style.display = 'none';
+
+  // Upload new photos
+  let uploadedUrls = [...existingPhotos];
+  for (const file of pendingPhotos) {
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: upErr } = await sb.storage.from('house-photos').upload(path, file);
+    if (upErr) { showFormError('Photo upload failed: ' + upErr.message); resetSaveBtn(); return; }
+    const { data: urlData } = sb.storage.from('house-photos').getPublicUrl(path);
+    uploadedUrls.push(urlData.publicUrl);
+  }
+
+  const payload = { title, type, price, location, description, water_included, wifi_available, available, photos: uploadedUrls };
+
+  let listingId = editingId;
+  if (editingId) {
+    const { error } = await sb.from('listings').update(payload).eq('id', editingId);
+    if (error) { showFormError(error.message); resetSaveBtn(); return; }
+  } else {
+    const { data, error } = await sb.from('listings').insert(payload).select().single();
+    if (error) { showFormError(error.message); resetSaveBtn(); return; }
+    listingId = data.id;
+  }
+
+  // Save caretaker contact
+  const { data: existing } = await sb.from('caretaker_contacts').select('id').eq('listing_id', listingId).single();
+  if (existing) {
+    await sb.from('caretaker_contacts').update({ caretaker_name: caretakerName, phone: caretakerPhone }).eq('listing_id', listingId);
+  } else {
+    await sb.from('caretaker_contacts').insert({ listing_id: listingId, caretaker_name: caretakerName, phone: caretakerPhone });
+  }
+
+  resetSaveBtn();
+  closeModal('listingOverlay');
+  toast(editingId ? 'Listing updated ✓' : 'Listing added ✓');
+  loadListings();
+}
+
+function resetSaveBtn() {
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('saveSpinner').style.display = 'none';
+  document.getElementById('saveBtnText').textContent = document.getElementById('editingId').value ? 'Update Listing' : 'Save Listing';
+}
+
+async function deleteListing(id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  const { error } = await sb.from('listings').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, true); return; }
+  toast('Listing deleted');
+  loadListings();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeOnBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+init();
+</script>
+</body>
+</html>
