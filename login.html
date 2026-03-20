@@ -449,6 +449,12 @@ body{
   .field input{height:46px}
   .submit-btn{height:48px}
 }
+
+/* forgot password */
+.forgot-row{text-align:right;margin-top:-.4rem;margin-bottom:.9rem}
+.forgot-link{font-size:.76rem;color:var(--gold-d);text-decoration:none;border-bottom:1px solid rgba(139,107,53,.25);transition:all var(--t)}
+.forgot-link:hover{color:var(--gold);border-color:var(--gold)}
+
 </style>
 </head>
 <body>
@@ -559,6 +565,9 @@ body{
               </button>
             </div>
           </div>
+          <div class="forgot-row">
+            <a href="#" class="forgot-link" onclick="showPanel('p-reset');return false">Forgot password?</a>
+          </div>
           <div>
             <button class="submit-btn" id="in-btn" onclick="doSignIn()">
               <span id="in-btn-lbl">Sign In</span>
@@ -619,6 +628,91 @@ body{
               <svg id="reg-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
             <div class="switch-row">Already have an account? <a href="#" onclick="switchTo('in');return false">Sign in →</a></div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- FORGOT PASSWORD PANEL -->
+      <div class="panel" id="p-reset">
+        <div class="stagger">
+          <div>
+            <div class="form-title">Reset <em>password.</em></div>
+            <p class="form-sub">Enter your email and we'll send you a reset link right away.</p>
+          </div>
+          <div class="msg" id="reset-msg">
+            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="reset-msg-txt"></span>
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <div class="field-inner">
+              <input type="email" id="reset-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
+              <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+          </div>
+          <div>
+            <button class="submit-btn" id="reset-btn" onclick="doReset()">
+              <span id="reset-btn-lbl">Send Reset Link</span>
+              <svg id="reset-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <div class="switch-row">Remembered it? <a href="#" onclick="switchTo('in');return false">Back to Sign In →</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESET EMAIL SENT SCREEN -->
+      <div class="panel" id="p-reset-sent">
+        <div class="special">
+          <div class="special-ico">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div class="special-t">Check your inbox.</div>
+          <p class="special-sub">A password reset link has been sent to<br/><span class="special-email" id="reset-sent-email">—</span></p>
+          <p class="special-sub" style="margin-top:-.5rem">Click the link in the email, then set your new password.</p>
+          <button class="submit-btn" style="max-width:240px;margin:0 auto" onclick="switchTo('in')">
+            Back to Sign In
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- NEW PASSWORD PANEL (after clicking reset link in email) -->
+      <div class="panel" id="p-newpass">
+        <div class="stagger">
+          <div>
+            <div class="form-title">New <em>password.</em></div>
+            <p class="form-sub">Choose a strong new password for your NestFinder account.</p>
+          </div>
+          <div class="msg" id="newpass-msg">
+            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="newpass-msg-txt"></span>
+          </div>
+          <div class="field">
+            <label>New Password</label>
+            <div class="field-inner">
+              <input type="password" id="newpass-1" placeholder="Min. 6 characters" autocomplete="new-password"/>
+              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <button class="eye-btn" type="button" onclick="toggleEye('newpass-1',this)" tabindex="-1">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Confirm New Password</label>
+            <div class="field-inner">
+              <input type="password" id="newpass-2" placeholder="Repeat your new password" autocomplete="new-password"/>
+              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <button class="eye-btn" type="button" onclick="toggleEye('newpass-2',this)" tabindex="-1">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div>
+            <button class="submit-btn" id="newpass-btn" onclick="doNewPass()">
+              <span id="newpass-btn-lbl">Set New Password</span>
+              <svg id="newpass-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
       </div>
@@ -789,11 +883,60 @@ function showDone(name){
   showPanel('p-done');
 }
 
+
+/* ── FORGOT / RESET PASSWORD ── */
+async function doReset(){
+  clearMsg('reset-msg');
+  const email=document.getElementById('reset-email').value.trim();
+  if(!email){showMsg('reset-msg','Please enter your email address.');return;}
+  setLoading('reset-btn','reset-arrow',true);
+  const {error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo: window.location.origin+'/login.html'
+  });
+  setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
+  if(error){showMsg('reset-msg',error.message);return;}
+  document.getElementById('reset-sent-email').textContent=email;
+  showPanel('p-reset-sent');
+}
+
+/* ── SET NEW PASSWORD (after clicking email link) ── */
+async function doNewPass(){
+  clearMsg('newpass-msg');
+  const p1=document.getElementById('newpass-1').value;
+  const p2=document.getElementById('newpass-2').value;
+  if(!p1||p1.length<6){showMsg('newpass-msg','Password must be at least 6 characters.');return;}
+  if(p1!==p2){showMsg('newpass-msg','Passwords do not match.');return;}
+  setLoading('newpass-btn','newpass-arrow',true);
+  const {error}=await sb.auth.updateUser({password:p1});
+  setLoading('newpass-btn','newpass-arrow',false,'Set New Password');
+  if(error){showMsg('newpass-msg',error.message);return;}
+  showMsg('newpass-msg','Password updated! Signing you in…','ok');
+  setTimeout(()=>{location.href='index.html';},1800);
+}
+
+/* ── DETECT RESET LINK (Supabase puts #access_token in URL) ── */
+(async()=>{
+  const hash=new URLSearchParams(window.location.hash.slice(1));
+  const type=hash.get('type');
+  const access=hash.get('access_token');
+  const refresh=hash.get('refresh_token');
+  if(type==='recovery'&&access){
+    // Set the session so updateUser works
+    await sb.auth.setSession({access_token:access,refresh_token:refresh||''});
+    document.getElementById('tabs').style.display='none';
+    showPanel('p-newpass');
+    // Clean the URL
+    history.replaceState(null,'',window.location.pathname);
+  }
+})();
+
 /* ── ENTER KEY ── */
 document.addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     if(document.getElementById('p-in').classList.contains('on'))doSignIn();
     else if(document.getElementById('p-reg').classList.contains('on'))doRegister();
+    else if(document.getElementById('p-reset').classList.contains('on'))doReset();
+    else if(document.getElementById('p-newpass').classList.contains('on'))doNewPass();
   }
 });
 </script>
