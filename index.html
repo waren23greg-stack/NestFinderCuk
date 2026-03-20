@@ -521,6 +521,29 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .lcard-rating{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
 .lcard-rating svg{width:10px;height:10px;fill:var(--gold);stroke:none}
 
+
+/* ── MODAL PREVIEW SECTION ── */
+.m-preview{padding:0}
+.m-photo-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 1.75rem 1rem;margin-top:.25rem}
+.m-photo-strip::-webkit-scrollbar{display:none}
+.m-photo-strip img{height:140px;min-width:200px;max-width:240px;object-fit:cover;border-radius:3px;cursor:zoom-in;flex-shrink:0;transition:opacity .2s}
+.m-photo-strip img:hover{opacity:.88}
+.m-photo-single{width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in}
+.m-desc{font-size:.82rem;color:var(--ink);line-height:1.7;padding:0 1.75rem .75rem;font-weight:300}
+.m-amenities{display:flex;gap:8px;flex-wrap:wrap;padding:0 1.75rem .75rem}
+.m-amenity{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--linen);border:1px solid var(--border);font-size:.68rem;color:var(--ink);border-radius:12px}
+.m-amenity svg{width:11px;height:11px;stroke:var(--gold);fill:none;stroke-width:1.8}
+/* CTA section — invite not demand */
+.m-cta-banner{margin:0 1.75rem 1.25rem;background:var(--dark);padding:1.25rem 1.5rem;border-radius:3px;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.m-cta-left{flex:1}
+.m-cta-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#fff;margin-bottom:.2rem}
+.m-cta-sub{font-size:.72rem;color:rgba(255,255,255,.45);line-height:1.5}
+.m-cta-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold-l);white-space:nowrap}
+.m-cta-price small{font-family:'Jost',sans-serif;font-size:.62rem;color:rgba(255,255,255,.35);display:block;text-align:right;margin-top:1px;letter-spacing:.06em;text-transform:uppercase}
+/* sections visibility */
+#preview-sec{display:none}
+#preview-sec.on{display:block}
+
 </style>
 </head>
 <body>
@@ -780,19 +803,55 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   <div class="modal">
     <div class="m-head">
       <div>
-        <div class="m-tag"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Caretaker Contact</div>
+        <div class="m-tag"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Verified Listing</div>
         <div class="m-title" id="m-title">House Details</div>
       </div>
       <button class="m-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="m-body">
-      <div class="m-grid">
-        <div class="m-det"><div class="m-det-l">Room Type</div><div class="m-det-v" id="m-type">—</div></div>
-        <div class="m-det"><div class="m-det-l">Monthly Rent</div><div class="m-det-v" id="m-price">—</div></div>
-        <div class="m-det"><div class="m-det-l">Location</div><div class="m-det-v" id="m-loc">—</div></div>
-        <div class="m-det"><div class="m-det-l">Status</div><div class="m-det-v" id="m-status" style="color:var(--gold)">Available</div></div>
+
+    <!-- PREVIEW SECTION — shown first, always free -->
+    <div id="preview-sec" class="m-preview">
+      <div id="m-photos" class="m-photo-strip"></div>
+      <div class="m-body" style="padding-top:0">
+        <div class="m-grid">
+          <div class="m-det"><div class="m-det-l">Room Type</div><div class="m-det-v" id="m-type">—</div></div>
+          <div class="m-det"><div class="m-det-l">Monthly Rent</div><div class="m-det-v" id="m-price">—</div></div>
+          <div class="m-det"><div class="m-det-l">Location</div><div class="m-det-v" id="m-loc">—</div></div>
+          <div class="m-det"><div class="m-det-l">Status</div><div class="m-det-v" id="m-status" style="color:var(--gold)">Available</div></div>
+        </div>
+        <div id="m-amenities-wrap" class="m-amenities"></div>
+        <div id="m-desc-wrap" class="m-desc" style="display:none"></div>
       </div>
-      <div id="pay-sec" class="on">
+      <!-- CTA banner — invite to get contact -->
+      <div class="m-cta-banner" id="m-cta-banner">
+        <div class="m-cta-left">
+          <div class="m-cta-title">Interested in this house?</div>
+          <div class="m-cta-sub">Get the caretaker's number and call to arrange a viewing at your convenience.</div>
+        </div>
+        <div>
+          <div class="m-cta-price">Ksh 250<small>One-time fee</small></div>
+        </div>
+      </div>
+      <div style="padding:0 1.75rem 1.5rem">
+        <button class="btn btn-gold btn-full" onclick="sec('pay')" id="btn-get-contact">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 011.72 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>
+          Get Caretaker Contact
+        </button>
+        <p style="font-size:.67rem;color:var(--muted);text-align:center;margin-top:.6rem">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;stroke:#2D6A4F"><polyline points="20 6 9 17 4 12"/></svg>
+          You only pay when you want the caretaker's number — browsing is always free
+        </p>
+      </div>
+    </div>
+
+    <div class="m-body" id="m-pay-body">
+      <div class="m-grid" id="m-pay-details" style="display:none">
+        <div class="m-det"><div class="m-det-l">Room Type</div><div class="m-det-v" id="m-type2">—</div></div>
+        <div class="m-det"><div class="m-det-l">Monthly Rent</div><div class="m-det-v" id="m-price2">—</div></div>
+        <div class="m-det"><div class="m-det-l">Location</div><div class="m-det-v" id="m-loc2">—</div></div>
+        <div class="m-det"><div class="m-det-l">Status</div><div class="m-det-v" id="m-status2" style="color:var(--gold)">Available</div></div>
+      </div>
+      <div id="pay-sec" class="on"><button onclick="sec('preview')" style="background:none;border:none;font-family:'Jost',sans-serif;font-size:.7rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:5px;padding:.5rem 0;-webkit-tap-highlight-color:transparent;margin-bottom:.25rem"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to listing</button>
         <div class="divider"></div>
         <div class="mpesa-row">
           <div class="mpesa-logo"><span>M-PESA</span></div>
@@ -981,18 +1040,70 @@ function fav(e,id){
 }
 async function openListing(id){
   const l=listings.find(x=>x.id===id);if(!l)return;cur=l;
+  // Fill all title/type/price/loc fields (both preview + pay views)
+  ['','2'].forEach(sfx=>{
+    const t=document.getElementById('m-type'+sfx);
+    const p=document.getElementById('m-price'+sfx);
+    const loc=document.getElementById('m-loc'+sfx);
+    const st=document.getElementById('m-status'+sfx);
+    if(t)t.textContent=TL[l.type]||l.type;
+    if(p)p.textContent='Ksh '+(l.price||0).toLocaleString()+' / mo';
+    if(loc)loc.textContent=l.location;
+    if(st)st.textContent=l.available?'Available Now':'Currently Taken';
+  });
   document.getElementById('m-title').textContent=l.title;
-  document.getElementById('m-type').textContent=TL[l.type]||l.type;
-  document.getElementById('m-price').textContent='Ksh '+(l.price||0).toLocaleString()+' / mo';
-  document.getElementById('m-loc').textContent=l.location;
-  document.getElementById('m-status').textContent=l.available?'Available Now':'Currently Taken';
-  if(user){const {data}=await sb.from('payments').select('id').eq('user_id',user.id).eq('listing_id',id).eq('status','confirmed').maybeSingle();if(data){await showContact(id);sec('succ');openOv();return;}}
-  sec('pay');openOv();
+
+  // Photos in modal preview strip
+  const photoWrap=document.getElementById('m-photos');
+  if(photoWrap){
+    const pool=PHOTOS[l.type]||PHOTOS.default;
+    const imgs=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,2)];
+    photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${l.title}"/>`).join('');
+    photoWrap.style.display=imgs.length?'flex':'none';
+  }
+
+  // Amenities
+  const amenWrap=document.getElementById('m-amenities-wrap');
+  if(amenWrap){
+    const items=[];
+    if(l.water_included)items.push('<div class="m-amenity"><svg viewBox="0 0 24 24"><path d="M12 2C8.69 2 6 4.69 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.31-2.69-6-6-6z"/></svg>Water Included</div>');
+    if(l.wifi_available)items.push('<div class="m-amenity"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi Available</div>');
+    amenWrap.innerHTML=items.join('');
+    amenWrap.style.display=items.length?'flex':'none';
+  }
+
+  // Description
+  const descWrap=document.getElementById('m-desc-wrap');
+  if(descWrap&&l.description){
+    descWrap.textContent=l.description;
+    descWrap.style.display='block';
+  }else if(descWrap){descWrap.style.display='none';}
+
+  // Already paid? → skip preview and show contact directly
+  if(user){
+    const {data}=await sb.from('payments').select('id').eq('user_id',user.id).eq('listing_id',id).eq('status','confirmed').maybeSingle();
+    if(data){await showContact(id);sec('succ');openOv();return;}
+  }
+  // Show preview first
+  sec('preview');
+  openOv();
 }
 function openOv(){document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';clearInterval(poll);sec('pay');document.getElementById('ph-inp').value='';}
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';clearInterval(poll);document.getElementById('ph-inp').value='';}
 function bgClose(e){if(e.target===e.currentTarget)closeModal();}
-function sec(s){['pay','wait','succ'].forEach(x=>document.getElementById(x+'-sec').className=x===s?x+'-sec on':x+'-sec');}
+function sec(s){
+  // hide/show preview vs pay/wait/succ
+  const prev=document.getElementById('preview-sec');
+  const payBody=document.getElementById('m-pay-body');
+  if(s==='preview'){
+    if(prev)prev.classList.add('on');
+    if(payBody)payBody.style.display='none';
+  } else {
+    if(prev)prev.classList.remove('on');
+    if(payBody)payBody.style.display='';
+  }
+  ['pay','wait','succ'].forEach(x=>document.getElementById(x+'-sec').className=x===s?x+'-sec on':x+'-sec');
+}
 async function pay(){
   if(!user){toast('Please sign in first','err');closeModal();setTimeout(()=>location.href='login.html',600);return;}
   const raw=document.getElementById('ph-inp').value.replace(/\s/g,'');
