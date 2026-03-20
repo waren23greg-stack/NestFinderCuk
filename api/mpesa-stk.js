@@ -1,26 +1,18 @@
-// netlify/functions/mpesa-stk.js
-// Netlify serverless function — handles M-Pesa STK Push
+// api/mpesa-stk.js
+// Vercel serverless function — handles M-Pesa STK Push
 
-exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  };
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { phone, listing_id, user_id, amount = 250 } = JSON.parse(event.body);
+    const { phone, listing_id, user_id, amount = 250 } = req.body;
 
     if (!phone || !listing_id || !user_id) {
-      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing required fields' }) };
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Format phone: 0712345678 → 254712345678
@@ -50,12 +42,13 @@ exports.handler = async (event) => {
     const accessToken = tokenData.access_token;
 
     if (!accessToken) {
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to get M-Pesa token' }) };
+      return res.status(500).json({ error: 'Failed to get M-Pesa token. Check your consumer key/secret.' });
     }
 
     // Step 2: Generate timestamp & password
     const now = new Date();
-    const timestamp = now.getFullYear().toString() +
+    const timestamp =
+      now.getFullYear().toString() +
       String(now.getMonth() + 1).padStart(2, '0') +
       String(now.getDate()).padStart(2, '0') +
       String(now.getHours()).padStart(2, '0') +
@@ -82,35 +75,25 @@ exports.handler = async (event) => {
         PhoneNumber: formattedPhone,
         CallBackURL: CALLBACK_URL,
         AccountReference: `NestFinder-${listing_id.slice(0, 8)}`,
-        TransactionDesc: `NestFinder CUK viewing fee - Ksh ${amount}`
+        TransactionDesc: `NestFinder CUK viewing fee Ksh ${amount}`
       })
     });
 
     const stkData = await stkRes.json();
 
     if (stkData.ResponseCode === '0') {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          checkout_request_id: stkData.CheckoutRequestID,
-          message: 'STK push sent. Check your phone.'
-        })
-      };
+      return res.status(200).json({
+        success: true,
+        checkout_request_id: stkData.CheckoutRequestID,
+        message: 'STK push sent. Enter your M-Pesa PIN on your phone.'
+      });
     } else {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: stkData.errorMessage || stkData.ResponseDescription || 'STK push failed' })
-      };
+      return res.status(400).json({
+        error: stkData.errorMessage || stkData.ResponseDescription || 'STK push failed'
+      });
     }
 
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: 'Server error: ' + err.message })
-    };
+    return res.status(500).json({ error: 'Server error: ' + err.message });
   }
-};
+}

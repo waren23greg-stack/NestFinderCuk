@@ -1,9 +1,9 @@
 // api/mpesa-callback.js
 // Safaricom calls this URL when payment is confirmed or fails
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
