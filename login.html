@@ -891,7 +891,7 @@ async function doReset(){
   if(!email){showMsg('reset-msg','Please enter your email address.');return;}
   setLoading('reset-btn','reset-arrow',true);
   const {error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo: window.location.origin+'/login.html'
+    redirectTo: 'https://nest-finder-cuk.vercel.app/login.html'
   });
   setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
   if(error){showMsg('reset-msg',error.message);return;}

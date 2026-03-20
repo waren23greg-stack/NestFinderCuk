@@ -488,7 +488,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   <div class="hero-content">
     <div class="hero-eyebrow">The Cooperative University of Kenya</div>
     <h1>Find Your <em>Perfect</em><br/>Student Home</h1>
-    <p class="hero-sub">Safe, verified, affordable housing near CUK. No scammers. No wasted trips. Browse, pay securely, and move in.</p>
+    <p class="hero-sub">Browse real photos for free. Pay Ksh 250 once to unlock the caretaker's number, call to arrange a viewing, and move in.</p>
     <div class="hero-btns">
       <a href="#listings" class="btn btn-gold">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -499,7 +499,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <div class="hero-rule">
       <div><div class="stat-n" id="stat-n">—</div><div class="stat-l">Verified Listings</div></div>
       <div><div class="stat-n">3</div><div class="stat-l">Room Types</div></div>
-      <div><div class="stat-n">Ksh 250</div><div class="stat-l">Viewing Fee</div></div>
+      <div><div class="stat-n">Ksh 250</div><div class="stat-l">Contact Fee</div></div>
     </div>
   </div>
 </section>
@@ -560,7 +560,15 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 <div id="listings" class="listings-wrap">
   <div class="sec-header">
     <div><p class="sec-label">Available Now</p><h2 class="sec-title">Verified Listings</h2></div>
-    <span id="res-count" style="font-size:.74rem;color:var(--muted);letter-spacing:.04em"></span>
+    <span style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap">
+      <span id="res-count" style="font-size:.74rem;color:var(--muted);letter-spacing:.04em"></span>
+      <span style="font-size:.68rem;color:var(--muted);display:flex;align-items:center;gap:5px;border-left:1px solid var(--border);padding-left:1.25rem">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Photos free &nbsp;·&nbsp;
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+        Pay Ksh 250 to get caretaker contact
+      </span>
+    </span>
   </div>
   <div class="lg" id="lg">
     <div class="lcard" style="pointer-events:none">
@@ -581,9 +589,9 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <h2 class="sec-title">How NestFinder Works</h2>
     <div class="steps">
       <div class="step"><div class="step-ico"><div class="step-n">1</div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div><div class="step-t">Browse</div><p class="step-d">Filter by room type. See up to 6 real photos per listing.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">2</div><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="step-t">Choose</div><p class="step-d">Found one you like? Unlock the caretaker contact with Ksh 250.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">3</div><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div><div class="step-t">Pay M-Pesa</div><p class="step-d">Enter your Safaricom number. STK push arrives instantly.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">4</div><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div><div class="step-t">Get Contact</div><p class="step-d">Caretaker number revealed instantly after payment.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">2</div><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="step-t">Choose</div><p class="step-d">Like what you see? Pay Ksh 250 once to get the caretaker's phone number.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">3</div><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div><div class="step-t">Pay M-Pesa</div><p class="step-d">Enter your Safaricom number. M-Pesa STK push arrives in seconds.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">4</div><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div><div class="step-t">Get Contact</div><p class="step-d">Caretaker's phone number revealed instantly. Call to book a viewing.</p></div></div>
       <div class="step"><div class="step-ico"><div class="step-n">5</div><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div><div><div class="step-t">Move In</div><p class="step-d">Visit, confirm it suits you, and settle in.</p></div></div>
     </div>
   </div>
@@ -597,7 +605,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     </div>
     <div class="tgrid">
       <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="titem-t">Verified Only</div><p class="titem-d">Every listing personally inspected by admin before going live.</p></div>
-      <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div class="titem-t">Secure M-Pesa</div><p class="titem-d">Ksh 250 via official Safaricom STK push — no cash, no risk.</p></div>
+      <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div class="titem-t">Secure M-Pesa</div><p class="titem-d">Pay Ksh 250 via M-Pesa to unlock a caretaker contact. Photos are always free.</p></div>
       <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div><div class="titem-t">Real Photos</div><p class="titem-d">Up to 6 actual house photos per listing. No stock images.</p></div>
       <div class="titem" style="border-right:none"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="titem-t">CUK Students Only</div><p class="titem-d">Built exclusively for Cooperative University of Kenya students.</p></div>
     </div>
@@ -626,7 +634,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   <div class="modal">
     <div class="m-head">
       <div>
-        <div class="m-tag"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Verified Listing</div>
+        <div class="m-tag"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Caretaker Contact</div>
         <div class="m-title" id="m-title">House Details</div>
       </div>
       <button class="m-close" onclick="closeModal()" aria-label="Close"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -642,11 +650,18 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
         <div class="divider"></div>
         <div class="mpesa-row">
           <div class="mpesa-logo"><span>M-PESA</span></div>
-          <div class="mpesa-info"><strong>Lipa Na M-Pesa</strong>Pay securely via STK push to your Safaricom number</div>
+          <div class="mpesa-info"><strong>Lipa Na M-Pesa — Ksh 250</strong>Pay once to unlock the caretaker's phone number for this listing.</div>
         </div>
         <div class="fee-row">
-          <div><div style="font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">One-time Viewing Fee</div><div class="fee-num">Ksh 250</div></div>
-          <div class="fee-note">Unlocks caretaker contact once M-Pesa is confirmed</div>
+          <div>
+  <div style="font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">One-time Contact Fee</div>
+  <div class="fee-num">Ksh 250</div>
+  <div style="font-size:.68rem;color:var(--ok,#2D6A4F);margin-top:.3rem;display:flex;align-items:center;gap:4px">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Photos &amp; details always free
+  </div>
+</div>
+          <div class="fee-note">Get the caretaker's phone number instantly. Photos are always free.</div>
         </div>
         <div class="ph-wrap">
           <div class="ph-pre">
@@ -659,7 +674,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="3"/></svg>
           Send STK Push — Ksh 250
         </button>
-        <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:.65rem">Check your phone and enter your M-Pesa PIN when prompted</p>
+        <p style="font-size:.68rem;color:var(--muted);text-align:center;margin-top:.65rem">After payment, the caretaker's number is revealed instantly. Call to arrange a viewing.</p>
       </div>
       <div id="wait-sec">
         <div class="divider"></div>
@@ -673,7 +688,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
       <div id="succ-sec">
         <div class="divider"></div>
         <div class="contact-box">
-          <div class="cb-label">Caretaker Contact Unlocked</div>
+          <div class="cb-label">Contact Unlocked — Call to Arrange Viewing</div>
           <div class="cb-name" id="cb-name">—</div>
           <div class="cb-phone" id="cb-phone">—</div>
           <a id="cb-call" href="#" class="btn btn-gold btn-full" style="margin-top:1.1rem">
@@ -765,8 +780,8 @@ function render(list){
     <div class="lcard-foot">
       <div class="lcard-price">Ksh ${(l.price||0).toLocaleString()}<span>/ mo</span></div>
       <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="3"/></svg>
-        Unlock
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>
+        Get Contact
       </button>
     </div>
   </div>
