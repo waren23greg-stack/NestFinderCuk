@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NestFinder CUK — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-deep: #085041;
+    --green-light: #E1F5EE;
+    --green-mid: #5DCAA5;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --border: rgba(0,0,0,0.1);
+    --white: #ffffff;
+    --error: #dc2626;
+    --error-bg: #fef2f2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--white);
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: var(--green-deep);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem;
+    overflow: hidden;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -60px;
+    width: 300px; height: 300px;
+    background: rgba(29,158,117,0.15);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .left-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    color: white;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .left-logo span { color: #FAC775; }
+
+  .left-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .left-content h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    color: white;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    margin-bottom: 1.25rem;
+  }
+
+  .left-content h2 span { color: #9FE1CB; }
+
+  .left-content p {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 340px;
+  }
+
+  .left-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .left-stat {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 0.9rem 1.2rem;
+    flex: 1;
+  }
+
+  .left-stat strong {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #FAC775;
+  }
+
+  .left-stat span {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.55);
+  }
+
+  .left-footer {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.35);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    background: #f9fafb;
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .auth-tabs {
+    display: flex;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 2rem;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 0.65rem;
+    border: none;
+    background: none;
+    border-radius: 9px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+
+  .tab-btn.active {
+    background: var(--green);
+    color: white;
+    box-shadow: 0 2px 8px rgba(29,158,117,0.3);
+  }
+
+  .auth-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    margin-bottom: 0.4rem;
+  }
+
+  .auth-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 1.75rem;
+    line-height: 1.6;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-group input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(29,158,117,0.1);
+  }
+
+  .form-group input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+  }
+
+  .input-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+  }
+
+  .error-msg {
+    background: var(--error-bg);
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--error);
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .success-msg {
+    background: var(--green-light);
+    border: 1px solid #9FE1CB;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: var(--green-dark);
+    margin-bottom: 1rem;
+    display: none;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(29,158,117,0.3);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spinner-sm {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .terms {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+
+  .terms a {
+    color: var(--green);
+    text-decoration: none;
+  }
+
+  /* Password toggle */
+  .pw-wrap {
+    position: relative;
+  }
+
+  .pw-toggle {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    padding: 0.2rem 0.4rem;
+  }
+
+  /* Welcome screen (shown after login) */
+  .welcome-screen {
+    display: none;
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  .welcome-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1.5rem;
+  }
+
+  .welcome-screen h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .welcome-screen p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .go-home-btn {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .go-home-btn:hover { background: var(--green-dark); }
+
+  /* Verify email screen */
+  .verify-screen {
+    display: none;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .verify-screen .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .verify-screen h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .verify-screen p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .auth-box { animation: fadeUp 0.35s ease; }
+
+  .form-panel { transition: opacity 0.2s; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    body { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 2rem 1.25rem; background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="left-panel">
+  <div class="left-logo">Nest<span>Finder</span> <span style="font-size:0.7rem;color:rgba(255,255,255,0.4);font-weight:400;">CUK</span></div>
+
+  <div class="left-content">
+    <h2>Your next home<br>is <span>one click</span><br>away.</h2>
+    <p>Safe, verified, affordable student housing near The Cooperative University of Kenya. No scammers. No wasted trips. Just real homes.</p>
+
+    <div class="left-stats">
+      <div class="left-stat">
+        <strong>Ksh 250</strong>
+        <span>Viewing fee only</span>
+      </div>
+      <div class="left-stat">
+        <strong>3</strong>
+        <span>Room types</span>
+      </div>
+      <div class="left-stat">
+        <strong>0</strong>
+        <span>Scammers</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-footer">© 2025 NestFinder CUK · CUK Student Housing Platform</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right-panel">
+  <div class="auth-box">
+
+    <!-- Tabs -->
+    <div class="auth-tabs" id="authTabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- Error / Success -->
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="success-msg" id="successMsg"></div>
+
+    <!-- LOGIN FORM -->
+    <div class="form-panel" id="loginPanel">
+      <div class="auth-title">Welcome back 👋</div>
+      <div class="auth-sub">Sign in to browse listings and manage your account.</div>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePw('loginPassword', this)">Show</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="loginBtn" onclick="handleLogin()">
+        <div class="spinner-sm" id="loginSpinner"></div>
+        <span id="loginBtnText">Sign In</span>
+      </button>
+
+      <div class="terms">
+        Don't have an account? <a href="#" onclick="switchTab('signup')">Create one free</a>
+      </div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div class="form-panel" id="signupPanel" style="display:none;">
+      <div class="auth-title">Join NestFinder CUK</div>
+      <div class="auth-sub">Create your free student account to browse and save listings.</div>
+
+      <div class="form-group">
+        <label>Full name</label>
+        <input type="text" id="signupName" placeholder="e.g. Jane Wanjiru" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+        <div class="input-hint">Use any valid email — a confirmation will be sent.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Phone number</label>
+        <input type="tel" id="signupPhone" placeholder="07XXXXXXXX">
+        <div class="input-hint">Your Safaricom number for M-Pesa payments.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePw('signupPassword', this)">Show</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="signupBtn" onclick="handleSignup()">
+        <div class="spinner-sm" id="signupSpinner"></div>
+        <span id="signupBtnText">Create Account</span>
+      </button>
+
+      <div class="terms">
+        By signing up you agree to use this platform responsibly.<br>
+        Already have an account? <a href="#" onclick="switchTab('login')">Sign in</a>
+      </div>
+    </div>
+
+    <!-- VERIFY EMAIL SCREEN -->
+    <div class="verify-screen" id="verifyScreen">
+      <div class="icon">📬</div>
+      <h3>Check your email!</h3>
+      <p>We sent a confirmation link to<br><strong id="verifyEmail" style="color:var(--green-dark)"></strong><br><br>Click the link to activate your account, then come back and sign in.</p>
+      <br>
+      <a href="#" onclick="switchTab('login')" style="color:var(--green);font-size:0.88rem;">Back to Sign In →</a>
+    </div>
+
+    <!-- WELCOME SCREEN (after login) -->
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-icon">🏠</div>
+      <h3>You're in, <span id="welcomeName">Student</span>!</h3>
+      <p>Your account is active. Let's find your perfect house near CUK.</p>
+      <a href="index.html" class="go-home-btn">Browse Listings →</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://mtycapgbtvpczvswpjpo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ikfawEkiP9A6I9Exk0xN-w_JgqsG7-C';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('loginPanel').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('signupPanel').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('verifyScreen').style.display = 'none';
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', isLogin ? i === 0 : i === 1);
+  });
+  clearMessages();
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('successMsg').style.display = 'none';
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('successMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('errorMsg').style.display = 'none';
+}
+
+function clearMessages() {
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'none';
+}
+
+function setLoading(btnId, spinnerId, textId, loading, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  document.getElementById(spinnerId).style.display = loading ? 'block' : 'none';
+  document.getElementById(textId).textContent = loading ? 'Please wait...' : text;
+}
+
+function togglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Hide' : 'Show';
+}
+
+async function handleLogin() {
+  clearMessages();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) { showError('Please fill in all fields.'); return; }
+
+  setLoading('loginBtn', 'loginSpinner', 'loginBtnText', true, 'Sign In');
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  setLoading('loginBtn', 'loginSpinner', 'loginBtnText', false, 'Sign In');
+
+  if (error) {
+    if (error.message.includes('Invalid login')) showError('Wrong email or password. Please try again.');
+    else if (error.message.includes('Email not confirmed')) showError('Please confirm your email first. Check your inbox.');
+    else showError(error.message);
+    return;
+  }
+
+  const name = data.user.user_metadata?.full_name || 'Student';
+  document.getElementById('welcomeName').textContent = name.split(' ')[0];
+  document.getElementById('loginPanel').style.display = 'none';
+  document.getElementById('authTabs').style.display = 'none';
+  document.getElementById('welcomeScreen').style.display = 'block';
+
+  setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+}
+
+async function handleSignup() {
+  clearMessages();
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!name || !email || !phone || !password) { showError('Please fill in all fields.'); return; }
+  if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
+  if (!/^07\d{8}$/.test(phone)) { showError('Enter a valid Safaricom number e.g. 0712345678'); return; }
+
+  setLoading('signupBtn', 'signupSpinner', 'signupBtnText', true, 'Create Account');
+
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: name, phone }
+    }
+  });
+
+  setLoading('signupBtn', 'signupSpinner', 'signupBtnText', false, 'Create Account');
+
+  if (error) {
+    if (error.message.includes('already registered')) showError('This email is already registered. Try signing in.');
+    else showError(error.message);
+    return;
+  }
+
+  document.getElementById('verifyEmail').textContent = email;
+  document.getElementById('signupPanel').style.display = 'none';
+  document.getElementById('authTabs').style.display = 'none';
+  document.getElementById('verifyScreen').style.display = 'block';
+}
+
+// Check if already logged in
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const name = session.user.user_metadata?.full_name || 'Student';
+    document.getElementById('welcomeName').textContent = name.split(' ')[0];
+    document.getElementById('loginPanel').style.display = 'none';
+    document.getElementById('authTabs').style.display = 'none';
+    document.getElementById('welcomeScreen').style.display = 'block';
+  }
+}
+
+checkSession();
+
+// Allow Enter key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const loginVisible = document.getElementById('loginPanel').style.display !== 'none';
+    const signupVisible = document.getElementById('signupPanel').style.display !== 'none';
+    if (loginVisible) handleLogin();
+    else if (signupVisible) handleSignup();
+  }
+});
+</script>
+</body>
+</html>
