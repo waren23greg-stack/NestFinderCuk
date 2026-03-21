@@ -1743,7 +1743,16 @@ async function loadRatings(){
 ══════════════════════════════════════════ */
 function showFavs(){
   if(!user){toast('Sign in to view your saved listings','err');return;}
-  const favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
+  let favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
+  if(user){
+    try{
+      const _t=localStorage.getItem('sb-token');
+      const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/favourites?select=listing_id&user_id=eq.'+user.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t}});
+      const _d=await _r.json();
+      if(Array.isArray(_d))favIds=_d.map(f=>f.listing_id);
+      localStorage.setItem('nf-favs',JSON.stringify(favIds));
+    }catch(e){}
+  }
   const favListings=listings.filter(l=>favIds.includes(l.id));
   const grid=document.getElementById('favs-grid');
   if(!favListings.length){
