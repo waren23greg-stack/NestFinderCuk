@@ -1277,42 +1277,29 @@ let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
 async function initAuth(){
-  let session = null;
-  for(let attempt=0; attempt<3; attempt++){
-    const {data} = await sb.auth.getUser();
-    if(data && data.user){ session = data.user; break; }
-    if(attempt < 2) await new Promise(r=>setTimeout(r,600));
-  }
-  const u = session;
-  let prof=null;
+  const t=localStorage.getItem('sb-token');
   try{
-    const _t=localStorage.getItem('sb-token');
-    const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t}
-    });
-    const _d=await _r.json();
-    if(Array.isArray(_d)&&_d.length>0)prof=_d[0];
-  }catch(e){}
-  const name = prof?.full_name?.split(' ')[0] || 'Student';
-  const isAdmin = prof?.role === 'admin';
-  document.getElementById('nav-hello').textContent = 'Hi, '+name;
-  document.getElementById('nav-in').style.display = 'none';
-  document.getElementById('nav-out').style.display = '';
-  document.getElementById('drawer-in').style.display = 'none';
-  document.getElementById('drawer-out').style.display = '';
-  document.getElementById('drawer-user').textContent = 'Signed in as '+name;
-  ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.style.display='';
-  });
-  if(isAdmin){
-    ['nav-admin','drawer-admin'].forEach(id=>{
-      const el=document.getElementById(id); if(el) el.style.display='';
-    });
-  }
-  const bi=document.getElementById('bot-in');
-  if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
+    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}});
+    const u=await ur.json();
+    user=u;
+    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}});
+    const pd=await pr.json();
+    const prof=Array.isArray(pd)&&pd.length>0?pd[0]:null;
+    const name=prof?.full_name?.split(' ')[0]||'Student';
+    const isAdmin=prof?.role==='admin';
+    document.getElementById('nav-hello').textContent='Hi, '+name;
+    document.getElementById('nav-in').style.display='none';
+    document.getElementById('nav-out').style.display='';
+    document.getElementById('drawer-in').style.display='none';
+    document.getElementById('drawer-out').style.display='';
+    document.getElementById('drawer-user').textContent='Signed in as '+name;
+    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+    if(isAdmin){['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});}
+    const bi=document.getElementById('bot-in');
+    if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
+  }catch(e){console.error('initAuth error',e);}
 }
-async function doSignOut(){await sb.auth.signOut();location.reload();}
+async function doSignOut(){localStorage.removeItem("sb-token");localStorage.removeItem("sb-refresh");localStorage.removeItem("nf-favs");localStorage.removeItem("nf-listings-cache");localStorage.removeItem("nf-listings-time");user=null;location.reload();}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeModal();closeGallery();} if(document.getElementById('gallery-ov').classList.contains('open')){if(e.key==='ArrowLeft')galleryNav(-1);if(e.key==='ArrowRight')galleryNav(1);}});
