@@ -1302,10 +1302,19 @@ function photo(l){
 }
 
 async function load(){
+  const cached=localStorage.getItem('nf-listings-cache');
+  const cacheTime=localStorage.getItem('nf-listings-time');
+  if(cached&&cacheTime&&(Date.now()-parseInt(cacheTime))<300000){
+    listings=JSON.parse(cached);
+    document.getElementById('stat-n').textContent=listings.length;
+    render(listings);
+  }
   const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
   if(error||!data){emptyState();return;}
   listings=data;
   document.getElementById('stat-n').textContent=data.length;
+  localStorage.setItem('nf-listings-cache',JSON.stringify(data));
+  localStorage.setItem('nf-listings-time',Date.now().toString());
   render(data);
 }
 
