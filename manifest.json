@@ -1,0 +1,31 @@
+{
+  "name": "NestFinder CUK",
+  "short_name": "NestFinder",
+  "description": "Safe, verified student housing near The Cooperative University of Kenya",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#085041",
+  "theme_color": "#1D9E75",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "utilities"],
+  "lang": "en-KE",
+  "shortcuts": [
+    { "name": "Browse Listings", "url": "/index.html" },
+    { "name": "My Payments", "url": "/payments.html" },
+    { "name": "Sign In", "url": "/login.html" }
+  ]
+}

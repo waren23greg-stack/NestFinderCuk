@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="NestFinder"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231D9E75'/%3E%3Cpath d='M96 40L156 85V152H36V85Z' fill='white'/%3E%3Crect x='72' y='108' width='48' height='44' rx='4' fill='%231D9E75'/%3E%3C/svg%3E"/>
 <meta name="theme-color" content="#16130E"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -544,6 +549,15 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 #preview-sec{display:none}
 #preview-sec.on{display:block}
 
+
+/* ── SKELETONS ── */
+.skeleton-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;padding:1.5rem;}
+.skel-card{background:#fff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;}
+.skel-img{height:200px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+.skel-body{padding:1.1rem;}
+.skel-line{height:13px;border-radius:4px;margin-bottom:9px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+.skel-line.w50{width:50%}.skel-line.w70{width:70%}.skel-line.w90{width:90%}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 </head>
 <body>
@@ -977,6 +991,22 @@ let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
 
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
+
+function showSkeletons(){
+  const g=document.getElementById('listingsGrid')||document.getElementById('grid');
+  if(!g)return;
+  g.innerHTML='<div class="skeleton-wrap" style="grid-column:1/-1;display:contents;">'+
+    [1,2,3,4,5,6].map(()=>`
+      <div class="skel-card">
+        <div class="skel-img"></div>
+        <div class="skel-body">
+          <div class="skel-line w90"></div>
+          <div class="skel-line w70"></div>
+          <div class="skel-line w50"></div>
+        </div>
+      </div>`).join('')+'</div>';
+}
+
 async function initAuth(){
   const {data:{user:u}}=await sb.auth.getUser();user=u;
   if(u){
@@ -1130,21 +1160,11 @@ async function pay(){
   if(raw.length<9){toast('Enter a valid Safaricom number','err');return;}
   const phone='254'+raw.replace(/^0/,'');sec('wait');
   try{
-    // Create pending payment in Supabase first
-    const {data:pmnt,error:pe}=await sb.from('payments').insert({user_id:user.id,listing_id:cur.id,phone:raw,amount:250,status:'pending'}).select().single();
-    if(pe){sec('pay');toast('Could not create payment — '+pe.message,'err');return;}
-    payId=pmnt.id;
-    // Trigger STK push
-    const r=await fetch('/api/mpesa-stk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,listing_id:cur.id,user_id:user.id,payment_id:pmnt.id,amount:250})});
+    const r=await fetch('/api/mpesa-stk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,listing_id:cur.id,user_id:user.id})});
     const d=await r.json();
-    if(d.success&&d.checkout_request_id){
-      await sb.from('payments').update({checkout_request_id:d.checkout_request_id}).eq('id',pmnt.id);
-      poll=setInterval(checkPay,4000);
-    } else {
-      await sb.from('payments').update({status:'failed'}).eq('id',pmnt.id);
-      sec('pay');toast(d.error||'STK push failed — try again','err');
-    }
-  }catch(e){sec('pay');toast('Network error: '+e.message,'err');}
+    if(d.CheckoutRequestID){payId=d.payment_id;poll=setInterval(checkPay,4000);}
+    else{sec('pay');toast(d.error||'STK push failed — try again','err');}
+  }catch{sec('pay');toast('Network error','err');}
 }
 async function checkPay(){
   if(!payId)return;
@@ -1486,5 +1506,6 @@ async function submitReview(){
 
 initAuth();load();loadRatings();
 </script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});</script>
 </body>
 </html>

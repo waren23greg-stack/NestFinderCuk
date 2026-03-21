@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#085041"/>
+<title>My Payments — NestFinder CUK</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="NestFinder"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--green:#1D9E75;--gd:#0F6E56;--gp:#085041;--gl:#E1F5EE;--gm:#9FE1CB;--amber:#EF9F27;--al:#FAEEDA;--text:#111827;--muted:#6b7280;--bg:#f3f4f6;--white:#fff;--border:#e5e7eb;--red:#dc2626;--rb:#fef2f2;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;}
+nav{background:var(--gp);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;text-decoration:none;}
+.logo span{color:#FAC775;}
+.back{color:rgba(255,255,255,.75);font-size:.85rem;text-decoration:none;display:flex;align-items:center;gap:.4rem;}
+.back:hover{color:#fff;}
+.hero{background:linear-gradient(135deg,var(--gp),var(--green));padding:2rem 1.5rem 2.5rem;}
+.hero h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:.3rem;}
+.hero p{color:rgba(255,255,255,.7);font-size:.9rem;}
+.stats{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.75rem 1.1rem;}
+.stat strong{display:block;font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#FAC775;}
+.stat span{font-size:.75rem;color:rgba(255,255,255,.65);}
+.content{max-width:800px;margin:0 auto;padding:2rem 1.5rem;}
+/* skeleton */
+.sk-card{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.25rem;margin-bottom:1rem;display:flex;gap:1rem;}
+.sk-img{width:80px;height:80px;border-radius:12px;flex-shrink:0;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:sh 1.4s infinite;}
+.sk-body{flex:1;}
+.sk-ln{height:13px;border-radius:4px;margin-bottom:8px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:sh 1.4s infinite;}
+.sk-ln.w8{width:80%}.sk-ln.w6{width:60%}.sk-ln.w4{width:40%}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* cards */
+.pcard{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.25rem;margin-bottom:1rem;display:flex;gap:1rem;align-items:flex-start;transition:box-shadow .2s;}
+.pcard:hover{box-shadow:0 4px 16px rgba(15,110,86,.1);}
+.thumb{width:80px;height:80px;border-radius:12px;object-fit:cover;flex-shrink:0;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1.8rem;overflow:hidden;}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+.cbody{flex:1;min-width:0;}
+.ctitle{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cloc{font-size:.8rem;color:var(--muted);margin-bottom:.6rem;}
+.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;}
+.badge{display:inline-block;padding:.2rem .65rem;border-radius:100px;font-size:.72rem;font-weight:600;}
+.bt{background:var(--gl);color:var(--gp);}
+.bc{background:#E1F5EE;color:#085041;}
+.bp{background:var(--al);color:#633806;}
+.bf{background:var(--rb);color:var(--red);}
+.cbox{background:var(--gl);border:1px solid var(--gm);border-radius:10px;padding:.75rem 1rem;}
+.clabel{font-size:.72rem;color:var(--gd);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem;}
+.cname{font-weight:600;font-size:.88rem;color:var(--gp);margin-bottom:.2rem;}
+.cphone{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gp);}
+.cactions{display:flex;gap:.5rem;margin-top:.6rem;}
+.cbtn{display:inline-flex;align-items:center;gap:.3rem;padding:.4rem .9rem;border-radius:8px;font-size:.8rem;font-weight:600;text-decoration:none;transition:all .15s;}
+.call{background:var(--green);color:#fff;}.call:hover{background:var(--gd);}
+.wa{background:#25D366;color:#fff;}.wa:hover{background:#1da851;}
+.pbox{background:var(--al);border:1px solid #FAC775;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#633806;}
+.fbox{background:var(--rb);border:1px solid #fecaca;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:var(--red);}
+.meta{margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.78rem;color:var(--muted);}
+.meta strong{color:var(--text);font-weight:600;}
+.empty{text-align:center;padding:4rem 1rem;}
+.empty .ico{font-size:3rem;margin-bottom:1rem;}
+.empty h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.5rem;}
+.empty p{color:var(--muted);font-size:.9rem;margin-bottom:1.5rem;}
+.browse{display:inline-block;background:var(--green);color:#fff;padding:.75rem 2rem;border-radius:10px;text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;}
+.browse:hover{background:var(--gd);}
+@media(max-width:640px){
+  .pcard{flex-direction:column;}
+  .thumb{width:100%;height:160px;}
+  .hero h1{font-size:1.35rem;}
+  .content{padding:1.25rem 1rem;}
+  .stats{gap:.75rem;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">Nest<span>Finder</span></a>
+  <a href="index.html" class="back">← Listings</a>
+</nav>
+<div class="hero">
+  <h1>My Unlocked Contacts</h1>
+  <p>All caretaker contacts you have paid to access.</p>
+  <div class="stats">
+    <div class="stat"><strong id="sTotal">—</strong><span>Total payments</span></div>
+    <div class="stat"><strong id="sUnlocked">—</strong><span>Contacts unlocked</span></div>
+    <div class="stat"><strong id="sSpent">—</strong><span>Total spent</span></div>
+  </div>
+</div>
+<div class="content" id="root">
+  <!-- skeletons shown while loading -->
+  <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-ln w8"></div><div class="sk-ln w6"></div><div class="sk-ln w4"></div></div></div>
+  <div class="sk-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-ln w8"></div><div class="sk-ln w6"></div><div class="sk-ln w4"></div></div></div>
+</div>
+<script>
+const SU='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const sb=supabase.createClient(SU,SK);
+
+function wa(phone,name){
+  const p=phone.replace(/\D/g,'');
+  const intl=p.startsWith('0')?'254'+p.slice(1):p;
+  const msg=encodeURIComponent('Hello '+name+', I found your listing on NestFinder CUK and I am interested in viewing the house. When would be a good time?');
+  return 'https://wa.me/'+intl+'?text='+msg;
+}
+
+async function load(){
+  const root=document.getElementById('root');
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){
+    root.innerHTML='<div class="empty"><div class="ico">🔒</div><h3>Sign in to view your payments</h3><p>You need an account to see your unlocked contacts.</p><a href="login.html" class="browse">Sign In</a></div>';
+    return;
+  }
+  const {data:payments}=await sb.from('payments').select('*,listings(id,title,type,price,location,photos)').eq('user_id',session.user.id).order('created_at',{ascending:false});
+  if(!payments?.length){
+    root.innerHTML='<div class="empty"><div class="ico">🏠</div><h3>No payments yet</h3><p>Browse listings and pay Ksh 250 to unlock a caretaker contact.</p><a href="index.html" class="browse">Browse Listings</a></div>';
+    return;
+  }
+  const confirmed=payments.filter(p=>p.status==='confirmed');
+  document.getElementById('sTotal').textContent=payments.length;
+  document.getElementById('sUnlocked').textContent=confirmed.length;
+  document.getElementById('sSpent').textContent='Ksh '+(confirmed.length*250).toLocaleString();
+  const ids=confirmed.map(p=>p.listing_id).filter(Boolean);
+  let contacts={};
+  if(ids.length){
+    const {data:ctk}=await sb.from('caretaker_contacts').select('listing_id,caretaker_name,phone').in('listing_id',ids);
+    (ctk||[]).forEach(c=>contacts[c.listing_id]=c);
+  }
+  root.innerHTML=payments.map(p=>{
+    const h=p.listings||{};
+    const photo=(h.photos||[])[0];
+    const ct=contacts[p.listing_id];
+    const date=new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+    const typeLabel=(h.type||'').replace('-',' ').replace(/\b\w/g,l=>l.toUpperCase());
+    const thumb=photo?`<div class="thumb"><img src="${photo}" alt="${h.title}" onerror="this.parentElement.textContent='🏠'"/></div>`:`<div class="thumb">🏠</div>`;
+    let cSection='';
+    if(p.status==='confirmed'&&ct){
+      cSection=`<div class="cbox"><div class="clabel">Caretaker Contact</div><div class="cname">${ct.caretaker_name}</div><div class="cphone">${ct.phone}</div><div class="cactions"><a href="tel:${ct.phone.replace(/\s/g,'')}" class="cbtn call">📞 Call</a><a href="${wa(ct.phone,ct.caretaker_name)}" target="_blank" class="cbtn wa">💬 WhatsApp</a></div></div>`;
+    } else if(p.status==='pending'){
+      cSection='<div class="pbox">⏳ Payment pending — contact admin if you completed M-Pesa payment.</div>';
+    } else if(p.status==='failed'){
+      cSection='<div class="fbox">❌ Payment failed. <a href="index.html" style="color:var(--red);font-weight:600;">Try again →</a></div>';
+    }
+    return `<div class="pcard">${thumb}<div class="cbody"><div class="ctitle">${h.title||'Listing'}</div><div class="cloc">📍 ${h.location||'—'}</div><div class="badges"><span class="badge bt">${typeLabel||'House'}</span><span class="badge b${p.status[0]}">${p.status}</span></div>${cSection}<div class="meta"><span>${date}</span><strong>Ksh ${(p.amount||250).toLocaleString()}</strong></div></div></div>`;
+  }).join('');
+}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+load();
+</script>
+</body>
+</html>
