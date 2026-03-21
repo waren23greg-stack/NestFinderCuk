@@ -1920,8 +1920,8 @@ function pickStar(v){
 
 async function loadReviews(lid){
   const _t=localStorage.getItem('sb-token');
-  const _h={'apikey':'','Authorization':'Bearer '+(_t||'')};
-  const _r=await fetch('/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{headers:_h});
+  const _h={'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM')};
+  const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{headers:_h});
   const data=await _r.json().catch(()=>null);
   const list=document.getElementById('review-list');
   const avgEl=document.getElementById('avg-rating');
