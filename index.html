@@ -1953,9 +1953,9 @@ async function submitReview(){
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
   const _t2=localStorage.getItem('sb-token');
-  const _sr=await fetch('/rest/v1/reviews',{
+  const _sr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews',{
     method:'POST',
-    headers:{'apikey':'','Authorization':'Bearer '+_t2,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t2,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
     body:JSON.stringify({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment})
   });
   const error=_sr.ok?null:{message:'Failed to submit review ('+_sr.status+')'};
