@@ -1251,7 +1251,15 @@ async function initAuth(){
     if(attempt < 2) await new Promise(r=>setTimeout(r,600));
   }
   const u = session;
-  const {data:prof} = await sb.from('profiles').select('full_name,role').eq('id',u.id).maybeSingle();
+  let prof=null;
+  try{
+    const _t=localStorage.getItem('sb-token');
+    const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t}
+    });
+    const _d=await _r.json();
+    if(Array.isArray(_d)&&_d.length>0)prof=_d[0];
+  }catch(e){}
   const name = prof?.full_name?.split(' ')[0] || 'Student';
   const isAdmin = prof?.role === 'admin';
   document.getElementById('nav-hello').textContent = 'Hi, '+name;
