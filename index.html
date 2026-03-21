@@ -260,7 +260,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .lcard{background:#fff;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s;-webkit-tap-highlight-color:transparent}
 @media(hover:hover){.lcard:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(22,19,14,.09);border-color:var(--gold-l)}}
 .lcard:active{transform:scale(.99)}
-.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen)}
+.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen);box-shadow:inset 0 0 0 1px rgba(184,149,90,.25)}.lcard-img::before{content:"";position:absolute;inset:8px;border:1px solid rgba(184,149,90,.35);z-index:2;pointer-events:none;mix-blend-mode:overlay}.lcard-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,19,14,0) 50%,rgba(22,19,14,.18) 100%);z-index:1;pointer-events:none}
 .lcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
 @media(hover:hover){.lcard:hover .lcard-img img{transform:scale(1.05)}}
 .lcard-badge{position:absolute;top:10px;left:10px;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;background:var(--dark);color:#fff}
@@ -1244,30 +1244,32 @@ let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
 async function initAuth(){
-  const {data:{user:u}}=await sb.auth.getUser();user=u;
-  if(u){
-    const {data:prof}=await sb.from('profiles').select('full_name,role').eq('id',u.id).single();
-    const name=prof?.full_name?.split(' ')[0]||'Student';
-    const isAdmin=prof?.role==='admin';
-    document.getElementById('nav-hello').textContent='Hi, '+name;
-    document.getElementById('nav-in').style.display='none';
-    document.getElementById('nav-out').style.display='';
-    document.getElementById('drawer-in').style.display='none';
-    document.getElementById('drawer-out').style.display='';
-    document.getElementById('drawer-user').textContent='Signed in as '+name;
-    // Show My Payments everywhere
-    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.style.display='';
-    });
-    // Show Admin link only for admins
-    if(isAdmin){
-      ['nav-admin','drawer-admin'].forEach(id=>{
-        const el=document.getElementById(id);if(el)el.style.display='';
-      });
-    }
-    const bi=document.getElementById('bot-in');
-    if(bi){bi.innerHTML=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${name}`;bi.href='payments.html';}
+  let session = null;
+  for(let attempt=0; attempt<3; attempt++){
+    const {data} = await sb.auth.getUser();
+    if(data && data.user){ session = data.user; break; }
+    if(attempt < 2) await new Promise(r=>setTimeout(r,600));
   }
+  const u = session;
+  const {data:prof} = await sb.from('profiles').select('full_name,role').eq('id',u.id).maybeSingle();
+  const name = prof?.full_name?.split(' ')[0] || 'Student';
+  const isAdmin = prof?.role === 'admin';
+  document.getElementById('nav-hello').textContent = 'Hi, '+name;
+  document.getElementById('nav-in').style.display = 'none';
+  document.getElementById('nav-out').style.display = '';
+  document.getElementById('drawer-in').style.display = 'none';
+  document.getElementById('drawer-out').style.display = '';
+  document.getElementById('drawer-user').textContent = 'Signed in as '+name;
+  ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='';
+  });
+  if(isAdmin){
+    ['nav-admin','drawer-admin'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='';
+    });
+  }
+  const bi=document.getElementById('bot-in');
+  if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
 }
 async function doSignOut(){await sb.auth.signOut();location.reload();}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
