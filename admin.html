@@ -678,6 +678,26 @@ async function updateReport(id,status){
 }
 
 // ── AUTH ──
+
+async function refreshToken(){
+  var rt=localStorage.getItem('sb-refresh');
+  if(!rt) return;
+  try{
+    var r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=refresh_token',{
+      method:'POST',
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Content-Type':'application/json'},
+      body:JSON.stringify({refresh_token:rt})
+    });
+    var d=await r.json();
+    if(d.access_token){
+      localStorage.setItem('sb-token',d.access_token);
+      if(d.refresh_token) localStorage.setItem('sb-refresh',d.refresh_token);
+    }
+  }catch(e){}
+}
+refreshToken();
+setInterval(refreshToken, 50*60*1000);
+
 async function init(){
   let session=null;
   const token=localStorage.getItem("sb-token");
