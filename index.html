@@ -1741,7 +1741,7 @@ async function loadRatings(){
 /* ══════════════════════════════════════════
    FAVOURITES PAGE
 ══════════════════════════════════════════ */
-function showFavs(){
+async function showFavs(){
   if(!user){toast('Sign in to view your saved listings','err');return;}
   let favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
   if(user){
