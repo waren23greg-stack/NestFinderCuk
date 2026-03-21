@@ -679,19 +679,13 @@ async function updateReport(id,status){
 // ── AUTH ──
 async function init(){
   let session=null;
-  for(let i=0;i<3;i++){
-    const {data}=await sb.auth.getSession();
-    if(data.session){session=data.session;break;}
-    await new Promise(r=>setTimeout(r,200));
-  }
+  const token=localStorage.getItem("sb-token");
+  if(!token){window.location.href="login.html";return;}
+  const {data:ud}=await sb.auth.getUser();
+  if(ud&&ud.user){session={user:ud.user};}
   if(!session){window.location.href='login.html';return;}
 
-  let profile=null;
-  for(let i=0;i<3;i++){
-    const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).single();
-    if(data){profile=data;break;}
-    await new Promise(r=>setTimeout(r,500));
-  }
+  const {data:profile}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).maybeSingle();
 
   document.getElementById('loading').classList.add('hide');
 
