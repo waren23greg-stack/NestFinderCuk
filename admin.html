@@ -1026,7 +1026,7 @@ async function saveListing(){
   resetSave();
   closeModal('listingOverlay');
   toast(editId?'Listing updated ✓':'Listing added ✓');
-  loadListings();
+  setTimeout(()=>loadListings(), 500);
 }
 
 function resetSave(){
