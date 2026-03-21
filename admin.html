@@ -1,511 +1,455 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NestFinder CUK — Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#16130E"/>
+<title>Admin — NestFinder CUK</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root {
-    --green: #1D9E75;
-    --green-dark: #0F6E56;
-    --green-deep: #085041;
-    --green-light: #E1F5EE;
-    --green-mid: #9FE1CB;
-    --amber: #EF9F27;
-    --amber-light: #FAEEDA;
-    --red: #dc2626;
-    --red-light: #fef2f2;
-    --text: #111827;
-    --text-muted: #6b7280;
-    --bg: #f3f4f6;
-    --white: #ffffff;
-    --border: #e5e7eb;
-    --sidebar-w: 240px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Jost',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
+:root{
+  --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;--gold-gl:rgba(184,149,90,.1);
+  --dark:#16130E;--dark2:#231F18;--dark3:#302B22;
+  --ink:#4A4438;--muted:#8A8070;
+  --linen:#F8F4EE;--cream:#FDF9F4;
+  --border:rgba(184,149,90,.15);--border2:rgba(184,149,90,.3);
+  --sidebar:220px;
+  --green:#1D9E75;--green-d:#0F6E56;--green-l:#E1F5EE;
+  --red:#C0392B;--red-l:#FCF0EE;
+  --amber:#B8750A;--amber-l:#FEF3D6;
+  --t:.26s;--ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{font-family:'Jost',sans-serif;background:var(--linen);color:var(--ink);min-height:100dvh;display:flex;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;opacity:.018;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15;}
+svg{display:block;flex-shrink:0;}
 
-  /* SIDEBAR */
-  .sidebar {
-    width:var(--sidebar-w); background:var(--green-deep); display:flex;
-    flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:50;
-  }
-  .sidebar-logo {
-    padding:1.5rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.08);
-    font-family:'Cormorant Garamond',serif; font-weight:800; font-size:1.2rem; color:white;
-  }
-  .sidebar-logo span { color:#FAC775; }
-  .sidebar-logo small { display:block; font-size:0.7rem; color:rgba(255,255,255,0.4); font-weight:400; margin-top:2px; }
-  .sidebar-nav { flex:1; padding:1rem 0.75rem; display:flex; flex-direction:column; gap:4px; }
-  .nav-item {
-    display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0.9rem;
-    border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.65);
-    font-size:0.88rem; font-weight:500; transition:all 0.15s; border:none; background:none; width:100%; text-align:left;
-  }
-  .nav-item:hover { background:rgba(255,255,255,0.08); color:white; }
-  .nav-item.active { background:var(--green); color:white; }
-  .nav-item .icon { font-size:1rem; width:20px; text-align:center; }
-  .sidebar-footer {
-    padding:1rem 0.75rem; border-top:1px solid rgba(255,255,255,0.08);
-  }
-  .sign-out-btn {
-    width:100%; padding:0.6rem 0.9rem; background:rgba(255,255,255,0.07);
-    border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6);
-    font-family:'Jost',sans-serif; font-size:0.85rem; cursor:pointer; transition:all 0.15s;
-  }
-  .sign-out-btn:hover { background:rgba(220,38,38,0.2); color:#fca5a5; border-color:rgba(220,38,38,0.3); }
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--dark);z-index:2000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.25rem;transition:opacity .4s;}
+#loading.hide{opacity:0;pointer-events:none;}
+.load-ring{width:44px;height:44px;border:2px solid rgba(184,149,90,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+.load-txt{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* MAIN */
-  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
-  .topbar {
-    background:white; border-bottom:1px solid var(--border); padding:0 2rem;
-    height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40;
-  }
-  .topbar h1 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; color:var(--text); }
-  .admin-badge {
-    background:var(--green-light); color:var(--green-dark); font-size:0.75rem;
-    font-weight:600; padding:0.25rem 0.75rem; border-radius:100px;
-  }
-  .content { padding:2rem; flex:1; }
+/* ── ACCESS DENIED ── */
+#denied{display:none;position:fixed;inset:0;background:var(--dark);z-index:1999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;text-align:center;padding:2rem;}
+#denied.show{display:flex;}
+.denied-ring{width:64px;height:64px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;}
+.denied-ring svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.4;}
+.denied-t{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;margin-bottom:.5rem;}
+.denied-sub{font-size:.82rem;color:rgba(255,255,255,.4);max-width:320px;line-height:1.7;font-weight:300;}
+.denied-btn{margin-top:1.5rem;display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:var(--gold);color:#fff;border-radius:2px;text-decoration:none;font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:background var(--t);}
+.denied-btn:hover{background:var(--gold-l);}
 
-  /* STATS */
-  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem; }
-  .stat-card {
-    background:white; border-radius:14px; border:1px solid var(--border);
-    padding:1.25rem; transition:box-shadow 0.2s;
-  }
-  .stat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
-  .stat-label { font-size:0.78rem; color:var(--text-muted); font-weight:500; margin-bottom:0.4rem; }
-  .stat-value { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:800; color:var(--text); }
-  .stat-sub { font-size:0.75rem; color:var(--green); margin-top:0.2rem; }
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--dark);
+  position:fixed;top:0;left:0;height:100dvh;
+  display:flex;flex-direction:column;
+  border-right:1px solid rgba(184,149,90,.08);
+  z-index:50;
+}
+.sb-logo{
+  padding:1.75rem 1.5rem 1.5rem;
+  border-bottom:1px solid rgba(184,149,90,.08);
+}
+.sb-logo-row{display:flex;align-items:center;gap:10px;}
+.sb-logo-ring{width:32px;height:32px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-logo-ring svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:1.9;}
+.sb-logo-text{font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff;letter-spacing:.02em;}
+.sb-logo-text b{color:var(--gold);font-weight:400;}
+.sb-badge{margin-top:.6rem;display:inline-flex;align-items:center;gap:5px;font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28);}
+.sb-badge::before{content:'';width:5px;height:5px;background:var(--gold);border-radius:50%;flex-shrink:0;}
+.sb-admin-name{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:.3rem;font-weight:300;}
 
-  /* SECTION HEADER */
-  .section-head {
-    display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;
-  }
-  .section-head h2 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; }
-  .add-btn {
-    background:var(--green); color:white; border:none; padding:0.6rem 1.2rem;
-    border-radius:10px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:0.85rem;
-    cursor:pointer; transition:background 0.2s; display:flex; align-items:center; gap:0.4rem;
-  }
-  .add-btn:hover { background:var(--green-dark); }
+.sb-nav{flex:1;padding:1.25rem .75rem;display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+.sb-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.65rem .9rem;border-radius:2px;
+  cursor:pointer;color:rgba(255,255,255,.45);
+  font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;
+  transition:all var(--t);border:none;background:none;width:100%;text-align:left;
+  -webkit-tap-highlight-color:transparent;
+}
+.sb-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.sb-item:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.04);}
+.sb-item.on{color:var(--gold-l);background:rgba(184,149,90,.1);border-right:2px solid var(--gold);}
 
-  /* TABLE */
-  .table-wrap { background:white; border-radius:14px; border:1px solid var(--border); overflow:hidden; }
-  table { width:100%; border-collapse:collapse; }
-  thead { background:var(--bg); }
-  th { padding:0.75rem 1rem; text-align:left; font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
-  td { padding:0.85rem 1rem; font-size:0.88rem; border-top:1px solid var(--border); vertical-align:middle; }
-  tr:hover td { background:#f9fafb; }
-  .badge {
-    display:inline-block; padding:0.2rem 0.65rem; border-radius:100px;
-    font-size:0.72rem; font-weight:600;
-  }
-  .badge-single { background:#E1F5EE; color:#085041; }
-  .badge-bedsitter { background:#FAEEDA; color:#633806; }
-  .badge-one { background:#E6F1FB; color:#042C53; }
-  .badge-available { background:#E1F5EE; color:#085041; }
-  .badge-taken { background:#fef2f2; color:#991b1b; }
-  .badge-confirmed { background:#E1F5EE; color:#085041; }
-  .badge-pending { background:#FAEEDA; color:#633806; }
-  .badge-failed { background:#fef2f2; color:#991b1b; }
-  .action-btn {
-    padding:0.3rem 0.75rem; border-radius:7px; font-size:0.78rem; font-weight:500;
-    cursor:pointer; transition:all 0.15s; border:1px solid;
-  }
-  .edit-btn { background:var(--green-light); color:var(--green-dark); border-color:var(--green-mid); }
-  .edit-btn:hover { background:var(--green-mid); }
-  .del-btn { background:var(--red-light); color:var(--red); border-color:#fecaca; margin-left:4px; }
-  .del-btn:hover { background:#fee2e2; }
+.sb-divider{height:1px;background:rgba(184,149,90,.08);margin:.5rem .9rem;}
 
-  /* PHOTO THUMBS */
-  .photo-thumbs { display:flex; gap:4px; }
-  .photo-thumb {
-    width:36px; height:36px; border-radius:6px; object-fit:cover;
-    background:var(--green-light); display:flex; align-items:center; justify-content:center;
-    font-size:0.65rem; color:var(--green-dark); font-weight:500; overflow:hidden;
-  }
-  .photo-thumb img { width:100%; height:100%; object-fit:cover; }
+.sb-foot{
+  padding:.75rem;
+  border-top:1px solid rgba(184,149,90,.08);
+}
+.sb-out{
+  width:100%;padding:.65rem .9rem;
+  background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:2px;
+  color:rgba(255,255,255,.35);font-family:'Jost',sans-serif;font-size:.68rem;
+  font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  transition:all var(--t);display:flex;align-items:center;justify-content:center;gap:.5rem;
+}
+.sb-out svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.sb-out:hover{border-color:rgba(192,57,43,.5);color:#e57368;background:rgba(192,57,43,.08);}
 
-  /* MODAL */
-  .overlay {
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
-    z-index:200; align-items:center; justify-content:center; padding:1rem;
-  }
-  .overlay.open { display:flex; }
-  .modal {
-    background:white; border-radius:20px; width:100%; max-width:560px;
-    max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.15);
-    animation:slideUp 0.25s ease;
-  }
-  @keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
-  .modal-head {
-    padding:1.5rem 1.5rem 0; display:flex; justify-content:space-between; align-items:center;
-    position:sticky; top:0; background:white; z-index:1; padding-bottom:1rem;
-    border-bottom:1px solid var(--border);
-  }
-  .modal-head h3 { font-family:'Cormorant Garamond',serif; font-weight:700; font-size:1.1rem; }
-  .modal-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted); }
-  .modal-body { padding:1.5rem; }
-  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-  .form-group { margin-bottom:1rem; }
-  .form-group label { display:block; font-size:0.82rem; font-weight:500; margin-bottom:0.35rem; color:var(--text); }
-  .form-group input, .form-group select, .form-group textarea {
-    width:100%; padding:0.7rem 0.9rem; border:1.5px solid var(--border);
-    border-radius:10px; font-family:'Jost',sans-serif; font-size:0.9rem;
-    color:var(--text); background:white; outline:none; transition:border-color 0.2s;
-  }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--green); }
-  .form-group textarea { resize:vertical; min-height:80px; }
-  .checkbox-row { display:flex; gap:1.5rem; margin-bottom:1rem; }
-  .checkbox-label { display:flex; align-items:center; gap:0.5rem; font-size:0.88rem; cursor:pointer; }
-  .checkbox-label input[type=checkbox] { width:16px; height:16px; accent-color:var(--green); }
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100dvh;}
 
-  /* PHOTO UPLOAD */
-  .upload-zone {
-    border:2px dashed var(--border); border-radius:12px; padding:1.5rem;
-    text-align:center; cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem;
-  }
-  .upload-zone:hover, .upload-zone.drag { border-color:var(--green); background:var(--green-light); }
-  .upload-zone p { font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; }
-  .upload-icon { font-size:1.8rem; }
-  .upload-previews { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
-  .preview-item {
-    width:72px; height:72px; border-radius:8px; overflow:hidden; position:relative;
-    border:1px solid var(--border);
-  }
-  .preview-item img { width:100%; height:100%; object-fit:cover; }
-  .preview-item .remove-photo {
-    position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6);
-    color:white; border:none; border-radius:50%; width:18px; height:18px;
-    font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  }
+/* ── TOPBAR ── */
+.topbar{
+  background:rgba(253,249,244,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 2.5rem;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-left{display:flex;align-items:center;gap:.75rem;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--dark);}
+.topbar-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border:1px solid var(--border2);border-radius:20px;
+  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);
+}
+.topbar-pill::before{content:'';width:5px;height:5px;background:var(--gold);border-radius:50%;}
+.topbar-right{display:flex;align-items:center;gap:.75rem;}
+.topbar-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;border-radius:2px;font-family:'Jost',sans-serif;
+  font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;transition:all var(--t);border:none;
+}
+.topbar-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.tbtn-gold{background:var(--gold);color:#fff;}
+.tbtn-gold:hover{background:var(--gold-l);}
+.tbtn-ghost{background:transparent;border:1px solid var(--border2);color:var(--ink);}
+.tbtn-ghost:hover{border-color:var(--gold);color:var(--gold);}
 
-  /* SAVE BTN */
-  .save-btn {
-    width:100%; padding:0.85rem; background:var(--green); color:white; border:none;
-    border-radius:10px; font-family:'Cormorant Garamond',serif; font-weight:700; font-size:0.95rem;
-    cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:0.5rem;
-  }
-  .save-btn:hover:not(:disabled) { background:var(--green-dark); }
-  .save-btn:disabled { opacity:0.6; cursor:not-allowed; }
-  .spinner-sm { width:18px; height:18px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
-  @keyframes spin { to{transform:rotate(360deg)} }
+/* ── CONTENT AREA ── */
+.content{padding:2.5rem;flex:1;}
 
-  /* TOAST */
-  .toast {
-    position:fixed; bottom:1.5rem; right:1.5rem; background:var(--green-deep);
-    color:white; padding:0.85rem 1.25rem; border-radius:12px; font-size:0.88rem;
-    font-weight:500; z-index:999; transform:translateY(80px); opacity:0;
-    transition:all 0.3s; pointer-events:none;
-  }
-  .toast.show { transform:translateY(0); opacity:1; }
-  .toast.error { background:var(--red); }
+/* ── PAGES ── */
+.page{display:none;animation:fadeUp .4s var(--ease) both;}
+.page.on{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-  /* PAGE SECTIONS */
-  .page { display:none; }
-  .page.active { display:block; }
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2.5rem;}
+.stat-card{
+  background:var(--cream);padding:1.5rem;
+  position:relative;overflow:hidden;
+  transition:background var(--t);
+}
+.stat-card:hover{background:#fff;}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-l));transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease);}
+.stat-card:hover::after{transform:scaleX(1);}
+.stat-ico{width:32px;height:32px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;}
+.stat-ico svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.6;}
+.stat-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:var(--dark);font-weight:300;line-height:1;}
+.stat-sub{font-size:.7rem;color:var(--muted);margin-top:.3rem;font-weight:300;}
 
-  /* EMPTY STATE */
-  .empty-state { text-align:center; padding:3rem; color:var(--text-muted); }
-  .empty-state .icon { font-size:2.5rem; margin-bottom:0.75rem; }
+/* ── SECTION HEADER ── */
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--dark);}
+.sec-sub{font-size:.72rem;color:var(--muted);font-weight:300;margin-top:.2rem;}
 
-  /* ACCESS DENIED */
-  .access-denied { display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:1rem; }
+/* ── TABLE ── */
+.tbl-wrap{border:1px solid var(--border);background:var(--cream);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--dark);}
+th{padding:.75rem 1rem;text-align:left;font-size:.58rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+td{padding:.9rem 1rem;font-size:.82rem;border-top:1px solid var(--border);vertical-align:middle;}
+tr:hover td{background:var(--linen);}
 
-  @media(max-width:768px) {
-    .sidebar { transform:translateX(-100%); }
-    .main { margin-left:0; }
-    .form-row { grid-template-columns:1fr; }
-  }
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.62rem;font-weight:500;letter-spacing:.04em;}
+.badge::before{content:'';width:4px;height:4px;border-radius:50%;}
+.badge-ok{background:var(--green-l);color:var(--green-d);}.badge-ok::before{background:var(--green);}
+.badge-pending{background:var(--amber-l);color:var(--amber);}.badge-pending::before{background:var(--amber);}
+.badge-failed{background:var(--red-l);color:var(--red);}.badge-failed::before{background:var(--red);}
+.badge-single{background:var(--linen);color:var(--ink);border:1px solid var(--border2);}
+.badge-bedsitter{background:var(--amber-l);color:var(--amber);}
+.badge-one{background:#EBF4FB;color:#1A5276;}
+.badge-admin{background:rgba(184,149,90,.1);color:var(--gold);}
+.badge-student{background:var(--linen);color:var(--muted);border:1px solid var(--border);}
 
-  /* MOBILE SIDEBAR */
-  @media(max-width:768px){
-    .sidebar{transform:translateX(-100%);transition:transform 0.3s ease;width:240px;}
-    .sidebar.open{transform:translateX(0);}
-    .main{margin-left:0!important;}
-    .mob-toggle{display:flex!important;}
-    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:49;}
-    .sidebar-overlay.open{display:block;}
-    .topbar{padding:0 1rem;}
-    .content{padding:1.25rem 1rem;}
-    .stats-grid{grid-template-columns:1fr 1fr;}
-    table{font-size:0.8rem;}
-    th,td{padding:0.6rem 0.75rem;}
-    .form-row{grid-template-columns:1fr;}
-    .modal{max-width:100%;margin:0.5rem;}
-  }
-  .mob-toggle{
-    display:none;background:none;border:none;cursor:pointer;
-    padding:0.5rem;color:var(--text-muted);
-  }
-  .mob-toggle svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
+/* action buttons */
+.act{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:2px;font-size:.65rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all var(--t);border:1px solid;}
+.act svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
+.act-edit{background:transparent;border-color:var(--border2);color:var(--ink);}.act-edit:hover{border-color:var(--gold);color:var(--gold);}
+.act-del{background:transparent;border-color:rgba(192,57,43,.2);color:var(--red);}.act-del:hover{background:var(--red-l);}
+.act-confirm{background:var(--green);color:#fff;border-color:var(--green);}.act-confirm:hover{background:var(--green-d);}
+
+/* photo thumbs */
+.thumbs{display:flex;gap:3px;}
+.thumb-sm{width:32px;height:32px;border-radius:1px;overflow:hidden;background:var(--linen);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+.thumb-sm img{width:100%;height:100%;object-fit:cover;}
+.thumb-sm svg{width:12px;height:12px;stroke:var(--muted);fill:none;stroke-width:1.5;}
+
+/* toggle availability */
+.avail-toggle{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-size:.72rem;color:var(--muted);}
+.toggle-track{position:relative;width:34px;height:18px;background:var(--border2);border-radius:9px;transition:background var(--t);flex-shrink:0;}
+.toggle-track.on{background:var(--green);}
+.toggle-knob{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform var(--t);box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle-track.on .toggle-knob{transform:translateX(16px);}
+
+/* empty state */
+.empty-row td{text-align:center;padding:3rem;color:var(--muted);font-size:.82rem;font-weight:300;}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(22,19,14,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{
+  background:var(--cream);width:100%;max-width:580px;
+  max-height:90dvh;overflow-y:auto;
+  border:1px solid var(--border);
+  animation:fadeUp .28s var(--ease) both;
+}
+.modal::-webkit-scrollbar{width:4px;}.modal::-webkit-scrollbar-thumb{background:var(--border2);}
+.m-head{
+  padding:1.5rem 1.75rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--cream);z-index:1;
+}
+.m-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--dark);}
+.m-close{background:none;border:1px solid var(--border2);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:all var(--t);}
+.m-close:hover{border-color:var(--gold);color:var(--gold);}
+.m-close svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;}
+.m-body{padding:1.75rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.f-group{margin-bottom:1.1rem;}
+.f-group label{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;font-weight:500;}
+.f-group input,.f-group select,.f-group textarea{
+  width:100%;padding:.7rem .9rem;
+  background:#fff;border:1px solid var(--border2);
+  font-family:'Jost',sans-serif;font-size:.88rem;color:var(--ink);
+  outline:none;border-radius:0;transition:border-color var(--t),box-shadow var(--t);
+}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,149,90,.1);}
+.f-group textarea{resize:vertical;min-height:80px;font-size:.84rem;}
+.f-group select{appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8070'/%3E%3C/svg%3E") right 12px center no-repeat;cursor:pointer;}
+.checks{display:flex;gap:1.5rem;margin-bottom:1.1rem;flex-wrap:wrap;}
+.check-label{display:flex;align-items:center;gap:.5rem;font-size:.78rem;cursor:pointer;color:var(--ink);}
+.check-label input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;}
+
+/* upload zone */
+.upload-zone{
+  border:1.5px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;
+  transition:all var(--t);margin-bottom:.75rem;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:var(--gold-gl);}
+.upload-zone svg{width:24px;height:24px;stroke:var(--muted);fill:none;stroke-width:1.4;margin:0 auto .5rem;}
+.upload-zone p{font-size:.75rem;color:var(--muted);font-weight:300;}
+.previews{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem;}
+.prev-item{width:70px;height:70px;overflow:hidden;position:relative;border:1px solid var(--border);}
+.prev-item img{width:100%;height:100%;object-fit:cover;}
+.prev-rm{position:absolute;top:2px;right:2px;background:rgba(22,19,14,.7);color:#fff;border:none;width:16px;height:16px;font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* form error */
+.f-err{background:var(--red-l);border-left:3px solid var(--red);padding:.75rem 1rem;font-size:.78rem;color:var(--red);margin-bottom:1rem;display:none;}
+.f-err.show{display:block;}
+
+/* save btn */
+.save-btn{
+  width:100%;height:48px;background:var(--dark);color:#fff;border:none;
+  font-family:'Jost',sans-serif;font-size:.72rem;font-weight:500;
+  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:background var(--t);position:relative;overflow:hidden;
+}
+.save-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(184,149,90,.2));opacity:0;transition:opacity var(--t);}
+.save-btn:hover{background:var(--dark3);}
+.save-btn:hover::before{opacity:1;}
+.save-btn:disabled{opacity:.6;cursor:not-allowed;}
+.save-btn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:1.8;}
+.spin-sm{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  background:var(--dark);color:#fff;
+  padding:.85rem 1.25rem;
+  font-size:.75rem;letter-spacing:.06em;
+  display:flex;align-items:center;gap:.6rem;
+  transform:translateY(80px);opacity:0;transition:all .3s var(--ease);
+  z-index:999;border-left:3px solid var(--gold);
+  pointer-events:none;max-width:320px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.err{border-color:var(--red);}
+.toast svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0;}
+.toast.err svg{stroke:var(--red);}
+
+/* ── REVENUE CHART ── */
+.chart-wrap{border:1px solid var(--border);background:var(--cream);padding:1.5rem;margin-top:1px;}
+.chart-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem;}
+.bars{display:flex;align-items:flex-end;gap:6px;height:80px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar{width:100%;background:linear-gradient(180deg,var(--gold-l),var(--gold));border-radius:1px 1px 0 0;transition:height .6s var(--ease);min-height:2px;}
+.bar-day{font-size:.55rem;color:var(--muted);letter-spacing:.04em;}
+.bar-amt{font-size:.58rem;color:var(--gold);font-weight:500;}
+
+/* ── RECENT PAYMENTS (dashboard) ── */
+.recent-wrap{border:1px solid var(--border);background:var(--cream);margin-top:1px;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  :root{--sidebar:0px;}
+  .sidebar{transform:translateX(-100%);transition:transform .3s var(--ease);}
+  .sidebar.open{transform:translateX(0);}
+  .topbar{padding:0 1.25rem;}
+  .content{padding:1.5rem 1rem;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .ham-btn{display:flex!important;}
+}
+@media(min-width:901px){.ham-btn{display:none!important;}}
+.ham-btn{
+  display:none;background:none;border:1px solid var(--border2);
+  width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;
+}
+.ham-btn svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.8;}
 </style>
 </head>
 <body>
 
-<!-- LOADING OVERLAY -->
-<div id="loadingOverlay" style="display:flex;position:fixed;inset:0;background:white;z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
-  <div style="width:48px;height:48px;border:3px solid #E1F5EE;border-top-color:#1D9E75;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
-  <p style="font-family:'DM Sans',sans-serif;font-size:0.9rem;color:#6b7280;">Verifying access...</p>
+<!-- LOADING -->
+<div id="loading">
+  <div class="load-ring"></div>
+  <div class="load-txt">Verifying access</div>
 </div>
 
-<!-- ACCESS DENIED (shown if not admin) -->
-<div id="accessDenied" style="display:none;position:fixed;inset:0;background:white;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
-  <div style="font-size:3rem;">🔒</div>
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;">Admin Access Only</h2>
-  <p style="color:var(--text-muted);font-size:0.9rem;" id="accessDeniedMsg">This page is restricted to administrators.</p>
-  <a href="login.html" style="background:var(--green);color:white;padding:0.7rem 1.5rem;border-radius:10px;text-decoration:none;font-family:'Cormorant Garamond',serif;font-weight:600;">Go to Login</a>
+<!-- ACCESS DENIED -->
+<div id="denied">
+  <div>
+    <div class="denied-ring"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <div class="denied-t">Admin access only</div>
+    <p class="denied-sub" id="denied-msg">This page is restricted to administrators of NestFinder CUK.</p>
+    <a href="login.html" class="denied-btn">
+      <svg viewBox="0 0 24 24" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
+      Go to Sign In
+    </a>
+  </div>
 </div>
 
 <!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    Nest<span>Finder</span> CUK
-    <small>Admin Panel</small>
-    <small id="adminName" style="color:rgba(255,255,255,0.5);font-size:0.65rem;display:block;margin-top:2px;"></small>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-row">
+      <div class="sb-logo-ring"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div>
+      <div class="sb-logo-text">Nest<b>Finder</b> CUK</div>
+    </div>
+    <div class="sb-badge">Admin Panel</div>
+    <div class="sb-admin-name" id="adminName"></div>
   </div>
-  <nav class="sidebar-nav">
-    <button class="nav-item active" onclick="showPage('dashboard')">
-      <span class="icon">📊</span> Dashboard
+  <nav class="sb-nav">
+    <button class="sb-item on" onclick="goto('dashboard',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
     </button>
-    <button class="nav-item" onclick="showPage('listings')">
-      <span class="icon">🏠</span> Listings
+    <button class="sb-item" onclick="goto('listings',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
+      Listings
     </button>
-    <button class="nav-item" onclick="showPage('payments')">
-      <span class="icon">💳</span> Payments
+    <div class="sb-divider"></div>
+    <button class="sb-item" onclick="goto('payments',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Payments
     </button>
-    <button class="nav-item" onclick="showPage('users')">
-      <span class="icon">👥</span> Students
+    <button class="sb-item" onclick="goto('students',this)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Students
     </button>
-    <div style="height:1px;background:rgba(255,255,255,0.08);margin:0.5rem 0;"></div>
-    <button class="nav-item" onclick="showPage('golive')">
-      <span class="icon">🚀</span> Go Live
-    </button>
-    <button class="nav-item" onclick="showPage('seo')">
-      <span class="icon">🔍</span> SEO & Share
-    </button>
+    <div class="sb-divider"></div>
+    <a class="sb-item" href="index.html" style="text-decoration:none;">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      View Site
+    </a>
   </nav>
-  <div class="sidebar-footer">
-    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
+  <div class="sb-foot">
+    <button class="sb-out" onclick="doSignOut()">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      Sign Out
+    </button>
   </div>
 </aside>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <main class="main">
+
+  <!-- TOPBAR -->
   <div class="topbar">
-    <div style="display:flex;align-items:center;gap:0.75rem;">
-      <button class="mob-toggle" onclick="toggleSidebar()">
+    <div class="topbar-left">
+      <button class="ham-btn" id="hamBtn" onclick="document.getElementById('sidebar').classList.toggle('open')">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <h1 id="pageTitle">Dashboard</h1>
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-pill">NestFinder CUK</div>
     </div>
-    <span class="admin-badge">Admin</span>
+    <div class="topbar-right" id="topbarActions">
+      <!-- dynamic buttons injected per page -->
+    </div>
   </div>
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
   <div class="content">
 
     <!-- DASHBOARD -->
-    <div class="page active" id="page-dashboard">
+    <div class="page on" id="page-dashboard">
       <div class="stats-grid" id="statsGrid">
-        <div class="stat-card"><div class="stat-label">Total Listings</div><div class="stat-value" id="statListings">—</div><div class="stat-sub">Active houses</div></div>
-        <div class="stat-card"><div class="stat-label">Available Now</div><div class="stat-value" id="statAvailable">—</div><div class="stat-sub">Ready to view</div></div>
-        <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value" id="statStudents">—</div><div class="stat-sub">Registered users</div></div>
-        <div class="stat-card"><div class="stat-label">Total Payments</div><div class="stat-value" id="statPayments">—</div><div class="stat-sub">Viewing fees collected</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div><div class="stat-label">Total Listings</div><div class="stat-val" id="s-listings">—</div><div class="stat-sub">on platform</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label">Available</div><div class="stat-val" id="s-avail">—</div><div class="stat-sub">ready to view</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-label">Students</div><div class="stat-val" id="s-students">—</div><div class="stat-sub">registered</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="stat-label">Revenue</div><div class="stat-val" id="s-revenue">—</div><div class="stat-sub">from confirmed payments</div></div>
       </div>
 
-      <div class="section-head">
-        <h2>Recent Payments</h2>
+      <div class="sec-head"><div><div class="sec-title">Revenue — last 7 days</div><div class="sec-sub">Confirmed payments only</div></div></div>
+      <div class="chart-wrap">
+        <div class="chart-label">Daily confirmed payments (Ksh)</div>
+        <div class="bars" id="chartBars"></div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Student</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody id="recentPaymentsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
-        </table>
+
+      <div class="sec-head" style="margin-top:2rem;"><div><div class="sec-title">Recent payments</div></div></div>
+      <div class="recent-wrap">
+        <table><thead><tr><th>Student</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="recentBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table>
       </div>
     </div>
 
     <!-- LISTINGS -->
     <div class="page" id="page-listings">
-      <div class="section-head">
-        <h2>House Listings</h2>
-        <button class="add-btn" onclick="openListingModal()">+ Add Listing</button>
+      <div class="sec-head">
+        <div><div class="sec-title">House Listings</div><div class="sec-sub" id="listingCount">—</div></div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Photos</th><th>Title</th><th>Type</th><th>Price</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="listingsBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div>Loading listings...</div></td></tr></tbody>
-        </table>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Photos</th><th>Listing</th><th>Type</th><th>Price</th><th>Available</th><th>Actions</th></tr></thead>
+        <tbody id="listingsBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table>
       </div>
     </div>
 
     <!-- PAYMENTS -->
     <div class="page" id="page-payments">
-      <div class="section-head">
-        <h2>All Payments</h2>
-        <button class="add-btn" onclick="exportCSV()" style="background:var(--green-dark);">⬇ Export CSV</button>
+      <div class="sec-head">
+        <div><div class="sec-title">All Payments</div></div>
+        <button class="topbar-btn tbtn-ghost" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
-          <tbody id="paymentsBody"><tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
-        </table>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody id="paymentsBody"><tr class="empty-row"><td colspan="8">Loading…</td></tr></tbody></table>
       </div>
     </div>
 
     <!-- STUDENTS -->
-    <div class="page" id="page-users">
-      <div class="section-head"><h2>Registered Students</h2></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
-          <tbody id="usersBody"><tr><td colspan="5"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-
-    <!-- GO LIVE PAGE -->
-    <div class="page" id="page-golive">
-      <div style="max-width:700px;">
-
-        <div style="background:linear-gradient(135deg,#085041,#1D9E75);border-radius:14px;padding:2rem;margin-bottom:1.5rem;color:white;">
-          <div style="font-size:1.5rem;margin-bottom:0.5rem;">🚀 Switch to Real M-Pesa Payments</div>
-          <p style="opacity:0.8;font-size:0.9rem;line-height:1.7;">You are currently on Sandbox (test mode). Follow these steps to go live and collect real Ksh 250 payments from students.</p>
-        </div>
-
-        <div class="table-wrap" style="margin-bottom:1.5rem;">
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 1 — Apply for Go Live on Daraja</div>
-            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
-              <li>Go to <strong>developer.safaricom.co.ke</strong> → click <strong>Go Live</strong> in left sidebar</li>
-              <li>Fill in your business details — you need a <strong>registered business or M-Pesa Paybill/Till number</strong></li>
-              <li>For a personal Till: go to any Safaricom shop with your ID and register a <strong>Lipa Na M-Pesa Till</strong> (free)</li>
-              <li>Submit the Go Live form — Safaricom reviews in 2–5 business days</li>
-              <li>You will receive your <strong>live Consumer Key, Consumer Secret, Shortcode and Passkey</strong> via email</li>
-            </ol>
-          </div>
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 2 — Update Vercel Environment Variables</div>
-            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">Once you have your live credentials, go to <strong>vercel.com → nest-finder-cuk → Settings → Environment Variables</strong> and update:</p>
-            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;line-height:2;">
-              MPESA_ENV = <strong>live</strong><br>
-              MPESA_CONSUMER_KEY = <em>your live key</em><br>
-              MPESA_CONSUMER_SECRET = <em>your live secret</em><br>
-              MPESA_SHORTCODE = <em>your Till/Paybill number</em><br>
-              MPESA_PASSKEY = <em>your live passkey</em><br>
-              MPESA_CALLBACK_URL = https://nest-finder-cuk.vercel.app/api/mpesa-callback
-            </div>
-          </div>
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 3 — Get Supabase Service Key</div>
-            <p style="font-size:0.85rem;color:#6b7280;line-height:1.7;">Go to <strong>supabase.com → nestfinder-cuk → Settings → API</strong>. Copy the <strong>service_role</strong> key (the secret one). Add it to Vercel as <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">SUPABASE_SERVICE_KEY</code>. This lets the callback function confirm payments automatically.</p>
-          </div>
-          <div style="padding:1.25rem;">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 4 — Redeploy on Vercel</div>
-            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">After updating all variables, go to <strong>Vercel → Deployments → Redeploy</strong>. Students will now pay real money and contacts unlock automatically.</p>
-            <div style="background:#E1F5EE;border:1px solid #9FE1CB;border-radius:8px;padding:0.75rem 1rem;font-size:0.84rem;color:#085041;">
-              💡 <strong>Until then:</strong> Students pay in sandbox (test mode). You manually confirm payments from the Payments tab above. Contacts still unlock correctly.
-            </div>
-          </div>
-        </div>
-
-        <div class="table-wrap" style="margin-bottom:1.5rem;">
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">📧 Email Notifications — When Students Pay</div>
-            <p style="font-size:0.85rem;color:#6b7280;line-height:1.7;margin-bottom:1rem;">To get email alerts when a student pays, add this to your <strong>mpesa-callback.js</strong> Vercel function after the payment is confirmed:</p>
-            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;overflow-x:auto;">
-// Send email via Resend (free tier — 100 emails/day)<br>
-// 1. Sign up free at resend.com, get API key<br>
-// 2. Add RESEND_API_KEY to Vercel env vars<br>
-// 3. Add this after payment is confirmed:<br><br>
-await fetch('https://api.resend.com/emails', {<br>
-&nbsp;&nbsp;method: 'POST',<br>
-&nbsp;&nbsp;headers: {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;'Authorization': 'Bearer ' + process.env.RESEND_API_KEY,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;'Content-Type': 'application/json'<br>
-&nbsp;&nbsp;},<br>
-&nbsp;&nbsp;body: JSON.stringify({<br>
-&nbsp;&nbsp;&nbsp;&nbsp;from: 'NestFinder CUK &lt;noreply@nestfinder.co.ke&gt;',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;to: ['waren23greg@student.cuk.ac.ke'],<br>
-&nbsp;&nbsp;&nbsp;&nbsp;subject: 'New Payment — Ksh 250 received',<br>
-&nbsp;&nbsp;&nbsp;&nbsp;html: `&lt;p&gt;A student just paid Ksh 250.&lt;br&gt;Ref: ${mpesaRef}&lt;br&gt;Phone: ${phone}&lt;/p&gt;`<br>
-&nbsp;&nbsp;})<br>
-});
-            </div>
-          </div>
-          <div style="padding:1.25rem;">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">🌐 Custom Domain — nestfinder.co.ke</div>
-            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
-              <li>Buy <strong>nestfinder.co.ke</strong> at <strong>KENICregistry.or.ke</strong> or <strong>truehost.co.ke</strong> (~Ksh 1,500/yr)</li>
-              <li>In Vercel → <strong>Settings → Domains</strong> → Add <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">nestfinder.co.ke</code></li>
-              <li>Vercel shows you DNS records to add — go to your domain registrar and add them</li>
-              <li>SSL certificate is automatic — site goes live on your domain in ~10 minutes</li>
-              <li>Update <strong>MPESA_CALLBACK_URL</strong> in Vercel to <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">https://nestfinder.co.ke/api/mpesa-callback</code></li>
-            </ol>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- SEO PAGE -->
-    <div class="page" id="page-seo">
-      <div style="max-width:700px;">
-
-        <div style="background:linear-gradient(135deg,#1a1510,#3a3028);border-radius:14px;padding:2rem;margin-bottom:1.5rem;color:white;">
-          <div style="font-size:1.5rem;margin-bottom:0.5rem;">🔍 SEO & Google Discovery</div>
-          <p style="opacity:0.8;font-size:0.9rem;line-height:1.7;">Help students find NestFinder CUK on Google. These steps are free and take under 30 minutes.</p>
-        </div>
-
-        <div class="table-wrap" style="margin-bottom:1.5rem;">
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 1 — Submit to Google Search Console</div>
-            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
-              <li>Go to <strong>search.google.com/search-console</strong> → Add property</li>
-              <li>Enter <strong>nest-finder-cuk.vercel.app</strong> (or your custom domain)</li>
-              <li>Verify ownership via HTML tag — add the tag to your index.html &lt;head&gt;</li>
-              <li>Submit sitemap: <strong>nest-finder-cuk.vercel.app/sitemap.xml</strong></li>
-            </ol>
-          </div>
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 2 — Add these meta tags to index.html &lt;head&gt;</div>
-            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;overflow-x:auto;">
-&lt;meta name="description" content="Find affordable student housing near The Cooperative University of Kenya. Single rooms Ksh 3,500–5,500, Bedsitters Ksh 6,000–10,000, One bedrooms Ksh 10,000–13,000. Verified listings, no scammers."&gt;<br>
-&lt;meta name="keywords" content="CUK student housing, Cooperative University Kenya rentals, student bedsitter Karen, single room Rongai, student accommodation Langata"&gt;<br>
-&lt;meta property="og:title" content="NestFinder CUK — Student Housing"&gt;<br>
-&lt;meta property="og:description" content="Safe verified student housing near CUK. Browse free, pay Ksh 250 to unlock caretaker contact."&gt;<br>
-&lt;meta property="og:url" content="https://nest-finder-cuk.vercel.app"&gt;<br>
-&lt;meta property="og:type" content="website"&gt;<br>
-&lt;meta name="robots" content="index, follow"&gt;
-            </div>
-          </div>
-          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 3 — Create sitemap.xml</div>
-            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">Create a file called <strong>sitemap.xml</strong> in your project root:</p>
-            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;">
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>
-&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;<br>
-&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/&lt;/loc&gt;&lt;priority&gt;1.0&lt;/priority&gt;&lt;/url&gt;<br>
-&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/login.html&lt;/loc&gt;&lt;priority&gt;0.8&lt;/priority&gt;&lt;/url&gt;<br>
-&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/payments.html&lt;/loc&gt;&lt;priority&gt;0.6&lt;/priority&gt;&lt;/url&gt;<br>
-&lt;/urlset&gt;
-            </div>
-          </div>
-          <div style="padding:1.25rem;">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 4 — Share on Social Media</div>
-            <div style="display:flex;flex-direction:column;gap:0.75rem;">
-              <a href="https://www.facebook.com/sharer/sharer.php?u=https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#1877F2;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on Facebook</a>
-              <a href="https://twitter.com/intent/tweet?text=Find%20affordable%20student%20housing%20near%20CUK%20%F0%9F%8F%A0&url=https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#1DA1F2;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on Twitter/X</a>
-              <a href="https://wa.me/?text=Find%20affordable%20verified%20student%20housing%20near%20CUK%20%F0%9F%8F%A0%20https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#25D366;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on WhatsApp</a>
-            </div>
-          </div>
-        </div>
-
+    <div class="page" id="page-students">
+      <div class="sec-head"><div><div class="sec-title">Registered Students</div></div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+        <tbody id="studentsBody"><tr class="empty-row"><td colspan="5">Loading…</td></tr></tbody></table>
       </div>
     </div>
 
@@ -513,497 +457,382 @@ await fetch('https://api.resend.com/emails', {<br>
 </main>
 
 <!-- LISTING MODAL -->
-<div class="overlay" id="listingOverlay" onclick="closeOnBg(event,'listingOverlay')">
+<div class="overlay" id="listingOverlay" onclick="bgClose(event,'listingOverlay')">
   <div class="modal">
-    <div class="modal-head">
-      <h3 id="modalTitle">Add New Listing</h3>
-      <button class="modal-close" onclick="closeModal('listingOverlay')">✕</button>
+    <div class="m-head">
+      <div class="m-title" id="modalTitle">Add Listing</div>
+      <button class="m-close" onclick="closeModal('listingOverlay')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="modal-body">
-      <input type="hidden" id="editingId">
-
+    <div class="m-body">
+      <input type="hidden" id="editId"/>
       <div class="form-row">
-        <div class="form-group">
-          <label>Title</label>
-          <input type="text" id="fTitle" placeholder="e.g. Cosy Single Room — Karen">
-        </div>
-        <div class="form-group">
-          <label>Type</label>
-          <select id="fType">
-            <option value="single">Single Room</option>
-            <option value="bedsitter">Bedsitter</option>
-            <option value="one-bedroom">One Bedroom</option>
-          </select>
-        </div>
+        <div class="f-group"><label>Title</label><input id="fTitle" placeholder="e.g. Cosy Bedsitter — Karen Road"/></div>
+        <div class="f-group"><label>Type</label><select id="fType"><option value="single">Single Room</option><option value="bedsitter">Bedsitter</option><option value="one-bedroom">One Bedroom</option></select></div>
       </div>
-
       <div class="form-row">
-        <div class="form-group">
-          <label>Monthly Price (Ksh)</label>
-          <input type="number" id="fPrice" placeholder="e.g. 4500">
-        </div>
-        <div class="form-group">
-          <label>Location</label>
-          <input type="text" id="fLocation" placeholder="e.g. Karen Road, 10 min walk">
-        </div>
+        <div class="f-group"><label>Monthly Price (Ksh)</label><input type="number" id="fPrice" placeholder="e.g. 8500"/></div>
+        <div class="f-group"><label>Location</label><input id="fLoc" placeholder="e.g. Karen Road, 10 min walk"/></div>
       </div>
-
-      <div class="form-group">
-        <label>Description</label>
-        <textarea id="fDescription" placeholder="Describe the house — size, condition, surroundings..."></textarea>
+      <div class="f-group"><label>Description</label><textarea id="fDesc" placeholder="Describe the house, surroundings, condition…"></textarea></div>
+      <div class="checks">
+        <label class="check-label"><input type="checkbox" id="fWater"/> Water included</label>
+        <label class="check-label"><input type="checkbox" id="fWifi"/> WiFi available</label>
+        <label class="check-label"><input type="checkbox" id="fAvail" checked/> Available now</label>
       </div>
-
-      <div class="checkbox-row">
-        <label class="checkbox-label"><input type="checkbox" id="fWater"> Water Included</label>
-        <label class="checkbox-label"><input type="checkbox" id="fWifi"> WiFi Available</label>
-        <label class="checkbox-label"><input type="checkbox" id="fAvailable" checked> Available Now</label>
+      <div class="form-row">
+        <div class="f-group"><label>Caretaker Name</label><input id="fCtName" placeholder="e.g. Mama Wanjiku"/></div>
+        <div class="f-group"><label>Caretaker Phone</label><input id="fCtPhone" placeholder="07XXXXXXXX"/></div>
       </div>
-
-      <div class="form-group">
-        <label>Caretaker Name</label>
-        <input type="text" id="fCaretakerName" placeholder="e.g. Mama Wanjiku">
-      </div>
-      <div class="form-group">
-        <label>Caretaker Phone</label>
-        <input type="tel" id="fCaretakerPhone" placeholder="07XXXXXXXX">
-      </div>
-
-      <div class="form-group">
+      <div class="f-group">
         <label>House Photos (max 6)</label>
-        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()"
-          ondragover="event.preventDefault();this.classList.add('drag')"
-          ondragleave="this.classList.remove('drag')"
-          ondrop="handleDrop(event)">
-          <div class="upload-icon">📷</div>
-          <p>Click to upload or drag & drop photos here</p>
-          <p style="font-size:0.75rem;margin-top:0.25rem;">JPG, PNG — max 5MB each</p>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p>Click to upload or drag & drop photos</p>
+          <p style="margin-top:.25rem;font-size:.65rem;">JPG / PNG — max 5 MB each · up to 6 photos</p>
         </div>
-        <input type="file" id="photoInput" multiple accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
-        <div class="upload-previews" id="uploadPreviews"></div>
+        <input type="file" id="photoInput" multiple accept="image/*" style="display:none" onchange="handlePhotos(event)"/>
+        <div class="previews" id="previews"></div>
       </div>
-
-      <div id="formError" style="background:var(--red-light);border:1px solid #fecaca;border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--red);display:none;margin-bottom:1rem;"></div>
-
+      <div class="f-err" id="fErr"></div>
       <button class="save-btn" id="saveBtn" onclick="saveListing()">
-        <div class="spinner-sm" id="saveSpinner"></div>
-        <span id="saveBtnText">Save Listing</span>
+        <div class="spin-sm" id="saveSpin"></div>
+        <svg id="saveIco" viewBox="0 0 24 24" width="14" height="14"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="saveTxt">Save Listing</span>
       </button>
     </div>
   </div>
 </div>
 
 <!-- TOAST -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastTxt"></span>
+</div>
 
 <script>
-const SUPABASE_URL = 'https://mtycapgbtvpczvswpjpo.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_ikfawEkiP9A6I9Exk0xN-w_JgqsG7-C';
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SU='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const sb=supabase.createClient(SU,SK);
+let pendingPhotos=[],existingPhotos=[];
 
-let currentAdmin = null;
-let pendingPhotos = [];
-let existingPhotos = [];
+// ── AUTH ──
+async function init(){
+  let session=null;
+  for(let i=0;i<3;i++){
+    const {data}=await sb.auth.getSession();
+    if(data.session){session=data.session;break;}
+    await new Promise(r=>setTimeout(r,600));
+  }
+  if(!session){window.location.href='login.html';return;}
 
-async function init() {
-  // Show a loading overlay while we verify auth — prevents flash of login redirect
-  document.getElementById('loadingOverlay').style.display = 'flex';
-
-  // Wait for Supabase to fully restore session from storage
-  const { data: { session } } = await sb.auth.getSession();
-
-  if (!session) {
-    // Try once more after a short delay (handles slow session restore)
-    await new Promise(r => setTimeout(r, 800));
-    const { data: { session: session2 } } = await sb.auth.getSession();
-    if (!session2) {
-      window.location.href = 'login.html';
-      return;
-    }
+  let profile=null;
+  for(let i=0;i<3;i++){
+    const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).single();
+    if(data){profile=data;break;}
+    await new Promise(r=>setTimeout(r,500));
   }
 
-  const activeSession = session || (await sb.auth.getSession()).data.session;
+  document.getElementById('loading').classList.add('hide');
 
-  // Retry profile fetch up to 3 times — network can be slow
-  let profile = null;
-  for (let i = 0; i < 3; i++) {
-    const { data } = await sb.from('profiles')
-      .select('role,full_name')
-      .eq('id', activeSession.user.id)
-      .single();
-    if (data) { profile = data; break; }
-    await new Promise(r => setTimeout(r, 500));
-  }
-
-  document.getElementById('loadingOverlay').style.display = 'none';
-
-  if (!profile) {
-    // Profile not created yet — this can happen if trigger is slow
-    // Show access denied with a helpful message
-    document.getElementById('accessDenied').style.display = 'flex';
-    document.getElementById('accessDeniedMsg').textContent =
-      'Your profile is still being set up. Please wait a moment and refresh.';
+  if(!profile||profile.role!=='admin'){
+    if(!profile)document.getElementById('denied-msg').textContent='Your profile is still being set up. Refresh in a moment.';
+    document.getElementById('denied').classList.add('show');
     return;
   }
 
-  if (profile.role !== 'admin') {
-    document.getElementById('accessDenied').style.display = 'flex';
-    return;
-  }
-
-  currentAdmin = activeSession.user;
-  // Show admin name in sidebar
-  const name = profile.full_name?.split(' ')[0] || 'Admin';
-  document.getElementById('adminName').textContent = name;
+  document.getElementById('adminName').textContent=profile.full_name?.split(' ')[0]||'Admin';
   loadDashboard();
 }
 
-// Also listen for auth state changes — catches session restored after page load
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_OUT') {
-    window.location.href = 'login.html';
-  }
-});
+sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT')window.location.href='login.html';});
 
-async function signOut() {
-  await sb.auth.signOut();
-  window.location.href = 'login.html';
+async function doSignOut(){await sb.auth.signOut();window.location.href='login.html';}
+
+// ── NAVIGATION ──
+const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students'};
+const actions={
+  listings:`<button class="topbar-btn tbtn-gold" onclick="openModal()"><svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Listing</button>`,
+  payments:`<button class="topbar-btn tbtn-ghost" onclick="exportCSV()"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>`,
+  dashboard:'',students:''
+};
+function goto(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  if(btn)btn.classList.add('on');
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  document.getElementById('topbarActions').innerHTML=actions[name]||'';
+  document.getElementById('sidebar').classList.remove('open');
+  if(name==='listings')loadListings();
+  if(name==='payments')loadPayments();
+  if(name==='students')loadStudents();
 }
 
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelector(`[onclick="showPage('${name}')"]`).classList.add('active');
-  const titles = { dashboard:'Dashboard', listings:'House Listings', payments:'Payments', users:'Students', golive:'Go Live — Real Payments', seo:'SEO & Sharing' };
-  document.getElementById('pageTitle').textContent = titles[name];
-  if (name === 'listings') loadListings();
-  if (name === 'payments') loadPayments();
-  if (name === 'users') loadUsers();
-  if (name === 'golive') renderGoLive();
-  if (name === 'seo') renderSEO();
+// ── TOAST ──
+let toastTimer;
+function toast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.className='toast show'+(err?' err':'');
+  document.getElementById('toastTxt').textContent=msg;
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.className='toast',3200);
 }
 
-function toast(msg, isError=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (isError?' error':'');
-  setTimeout(() => t.className = 'toast', 3000);
-}
-
-async function loadDashboard() {
-  const [l, p, u] = await Promise.all([
-    sb.from('listings').select('id,available', {count:'exact'}),
-    sb.from('payments').select('id,status', {count:'exact'}),
-    sb.from('profiles').select('id', {count:'exact'}).eq('role','student')
+// ── DASHBOARD ──
+async function loadDashboard(){
+  const [l,p,u]=await Promise.all([
+    sb.from('listings').select('id,available',{count:'exact'}),
+    sb.from('payments').select('id,status,amount,created_at',{count:'exact'}),
+    sb.from('profiles').select('id',{count:'exact'}).eq('role','student')
   ]);
+  const avail=(l.data||[]).filter(x=>x.available).length;
+  const confirmed=(p.data||[]).filter(x=>x.status==='confirmed');
+  const rev=confirmed.reduce((s,x)=>s+(x.amount||250),0);
+  document.getElementById('s-listings').textContent=l.count??0;
+  document.getElementById('s-avail').textContent=avail;
+  document.getElementById('s-students').textContent=u.count??0;
+  document.getElementById('s-revenue').textContent='Ksh '+(rev).toLocaleString();
+  buildChart(confirmed);
 
-  document.getElementById('statListings').textContent = l.count ?? 0;
-  document.getElementById('statAvailable').textContent = (l.data||[]).filter(x=>x.available).length;
-  document.getElementById('statStudents').textContent = u.count ?? 0;
-  const confirmed = (p.data||[]).filter(x=>x.status==='confirmed');
-  document.getElementById('statPayments').textContent = 'Ksh ' + (confirmed.length * 250).toLocaleString();
-
-  const { data: payments } = await sb.from('payments')
-    .select('*, profiles(full_name), listings(title)')
-    .order('created_at', {ascending:false}).limit(8);
-
-  const tbody = document.getElementById('recentPaymentsBody');
-  if (!payments?.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
-  tbody.innerHTML = payments.map(p => `
-    <tr>
-      <td>${p.profiles?.full_name || '—'}</td>
-      <td>${p.listings?.title || '—'}</td>
-      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
-      <td style="font-family:monospace;font-size:0.8rem;">${p.mpesa_ref || '—'}</td>
-      <td><span class="badge badge-${p.status}">${p.status}</span></td>
-      <td>${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
-    </tr>`).join('');
+  const {data:rp}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(8);
+  const rb=document.getElementById('recentBody');
+  if(!rp?.length){rb.innerHTML='<tr class="empty-row"><td colspan="6">No payments yet.</td></tr>';return;}
+  rb.innerHTML=rp.map(p=>`<tr><td>${p.profiles?.full_name||'—'}</td><td style="max-width:160px;font-size:.78rem;">${p.listings?.title||'—'}</td><td>Ksh ${(p.amount||250).toLocaleString()}</td><td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td><td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='pending'?'pending':'failed'}">${p.status}</span></td><td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td></tr>`).join('');
 }
 
-async function loadListings() {
-  const { data } = await sb.from('listings').select('*').order('created_at', {ascending:false});
-  const tbody = document.getElementById('listingsBody');
-  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🏠</div>No listings yet. Add your first one!</div></td></tr>'; return; }
-
-  tbody.innerHTML = data.map(h => `
-    <tr>
-      <td>
-        <div class="photo-thumbs">
-          ${(h.photos||[]).slice(0,3).map(url=>`<div class="photo-thumb"><img src="${url}" onerror="this.parentElement.textContent='📷'"></div>`).join('')}
-          ${!(h.photos||[]).length ? '<div class="photo-thumb">📷</div>' : ''}
-        </div>
-      </td>
-      <td style="font-weight:500;max-width:180px;">${h.title}</td>
-      <td><span class="badge badge-${h.type==='one-bedroom'?'one':h.type}">${h.type}</span></td>
-      <td>Ksh ${h.price.toLocaleString()}</td>
-      <td style="font-size:0.82rem;color:var(--text-muted);">${h.location}</td>
-      <td><span class="badge ${h.available?'badge-available':'badge-taken'}">${h.available?'Available':'Taken'}</span></td>
-      <td>
-        <button class="action-btn edit-btn" onclick="editListing('${h.id}')">Edit</button>
-        <button class="action-btn" onclick="toggleAvailable('${h.id}',${h.available})" style="background:${h.available?'var(--amber-light)':'var(--green-light)'};color:${h.available?'#633806':'var(--green-dark)'};border-color:${h.available?'#FAC775':'var(--green-mid)'};">${h.available?'Mark Taken':'Mark Free'}</button>
-        <button class="action-btn del-btn" onclick="deleteListing('${h.id}','${h.title.replace(/'/g,'')}')">Delete</button>
-      </td>
-    </tr>`).join('');
-}
-
-async function loadPayments() {
-  const { data } = await sb.from('payments')
-    .select('*, profiles(full_name), listings(title)')
-    .order('created_at', {ascending:false});
-
-  const tbody = document.getElementById('paymentsBody');
-  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
-
-  tbody.innerHTML = data.map(p => `
-    <tr>
-      <td>${p.profiles?.full_name || '—'}</td>
-      <td>${p.phone || '—'}</td>
-      <td style="max-width:160px;font-size:0.82rem;">${p.listings?.title || '—'}</td>
-      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
-      <td style="font-family:monospace;font-size:0.78rem;">${p.mpesa_ref || '—'}</td>
-      <td><span class="badge badge-${p.status}">${p.status}</span></td>
-      <td style="font-size:0.82rem;">${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
-      <td>
-        ${p.status==='pending' ? `<button class="action-btn edit-btn" onclick="confirmPayment('${p.id}')">Confirm</button>` : ''}
-      </td>
-    </tr>`).join('');
-}
-
-async function confirmPayment(id) {
-  const { error } = await sb.from('payments').update({status:'confirmed'}).eq('id', id);
-  if (error) { toast('Failed to confirm', true); return; }
-  toast('Payment confirmed ✓');
-  loadPayments();
-}
-
-async function loadUsers() {
-  const { data } = await sb.from('profiles').select('*').order('created_at', {ascending:false});
-  const tbody = document.getElementById('usersBody');
-  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">👥</div>No students yet.</div></td></tr>'; return; }
-
-  tbody.innerHTML = data.map(u => `
-    <tr>
-      <td style="font-weight:500;">${u.full_name || '—'}</td>
-      <td>${u.phone || '—'}</td>
-      <td><span class="badge ${u.role==='admin'?'badge-one':'badge-available'}">${u.role}</span></td>
-      <td style="font-size:0.82rem;">${new Date(u.created_at).toLocaleDateString('en-KE')}</td>
-      <td>
-        ${u.role !== 'admin' ? `<button class="action-btn edit-btn" onclick="makeAdmin('${u.id}')">Make Admin</button>` : '<span style="font-size:0.78rem;color:var(--text-muted);">Admin</span>'}
-      </td>
-    </tr>`).join('');
-}
-
-async function makeAdmin(id) {
-  if (!confirm('Make this user an admin? They will have full access.')) return;
-  await sb.from('profiles').update({role:'admin'}).eq('id', id);
-  toast('User is now an admin');
-  loadUsers();
-}
-
-function openListingModal(data=null) {
-  document.getElementById('editingId').value = '';
-  document.getElementById('fTitle').value = '';
-  document.getElementById('fType').value = 'single';
-  document.getElementById('fPrice').value = '';
-  document.getElementById('fLocation').value = '';
-  document.getElementById('fDescription').value = '';
-  document.getElementById('fWater').checked = false;
-  document.getElementById('fWifi').checked = false;
-  document.getElementById('fAvailable').checked = true;
-  document.getElementById('fCaretakerName').value = '';
-  document.getElementById('fCaretakerPhone').value = '';
-  document.getElementById('modalTitle').textContent = 'Add New Listing';
-  document.getElementById('saveBtnText').textContent = 'Save Listing';
-  pendingPhotos = [];
-  existingPhotos = [];
-  renderPreviews();
-  document.getElementById('formError').style.display = 'none';
-  document.getElementById('listingOverlay').classList.add('open');
-}
-
-async function editListing(id) {
-  const { data: h } = await sb.from('listings').select('*').eq('id', id).single();
-  const { data: c } = await sb.from('caretaker_contacts').select('*').eq('listing_id', id).single();
-
-  document.getElementById('editingId').value = id;
-  document.getElementById('fTitle').value = h.title;
-  document.getElementById('fType').value = h.type;
-  document.getElementById('fPrice').value = h.price;
-  document.getElementById('fLocation').value = h.location;
-  document.getElementById('fDescription').value = h.description || '';
-  document.getElementById('fWater').checked = h.water_included;
-  document.getElementById('fWifi').checked = h.wifi_available;
-  document.getElementById('fAvailable').checked = h.available;
-  document.getElementById('fCaretakerName').value = c?.caretaker_name || '';
-  document.getElementById('fCaretakerPhone').value = c?.phone || '';
-  document.getElementById('modalTitle').textContent = 'Edit Listing';
-  document.getElementById('saveBtnText').textContent = 'Update Listing';
-  pendingPhotos = [];
-  existingPhotos = h.photos || [];
-  renderPreviews();
-  document.getElementById('formError').style.display = 'none';
-  document.getElementById('listingOverlay').classList.add('open');
-}
-
-function handlePhotoSelect(e) {
-  const files = Array.from(e.target.files);
-  const total = existingPhotos.length + pendingPhotos.length + files.length;
-  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
-  pendingPhotos.push(...files);
-  renderPreviews();
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('uploadZone').classList.remove('drag');
-  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
-  const total = existingPhotos.length + pendingPhotos.length + files.length;
-  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
-  pendingPhotos.push(...files);
-  renderPreviews();
-}
-
-function renderPreviews() {
-  const container = document.getElementById('uploadPreviews');
-  const existingHtml = existingPhotos.map((url, i) => `
-    <div class="preview-item">
-      <img src="${url}">
-      <button class="remove-photo" onclick="removeExisting(${i})">✕</button>
+function buildChart(confirmed){
+  const bars=document.getElementById('chartBars');
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d);}
+  const totals=days.map(d=>{
+    const ds=d.toDateString();
+    return confirmed.filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(p.amount||250),0);
+  });
+  const max=Math.max(...totals,250);
+  bars.innerHTML=days.map((d,i)=>`
+    <div class="bar-col">
+      <div class="bar-amt">${totals[i]?'Ksh'+totals[i]:''}</div>
+      <div class="bar" style="height:${Math.round((totals[i]/max)*70)+2}px"></div>
+      <div class="bar-day">${d.toLocaleDateString('en-KE',{weekday:'short'})}</div>
     </div>`).join('');
-  const pendingHtml = pendingPhotos.map((f, i) => `
-    <div class="preview-item">
-      <img src="${URL.createObjectURL(f)}">
-      <button class="remove-photo" onclick="removePending(${i})">✕</button>
-    </div>`).join('');
-  container.innerHTML = existingHtml + pendingHtml;
 }
 
-function removeExisting(i) { existingPhotos.splice(i, 1); renderPreviews(); }
-function removePending(i) { pendingPhotos.splice(i, 1); renderPreviews(); }
-
-function showFormError(msg) {
-  const el = document.getElementById('formError');
-  el.textContent = msg;
-  el.style.display = 'block';
+// ── LISTINGS ──
+async function loadListings(){
+  const {data}=await sb.from('listings').select('*').order('created_at',{ascending:false});
+  document.getElementById('listingCount').textContent=(data?.length||0)+' total listings';
+  const tb=document.getElementById('listingsBody');
+  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="6">No listings yet. Add your first one.</td></tr>';return;}
+  tb.innerHTML=data.map(h=>`<tr>
+    <td><div class="thumbs">${(h.photos||[]).slice(0,3).map(u=>`<div class="thumb-sm"><img src="${u}" onerror="this.style.display='none'"/></div>`).join('')}${!(h.photos||[]).length?`<div class="thumb-sm"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`:''}</div></td>
+    <td><div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--dark);margin-bottom:.15rem;">${h.title}</div><div style="font-size:.72rem;color:var(--muted);">${h.location}</div></td>
+    <td><span class="badge badge-${h.type==='one-bedroom'?'one':h.type}">${h.type.replace('-',' ')}</span></td>
+    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;">Ksh ${h.price.toLocaleString()}</td>
+    <td>
+      <label class="avail-toggle" onclick="toggleAvail('${h.id}',${!h.available},this)">
+        <div class="toggle-track${h.available?' on':''}"><div class="toggle-knob"></div></div>
+        <span>${h.available?'Available':'Taken'}</span>
+      </label>
+    </td>
+    <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+      <button class="act act-edit" onclick="editListing('${h.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button>
+      <button class="act act-del" onclick="delListing('${h.id}','${h.title.replace(/'/g,'')}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Del</button>
+    </td>
+  </tr>`).join('');
 }
 
-async function saveListing() {
-  const title = document.getElementById('fTitle').value.trim();
-  const type = document.getElementById('fType').value;
-  const price = parseInt(document.getElementById('fPrice').value);
-  const location = document.getElementById('fLocation').value.trim();
-  const description = document.getElementById('fDescription').value.trim();
-  const water_included = document.getElementById('fWater').checked;
-  const wifi_available = document.getElementById('fWifi').checked;
-  const available = document.getElementById('fAvailable').checked;
-  const caretakerName = document.getElementById('fCaretakerName').value.trim();
-  const caretakerPhone = document.getElementById('fCaretakerPhone').value.trim();
-  const editingId = document.getElementById('editingId').value;
+async function toggleAvail(id,newVal,label){
+  await sb.from('listings').update({available:newVal}).eq('id',id);
+  const track=label.querySelector('.toggle-track');
+  const span=label.querySelector('span');
+  track.classList.toggle('on',newVal);
+  span.textContent=newVal?'Available':'Taken';
+  toast(newVal?'Marked as available':'Marked as taken');
+}
 
-  if (!title || !price || !location) { showFormError('Title, price, and location are required.'); return; }
-  if (!caretakerName || !caretakerPhone) { showFormError('Caretaker name and phone are required.'); return; }
+async function delListing(id,title){
+  if(!confirm(`Delete "${title}"? This cannot be undone.`))return;
+  const {error}=await sb.from('listings').delete().eq('id',id);
+  if(error){toast('Delete failed: '+error.message,true);return;}
+  toast('Listing deleted');loadListings();
+}
 
-  document.getElementById('saveBtn').disabled = true;
-  document.getElementById('saveSpinner').style.display = 'block';
-  document.getElementById('saveBtnText').textContent = 'Saving...';
-  document.getElementById('formError').style.display = 'none';
+// ── PAYMENTS ──
+async function loadPayments(){
+  const {data}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
+  const tb=document.getElementById('paymentsBody');
+  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="8">No payments yet.</td></tr>';return;}
+  tb.innerHTML=data.map(p=>`<tr>
+    <td style="font-weight:500;">${p.profiles?.full_name||'—'}</td>
+    <td>${p.phone||'—'}</td>
+    <td style="font-size:.78rem;max-width:140px;">${p.listings?.title||'—'}</td>
+    <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+    <td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td>
+    <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
+    <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+    <td>${p.status==='pending'?`<button class="act act-confirm" onclick="confirmPay('${p.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Confirm</button>`:'—'}</td>
+  </tr>`).join('');
+}
 
-  // Upload photos in parallel for speed
-  let uploadedUrls = [...existingPhotos];
-  if (pendingPhotos.length) {
-    document.getElementById('saveBtnText').textContent = `Uploading ${pendingPhotos.length} photo${pendingPhotos.length>1?'s':''}...`;
-    const uploads = await Promise.all(pendingPhotos.map(async file => {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const path = `listings/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error: upErr } = await sb.storage.from('house-photos').upload(path, file, { cacheControl:'3600', upsert:false });
-      if (upErr) throw new Error('Photo upload failed: ' + upErr.message);
-      const { data: urlData } = sb.storage.from('house-photos').getPublicUrl(path);
-      return urlData.publicUrl;
-    }));
-    uploadedUrls = [...uploadedUrls, ...uploads];
-  }
-  document.getElementById('saveBtnText').textContent = 'Saving listing...';
+async function confirmPay(id){
+  await sb.from('payments').update({status:'confirmed'}).eq('id',id);
+  toast('Payment confirmed ✓');loadPayments();
+}
 
-  const payload = { title, type, price, location, description, water_included, wifi_available, available, photos: uploadedUrls };
+function exportCSV(){
+  const rows=[['Student','Phone','Listing','Amount','M-Pesa Ref','Status','Date']];
+  document.querySelectorAll('#paymentsBody tr:not(.empty-row)').forEach(tr=>{
+    rows.push([...tr.querySelectorAll('td')].slice(0,7).map(td=>'"'+td.textContent.trim()+'"'));
+  });
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='nestfinder-payments-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
 
-  let listingId = editingId;
-  if (editingId) {
-    const { error } = await sb.from('listings').update(payload).eq('id', editingId);
-    if (error) { showFormError('Update failed: ' + error.message); resetSaveBtn(); return; }
+// ── STUDENTS ──
+async function loadStudents(){
+  const {data}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  const tb=document.getElementById('studentsBody');
+  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="5">No students yet.</td></tr>';return;}
+  tb.innerHTML=data.map(u=>`<tr>
+    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;">${u.full_name||'—'}</td>
+    <td>${u.phone||'—'}</td>
+    <td><span class="badge badge-${u.role==='admin'?'admin':'student'}">${u.role}</span></td>
+    <td style="font-size:.75rem;">${new Date(u.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+    <td>${u.role!=='admin'?`<button class="act act-edit" onclick="makeAdmin('${u.id}')">Make Admin</button>`:'<span style="font-size:.72rem;color:var(--muted);">Admin</span>'}</td>
+  </tr>`).join('');
+}
+
+async function makeAdmin(id){
+  if(!confirm('Grant admin access to this user?'))return;
+  await sb.from('profiles').update({role:'admin'}).eq('id',id);
+  toast('User is now an admin');loadStudents();
+}
+
+// ── LISTING MODAL ──
+function openModal(data=null){
+  ['fTitle','fPrice','fLoc','fDesc','fCtName','fCtPhone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fType').value='single';
+  document.getElementById('fWater').checked=false;
+  document.getElementById('fWifi').checked=false;
+  document.getElementById('fAvail').checked=true;
+  document.getElementById('editId').value='';
+  document.getElementById('modalTitle').textContent='Add Listing';
+  document.getElementById('saveTxt').textContent='Save Listing';
+  pendingPhotos=[];existingPhotos=[];renderPreviews();
+  document.getElementById('fErr').className='f-err';
+  document.getElementById('listingOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+async function editListing(id){
+  const {data:h}=await sb.from('listings').select('*').eq('id',id).single();
+  const {data:ct}=await sb.from('caretaker_contacts').select('*').eq('listing_id',id).single();
+  document.getElementById('editId').value=id;
+  document.getElementById('fTitle').value=h.title;
+  document.getElementById('fType').value=h.type;
+  document.getElementById('fPrice').value=h.price;
+  document.getElementById('fLoc').value=h.location;
+  document.getElementById('fDesc').value=h.description||'';
+  document.getElementById('fWater').checked=h.water_included;
+  document.getElementById('fWifi').checked=h.wifi_available;
+  document.getElementById('fAvail').checked=h.available;
+  document.getElementById('fCtName').value=ct?.caretaker_name||'';
+  document.getElementById('fCtPhone').value=ct?.phone||'';
+  document.getElementById('modalTitle').textContent='Edit Listing';
+  document.getElementById('saveTxt').textContent='Update Listing';
+  pendingPhotos=[];existingPhotos=h.photos||[];renderPreviews();
+  document.getElementById('fErr').className='f-err';
+  document.getElementById('listingOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function handlePhotos(e){
+  const files=Array.from(e.target.files);
+  if(existingPhotos.length+pendingPhotos.length+files.length>6){showFErr('Max 6 photos allowed.');return;}
+  pendingPhotos.push(...files);renderPreviews();
+}
+function handleDrop(e){
+  e.preventDefault();document.getElementById('uploadZone').classList.remove('drag');
+  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  if(existingPhotos.length+pendingPhotos.length+files.length>6){showFErr('Max 6 photos.');return;}
+  pendingPhotos.push(...files);renderPreviews();
+}
+function renderPreviews(){
+  const c=document.getElementById('previews');
+  c.innerHTML=
+    existingPhotos.map((u,i)=>`<div class="prev-item"><img src="${u}"/><button class="prev-rm" onclick="existingPhotos.splice(${i},1);renderPreviews()">✕</button></div>`).join('')+
+    pendingPhotos.map((f,i)=>`<div class="prev-item"><img src="${URL.createObjectURL(f)}"/><button class="prev-rm" onclick="pendingPhotos.splice(${i},1);renderPreviews()">✕</button></div>`).join('');
+}
+function showFErr(msg){const e=document.getElementById('fErr');e.textContent=msg;e.className='f-err show';}
+
+async function saveListing(){
+  const title=document.getElementById('fTitle').value.trim();
+  const price=parseInt(document.getElementById('fPrice').value);
+  const location=document.getElementById('fLoc').value.trim();
+  const ctName=document.getElementById('fCtName').value.trim();
+  const ctPhone=document.getElementById('fCtPhone').value.trim();
+  if(!title||!price||!location){showFErr('Title, price and location are required.');return;}
+  if(!ctName||!ctPhone){showFErr('Caretaker name and phone are required.');return;}
+
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true;
+  document.getElementById('saveSpin').style.display='block';
+  document.getElementById('saveIco').style.display='none';
+  document.getElementById('saveTxt').textContent='Saving…';
+  document.getElementById('fErr').className='f-err';
+
+  // Upload photos in parallel
+  const urls=[...existingPhotos];
+  await Promise.all(pendingPhotos.map(async f=>{
+    const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
+    const {error}=await sb.storage.from('house-photos').upload(path,f);
+    if(error){showFErr('Photo upload failed: '+error.message);return;}
+    const {data:u}=sb.storage.from('house-photos').getPublicUrl(path);
+    urls.push(u.publicUrl);
+  }));
+
+  const payload={
+    title,type:document.getElementById('fType').value,price,location,
+    description:document.getElementById('fDesc').value.trim(),
+    water_included:document.getElementById('fWater').checked,
+    wifi_available:document.getElementById('fWifi').checked,
+    available:document.getElementById('fAvail').checked,
+    photos:urls
+  };
+
+  const editId=document.getElementById('editId').value;
+  let lid=editId;
+  if(editId){
+    const {error}=await sb.from('listings').update(payload).eq('id',editId);
+    if(error){showFErr(error.message);resetSave();return;}
   } else {
-    const { data, error } = await sb.from('listings').insert(payload).select().single();
-    if (error) { showFormError('Save failed: ' + error.message + ' — make sure you are set as admin in Supabase.'); resetSaveBtn(); return; }
-    listingId = data.id;
+    const {data,error}=await sb.from('listings').insert(payload).select().single();
+    if(error){showFErr(error.message);resetSave();return;}
+    lid=data.id;
   }
 
-  // Upsert caretaker contact (delete+insert to avoid constraint issues)
-  await sb.from('caretaker_contacts').delete().eq('listing_id', listingId);
-  const { error: ctErr } = await sb.from('caretaker_contacts').insert({ listing_id: listingId, caretaker_name: caretakerName, phone: caretakerPhone });
-  if (ctErr) { showFormError('Caretaker save failed: ' + ctErr.message); resetSaveBtn(); return; }
+  // Upsert caretaker
+  const {data:ex}=await sb.from('caretaker_contacts').select('id').eq('listing_id',lid).single();
+  if(ex){await sb.from('caretaker_contacts').update({caretaker_name:ctName,phone:ctPhone}).eq('listing_id',lid);}
+  else{await sb.from('caretaker_contacts').insert({listing_id:lid,caretaker_name:ctName,phone:ctPhone});}
 
-  resetSaveBtn();
+  resetSave();
   closeModal('listingOverlay');
-  toast(editingId ? 'Listing updated ✓' : 'Listing added ✓');
+  toast(editId?'Listing updated ✓':'Listing added ✓');
   loadListings();
 }
 
-function resetSaveBtn() {
-  document.getElementById('saveBtn').disabled = false;
-  document.getElementById('saveSpinner').style.display = 'none';
-  document.getElementById('saveBtnText').textContent = document.getElementById('editingId').value ? 'Update Listing' : 'Save Listing';
+function resetSave(){
+  const btn=document.getElementById('saveBtn');btn.disabled=false;
+  document.getElementById('saveSpin').style.display='none';
+  document.getElementById('saveIco').style.display='block';
+  document.getElementById('saveTxt').textContent=document.getElementById('editId').value?'Update Listing':'Save Listing';
 }
 
-
-async function toggleAvailable(id, current) {
-  const { error } = await sb.from('listings').update({ available: !current }).eq('id', id);
-  if (error) { toast('Failed to update: ' + error.message, true); return; }
-  toast(!current ? 'Listing marked available ✓' : 'Listing marked as taken ✓');
-  loadListings();
-}
-
-async function deleteListing(id, title) {
-  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-  const { error } = await sb.from('listings').delete().eq('id', id);
-  if (error) { toast('Delete failed: ' + error.message, true); return; }
-  toast('Listing deleted');
-  loadListings();
-}
-
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function closeOnBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
-
-
-
-function toggleSidebar(){
-  document.querySelector('.sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-
-
-async function exportCSV() {
-  const { data } = await sb.from('payments').select('*, profiles(full_name), listings(title)').order('created_at', {ascending:false});
-  if (!data?.length) { toast('No payments to export', true); return; }
-  const rows = [['Date','Student','Listing','Amount','M-Pesa Ref','Status','Phone']];
-  data.forEach(p => rows.push([
-    new Date(p.created_at).toLocaleDateString('en-KE'),
-    p.profiles?.full_name || '—',
-    p.listings?.title || '—',
-    'Ksh ' + (p.amount || 250),
-    p.mpesa_ref || '—',
-    p.status,
-    p.phone || '—'
-  ]));
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  const a = document.createElement('a');
-  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'nestfinder-payments-' + new Date().toISOString().slice(0,10) + '.csv';
-  a.click();
-  toast('CSV exported ✓');
-}
-
-function renderGoLive() { /* content is static HTML */ }
-function renderSEO() { /* content is static HTML */ }
+function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
+function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));});
 
 init();
 </script>
