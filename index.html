@@ -1560,9 +1560,12 @@ async function submitManualPay(){
       sb.from('profiles').select('full_name').eq('id',user.id).single(),
       sb.from('listings').select('title').eq('id',cur.id).single()
     ]);
+    const _nt=localStorage.getItem('sb-token');
+    const _sn=prof?.data?.full_name||prof?.full_name||user?.email||'Student';
+    const _lt=lst?.data?.title||lst?.title||cur?.title||'Listing';
     fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:250,payment_id:pmnt.id})
-    }).catch(()=>{});
+      body:JSON.stringify({student_name:_sn,listing_title:_lt,mpesa_ref:ref,amount:250,payment_id:pmnt?.id||''})
+    }).then(r=>r.json()).then(d=>console.log('Notify result:',d)).catch(e=>console.error('Notify error:',e));
   }catch(e){}
 
   // Poll for 5 minutes in case admin confirms quickly
