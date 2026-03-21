@@ -7,6 +7,22 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>NestFinder CUK — Student Housing</title>
+<meta name="description" content="Find safe, verified, affordable student housing near The Cooperative University of Kenya. Single rooms from Ksh 3,500, bedsitters from Ksh 6,000, one-bedrooms from Ksh 10,000."/>
+<meta name="keywords" content="student housing CUK, student rentals Cooperative University Kenya, bedsitter near CUK, single room Karen, student accommodation Kenya"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://nest-finder-cuk.vercel.app/"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://nest-finder-cuk.vercel.app/"/>
+<meta property="og:title" content="NestFinder CUK — Student Housing Near The Cooperative University of Kenya"/>
+<meta property="og:description" content="Safe, verified student housing near CUK. Single rooms Ksh 3,500–5,500. Bedsitters Ksh 6,000–10,000. One bedrooms Ksh 10,000–13,000. Pay Ksh 250 to contact caretaker."/>
+<meta property="og:image" content="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80"/>
+<meta property="og:site_name" content="NestFinder CUK"/>
+<meta property="og:locale" content="en_KE"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="NestFinder CUK — Student Housing Near CUK"/>
+<meta name="twitter:description" content="Safe, verified student housing near CUK. Browse free, pay Ksh 250 to unlock caretaker contact."/>
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80"/>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"RealEstateAgent","name":"NestFinder CUK","description":"Safe, verified student housing listings near The Cooperative University of Kenya","url":"https://nest-finder-cuk.vercel.app","telephone":"+254704285315","address":{"@type":"PostalAddress","addressLocality":"Karen","addressRegion":"Nairobi","addressCountry":"KE"},"priceRange":"Ksh 3,500 – Ksh 13,000"}</script>
 <link rel="manifest" href="/manifest.json"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="NestFinder"/>
@@ -1238,6 +1254,17 @@ async function submitManualPay(){
   // Show pending confirmation screen
   sec('wait');
   toast('Code submitted! Admin will confirm shortly.');
+
+  // Email notification to admin (fire and forget)
+  try{
+    const [{data:prof},{data:lst}]=await Promise.all([
+      sb.from('profiles').select('full_name').eq('id',user.id).single(),
+      sb.from('listings').select('title').eq('id',cur.id).single()
+    ]);
+    fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:250,payment_id:pmnt.id})
+    }).catch(()=>{});
+  }catch(e){}
 
   // Poll for 5 minutes in case admin confirms quickly
   let attempts=0;

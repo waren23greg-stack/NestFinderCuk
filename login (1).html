@@ -4,12 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#0E0B07"/>
-<link rel="manifest" href="/manifest.json"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="NestFinder"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231D9E75'/%3E%3Cpath d='M96 40L156 85V152H36V85Z' fill='white'/%3E%3Crect x='72' y='108' width='48' height='44' rx='4' fill='%231D9E75'/%3E%3C/svg%3E"/>
 <title>NestFinder CUK — Sign In</title>
+<meta name="description" content="Sign in to NestFinder CUK to browse verified student housing listings near The Cooperative University of Kenya."/>
+<meta name="robots" content="noindex, nofollow"/>
+<link rel="canonical" href="https://nest-finder-cuk.vercel.app/login.html"/>
+<meta property="og:title" content="Sign In — NestFinder CUK"/>
+<meta property="og:description" content="Sign in to NestFinder CUK to browse verified student housing listings near The Cooperative University of Kenya."/>
+<meta property="og:url" content="https://nest-finder-cuk.vercel.app/login.html"/>
+<meta property="og:site_name" content="NestFinder CUK"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -447,20 +449,7 @@ body{
     letter-spacing:.01em;
   }
 }
-
 @media(max-width:480px){
-  .right{padding:1.25rem 1rem 3rem;align-items:flex-start}
-  .form-wrap{padding-top:1rem}
-  .form-title{font-size:1.45rem}
-  .field input{height:50px;font-size:1rem}
-  .submit-btn{height:52px;font-size:1rem}
-  .tab-bar{margin-bottom:1.5rem}
-}
-@media(max-width:360px){
-  .form-title{font-size:1.25rem}
-  .right{padding:1rem 0.85rem 3rem}
-}
-@media(max-width:480px){ /* legacy */
   .right{padding:1.5rem 1rem;align-items:flex-start}
   .form-wrap{padding-top:1.25rem}
   .form-title{font-size:1.55rem}
@@ -957,9 +946,6 @@ document.addEventListener('keydown',e=>{
     else if(document.getElementById('p-newpass').classList.contains('on'))doNewPass();
   }
 });
-</script>
-<script>
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>
 </body>
 </html>
