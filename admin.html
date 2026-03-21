@@ -931,6 +931,27 @@ function renderPreviews(){
 }
 function showFErr(msg){const e=document.getElementById('fErr');e.textContent=msg;e.className='f-err show';}
 
+
+async function compressImage(file, maxWidth=1200, quality=0.78){
+  return new Promise(resolve=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      const scale=Math.min(1,maxWidth/img.width);
+      const w=Math.round(img.width*scale);
+      const h=Math.round(img.height*scale);
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>{
+        URL.revokeObjectURL(url);
+        resolve(new File([blob],file.name,{type:'image/jpeg'}));
+      },'image/jpeg',quality);
+    };
+    img.src=url;
+  });
+}
+
 async function saveListing(){
   const title=document.getElementById('fTitle').value.trim();
   const price=parseInt(document.getElementById('fPrice').value);
@@ -949,7 +970,7 @@ async function saveListing(){
 
   // Upload photos in parallel
   const urls=[...existingPhotos];
-  await Promise.all(pendingPhotos.map(async f=>{
+  await Promise.all(pendingPhotos.map(async f=>{ f=await compressImage(f);
     const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
     const {error}=await sb.storage.from('house-photos').upload(path,f);
     if(error){showFErr('Photo upload failed: '+error.message);return;}
