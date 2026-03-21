@@ -685,7 +685,15 @@ async function init(){
   if(ud&&ud.user){session={user:ud.user};}
   if(!session){window.location.href='login.html';return;}
 
-  const {data:profile}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).maybeSingle();
+  let profile=null;
+  try{
+    const _pt=localStorage.getItem('sb-token');
+    const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=role,full_name&id=eq.'+session.user.id,{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_pt}
+    });
+    const _pd=await _pr.json();
+    if(Array.isArray(_pd)&&_pd.length>0)profile=_pd[0];
+  }catch(e){console.error('Profile fetch error',e);}
 
   document.getElementById('loading').classList.add('hide');
 
