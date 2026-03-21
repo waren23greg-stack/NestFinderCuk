@@ -3,15 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<link rel="manifest" href="/manifest.json"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="NestFinder"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%231D9E75'/%3E%3Cpath d='M96 40L156 85V152H36V85Z' fill='white'/%3E%3Crect x='72' y='108' width='48' height='44' rx='4' fill='%231D9E75'/%3E%3C/svg%3E"/>
 <meta name="theme-color" content="#16130E"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>NestFinder CUK — Student Housing</title>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="NestFinder"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -550,14 +548,42 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 #preview-sec.on{display:block}
 
 
-/* ── SKELETONS ── */
-.skeleton-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;padding:1.5rem;}
-.skel-card{background:#fff;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;}
-.skel-img{height:200px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
-.skel-body{padding:1.1rem;}
-.skel-line{height:13px;border-radius:4px;margin-bottom:9px;background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
-.skel-line.w50{width:50%}.skel-line.w70{width:70%}.skel-line.w90{width:90%}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* WhatsApp admin strip in modal */
+.wa-admin-strip{
+  display:flex;align-items:center;gap:7px;
+  padding:.75rem 1rem;
+  background:#f0fdf4;
+  border:1px solid #bbf7d0;
+  border-radius:2px;
+  font-size:.74rem;color:#166534;
+  margin-bottom:.75rem;
+}
+.wa-admin-strip a{color:#15803d;font-weight:500;border-bottom:1px solid rgba(21,128,61,.3);text-decoration:none;}
+.wa-admin-strip a:hover{color:#166534;border-color:#166534;}
+
+/* PWA install banner */
+#pwa-banner{
+  display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  z-index:200;background:var(--dark);color:#fff;
+  padding:.85rem 1.25rem;border-radius:2px;
+  display:none;align-items:center;gap:1rem;
+  box-shadow:0 8px 32px rgba(22,19,14,.25);
+  font-size:.78rem;min-width:300px;
+  border:1px solid rgba(184,149,90,.2);
+}
+#pwa-banner.show{display:flex;}
+#pwa-banner-txt{flex:1;line-height:1.4;}
+#pwa-banner-txt strong{display:block;font-size:.84rem;margin-bottom:2px;color:var(--gold-l);}
+#pwa-install-btn{
+  background:var(--gold);color:#fff;border:none;
+  padding:8px 16px;border-radius:2px;cursor:pointer;
+  font-family:'Jost',sans-serif;font-size:.7rem;font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  transition:background var(--t);
+}
+#pwa-install-btn:hover{background:var(--gold-l);}
+#pwa-dismiss{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px;font-size:1rem;line-height:1;}
+#pwa-dismiss:hover{color:rgba(255,255,255,.8);}
 </style>
 </head>
 <body>
@@ -571,6 +597,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   <div class="nav-mid">
     <a href="#listings">Listings</a>
     <a href="#" onclick="showFavs();return false">Favourites</a>
+    <a href="payments.html" id="nav-payments" style="display:none">My Payments</a>
     <a href="#how">How It Works</a>
     <a href="#trust">Safety</a>
   </div>
@@ -578,6 +605,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <span id="nav-hello"></span>
     <a href="login.html" id="nav-in" class="btn btn-ghost btn-sm">Sign In</a>
     <button id="nav-out" class="btn btn-ghost btn-sm" style="display:none" onclick="doSignOut()">Sign Out</button>
+    <a href="admin.html" id="nav-admin" class="btn btn-ghost btn-sm" style="display:none">Admin</a>
     <button class="ham" id="ham-btn" onclick="toggleDrawer()" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
@@ -591,8 +619,11 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <div class="drawer-links">
       <a href="#listings" onclick="closeDrawer()">Listings</a>
       <a href="#" onclick="showFavs();closeDrawer();return false">Favourites</a>
+      <a href="payments.html" id="drawer-payments" style="display:none" onclick="closeDrawer()">My Payments</a>
       <a href="#how" onclick="closeDrawer()">How It Works</a>
       <a href="#trust" onclick="closeDrawer()">Safety</a>
+      <a href="admin.html" id="drawer-admin" style="display:none" onclick="closeDrawer()">Admin Panel</a>
+      <a href="https://wa.me/254704285315?text=Hi%2C%20I%20found%20a%20listing%20on%20NestFinder%20CUK%20and%20I%20need%20help%20before%20paying." target="_blank" rel="noopener" id="drawer-wa-admin" onclick="closeDrawer()" style="color:#25D366;">Contact Admin via WhatsApp</a>
     </div>
     <div class="drawer-user" id="drawer-user"></div>
     <a href="login.html" id="drawer-in" class="btn btn-gold" style="width:100%;margin-bottom:.75rem">Sign In</a>
@@ -765,6 +796,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <a href="#" class="bnb" onclick="window.scrollTo({top:0,behavior:'smooth'});return false"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Home</a>
     <a href="#listings" class="bnb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Search</a>
     <a href="login.html" class="bnb gold" id="bot-in"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Sign In</a>
+    <a href="payments.html" class="bnb" id="bot-payments" style="display:none"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Payments</a>
     <a href="#" class="bnb" onclick="showFavs();return false"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Saved</a>
   </div>
 </nav>
@@ -926,7 +958,11 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
       </div>
       <div id="succ-sec">
         <div class="divider"></div>
-        <div class="contact-box">
+        <div class="wa-admin-strip">
+  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+  Not ready to pay? <a href="https://wa.me/254704285315?text=Hi%2C%20I%20am%20interested%20in%20a%20listing%20on%20NestFinder%20CUK%20and%20would%20like%20to%20discuss%20before%20paying." target="_blank" rel="noopener">Ask admin on WhatsApp first →</a>
+</div>
+<div class="contact-box">
           <div class="cb-label">Contact Unlocked — Call to Arrange Viewing</div>
           <div class="cb-name" id="cb-name">—</div>
           <div class="cb-phone" id="cb-phone">—</div>
@@ -991,35 +1027,30 @@ let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
 
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
-
-function showSkeletons(){
-  const g=document.getElementById('listingsGrid')||document.getElementById('grid');
-  if(!g)return;
-  g.innerHTML='<div class="skeleton-wrap" style="grid-column:1/-1;display:contents;">'+
-    [1,2,3,4,5,6].map(()=>`
-      <div class="skel-card">
-        <div class="skel-img"></div>
-        <div class="skel-body">
-          <div class="skel-line w90"></div>
-          <div class="skel-line w70"></div>
-          <div class="skel-line w50"></div>
-        </div>
-      </div>`).join('')+'</div>';
-}
-
 async function initAuth(){
   const {data:{user:u}}=await sb.auth.getUser();user=u;
   if(u){
-    const {data}=await sb.from('profiles').select('full_name').eq('id',u.id).single();
-    const name=data?.full_name?.split(' ')[0]||'Student';
+    const {data:prof}=await sb.from('profiles').select('full_name,role').eq('id',u.id).single();
+    const name=prof?.full_name?.split(' ')[0]||'Student';
+    const isAdmin=prof?.role==='admin';
     document.getElementById('nav-hello').textContent='Hi, '+name;
     document.getElementById('nav-in').style.display='none';
     document.getElementById('nav-out').style.display='';
     document.getElementById('drawer-in').style.display='none';
     document.getElementById('drawer-out').style.display='';
     document.getElementById('drawer-user').textContent='Signed in as '+name;
+    // Show My Payments everywhere
+    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='';
+    });
+    // Show Admin link only for admins
+    if(isAdmin){
+      ['nav-admin','drawer-admin'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.style.display='';
+      });
+    }
     const bi=document.getElementById('bot-in');
-    if(bi){bi.innerHTML=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${name}`;}
+    if(bi){bi.innerHTML=`<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${name}`;bi.href='payments.html';}
   }
 }
 async function doSignOut(){await sb.auth.signOut();location.reload();}
@@ -1506,6 +1537,49 @@ async function submitReview(){
 
 initAuth();load();loadRatings();
 </script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});</script>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner">
+  <div id="pwa-banner-txt">
+    <strong>Install NestFinder CUK</strong>
+    Add to your home screen or desktop for quick access
+  </div>
+  <button id="pwa-install-btn" onclick="installPWA()">Install App</button>
+  <button id="pwa-dismiss" onclick="dismissPWA()" title="Dismiss">✕</button>
+</div>
+
+<script>
+// PWA Service Worker
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// PWA Install prompt
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  // Show banner after 8 seconds if not dismissed
+  setTimeout(()=>{
+    if(deferredPrompt&&!localStorage.getItem('pwa-dismissed')){
+      document.getElementById('pwa-banner').classList.add('show');
+    }
+  },8000);
+});
+function installPWA(){
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r=>{
+    document.getElementById('pwa-banner').classList.remove('show');
+    deferredPrompt=null;
+  });
+}
+function dismissPWA(){
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa-dismissed','1');
+}
+window.addEventListener('appinstalled',()=>{
+  document.getElementById('pwa-banner').classList.remove('show');
+  deferredPrompt=null;
+});
+</script>
 </body>
 </html>
