@@ -1285,6 +1285,15 @@ function toggleDrawer(){document.getElementById('drawer').classList.toggle('open
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeModal();closeGallery();} if(document.getElementById('gallery-ov').classList.contains('open')){if(e.key==='ArrowLeft')galleryNav(-1);if(e.key==='ArrowRight')galleryNav(1);}});
 
+
+function sanitize(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function safeUrl(u){
+  try{ const p=new URL(u); return ['https:','http:'].includes(p.protocol)?u:'#'; }catch(e){ return '#'; }
+}
+
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0}return h;}
 function photo(l){
   if(l.photos?.length){const p=l.photos[0];if(p.startsWith('http'))return p;}
@@ -1312,7 +1321,7 @@ function render(list,g){
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
     return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both">
   <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
-    <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
+    <img src="${ph}" alt="${sanitize(l.title)}" loading="lazy" decoding="async"/>
     <div class="lcard-badge ${l.available?'avail':''}">${l.available?'Available':'Taken'}</div>
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
     <div class="share-btn" onclick="shareCard(event,'${l.id}')" role="button" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
@@ -1320,10 +1329,10 @@ function render(list,g){
   </div>
   <div class="lcard-body">
     <div class="lcard-type">${TL[l.type]||l.type}</div>
-    ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${l.title}</div>
+    ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${sanitize(l.title)}</div>
     <div class="lcard-loc">
       <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      ${l.location}
+      ${sanitize(l.location)}
       <span class="lcard-dist"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${distFromCUK(l.location)}</span>
     </div>
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
@@ -1391,7 +1400,7 @@ async function openListing(id){
   if(photoWrap){
     const pool=PHOTOS[l.type]||PHOTOS.default;
     const imgs=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,2)];
-    photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${l.title}"/>`).join('');
+    photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${sanitize(l.title)}"/>`).join('');
     photoWrap.style.display=imgs.length?'flex':'none';
   }
 
@@ -1786,7 +1795,7 @@ function shareCurrentListing(){
 
 function doShare(l){
   const url=window.location.origin+window.location.pathname+'?listing='+l.id;
-  const text=`Check out this listing on NestFinder CUK: ${l.title} — Ksh ${(l.price||0).toLocaleString()}/mo in ${l.location}`;
+  const text=`Check out this listing on NestFinder CUK: ${sanitize(l.title)} — Ksh ${(l.price||0).toLocaleString()}/mo in ${sanitize(l.location)}`;
   if(navigator.share){
     navigator.share({title:l.title,text,url}).catch(()=>{});
   }else{

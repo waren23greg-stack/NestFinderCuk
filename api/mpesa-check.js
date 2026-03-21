@@ -1,3 +1,13 @@
+
+const _reqMap = {};
+function rateLimit(ip, max=10, windowMs=60000){
+  const now = Date.now();
+  _reqMap[ip] = _reqMap[ip].filter(t => now - t < windowMs);
+  if(_reqMap[ip].length >= max) return false;
+  _reqMap[ip].push(now);
+  return true;
+}
+
 // api/mpesa-check.js
 // Frontend polls this to check if payment was confirmed
 
