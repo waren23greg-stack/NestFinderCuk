@@ -682,7 +682,7 @@ async function init(){
   for(let i=0;i<3;i++){
     const {data}=await sb.auth.getSession();
     if(data.session){session=data.session;break;}
-    await new Promise(r=>setTimeout(r,600));
+    await new Promise(r=>setTimeout(r,200));
   }
   if(!session){window.location.href='login.html';return;}
 
