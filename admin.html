@@ -1,708 +1,1009 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#16130E"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NestFinder CUK — Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;
-  --dark:#16130E;--dark2:#231F18;--dark3:#302B22;
-  --ink:#4A4438;--muted:#8A8070;
-  --linen:#F8F4EE;--cream:#FDF9F4;
-  --border:rgba(184,149,90,0.18);--border2:rgba(184,149,90,0.35);
-  --ease:cubic-bezier(0.4,0,0.2,1);--t:0.26s;
-  --sb-w:220px;--top-h:60px;
-  --px:2rem;
-  --sb:env(safe-area-inset-bottom,0px);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
-body{font-family:'Jost',sans-serif;background:var(--linen);color:var(--dark);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.15}
+  :root {
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-deep: #085041;
+    --green-light: #E1F5EE;
+    --green-mid: #9FE1CB;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --bg: #f3f4f6;
+    --white: #ffffff;
+    --border: #e5e7eb;
+    --sidebar-w: 240px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Jost',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; }
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Jost',sans-serif;font-size:.73rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;border:none;cursor:pointer;transition:all var(--t);white-space:nowrap;text-decoration:none;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.btn-gold{background:var(--gold);color:#fff;padding:10px 20px;border-radius:2px}
-.btn-gold:hover{background:var(--gold-l)}
-.btn-gold:active{transform:scale(.97)}
-.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--ink);padding:9px 18px;border-radius:2px}
-.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
-.btn-dark{background:var(--dark);color:#fff;padding:9px 18px;border-radius:2px}
-.btn-dark:hover{background:var(--dark3)}
-.btn-sm{padding:6px 13px;font-size:.67rem}
-.btn-danger{background:transparent;border:1px solid rgba(180,50,50,.3);color:#9B2335;padding:6px 13px;border-radius:2px;font-size:.67rem}
-.btn-danger:hover,.btn-danger:active{background:#9B2335;color:#fff;border-color:#9B2335}
-.btn-success{background:transparent;border:1px solid rgba(45,106,79,.35);color:#2D6A4F;padding:6px 13px;border-radius:2px;font-size:.67rem}
-.btn-success:hover{background:#2D6A4F;color:#fff}
-.btn-full{width:100%;height:46px}
+  /* SIDEBAR */
+  .sidebar {
+    width:var(--sidebar-w); background:var(--green-deep); display:flex;
+    flex-direction:column; position:fixed; top:0; left:0; height:100vh; z-index:50;
+  }
+  .sidebar-logo {
+    padding:1.5rem 1.25rem; border-bottom:1px solid rgba(255,255,255,0.08);
+    font-family:'Cormorant Garamond',serif; font-weight:800; font-size:1.2rem; color:white;
+  }
+  .sidebar-logo span { color:#FAC775; }
+  .sidebar-logo small { display:block; font-size:0.7rem; color:rgba(255,255,255,0.4); font-weight:400; margin-top:2px; }
+  .sidebar-nav { flex:1; padding:1rem 0.75rem; display:flex; flex-direction:column; gap:4px; }
+  .nav-item {
+    display:flex; align-items:center; gap:0.75rem; padding:0.65rem 0.9rem;
+    border-radius:10px; cursor:pointer; color:rgba(255,255,255,0.65);
+    font-size:0.88rem; font-weight:500; transition:all 0.15s; border:none; background:none; width:100%; text-align:left;
+  }
+  .nav-item:hover { background:rgba(255,255,255,0.08); color:white; }
+  .nav-item.active { background:var(--green); color:white; }
+  .nav-item .icon { font-size:1rem; width:20px; text-align:center; }
+  .sidebar-footer {
+    padding:1rem 0.75rem; border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .sign-out-btn {
+    width:100%; padding:0.6rem 0.9rem; background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:rgba(255,255,255,0.6);
+    font-family:'Jost',sans-serif; font-size:0.85rem; cursor:pointer; transition:all 0.15s;
+  }
+  .sign-out-btn:hover { background:rgba(220,38,38,0.2); color:#fca5a5; border-color:rgba(220,38,38,0.3); }
 
-/* LAYOUT */
-.layout{display:flex;min-height:100vh}
-.sidebar{width:var(--sb-w);background:var(--dark);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:60;border-right:1px solid rgba(184,149,90,.1);transition:transform var(--t)}
-.sb-logo{padding:1.4rem 1.25rem 1.1rem;border-bottom:1px solid rgba(184,149,90,.1)}
-.sb-logo-text{font-family:'Cormorant Garamond',serif;font-size:1.08rem;color:#fff}
-.sb-logo-text b{color:var(--gold);font-weight:500}
-.sb-logo-sub{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-top:2px}
-.sb-nav{flex:1;padding:1rem 0;overflow-y:auto}
-.sb-section{font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.22);padding:.5rem 1.25rem .25rem}
-.sb-link{display:flex;align-items:center;gap:9px;padding:.62rem 1.25rem;font-size:.76rem;color:rgba(255,255,255,.48);cursor:pointer;transition:all var(--t);border-left:2px solid transparent;-webkit-tap-highlight-color:transparent}
-.sb-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
-.sb-link:hover{color:rgba(255,255,255,.82);background:rgba(255,255,255,.04)}
-.sb-link.active{color:#fff;border-left-color:var(--gold);background:rgba(184,149,90,.09)}
-.sb-footer{padding:1.1rem 1.25rem;border-top:1px solid rgba(184,149,90,.1);padding-bottom:calc(1.1rem + var(--sb))}
-.sb-user{font-size:.7rem;color:rgba(255,255,255,.38);margin-bottom:.7rem;line-height:1.55}
-.sb-user strong{display:block;color:rgba(255,255,255,.7);font-weight:500}
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; min-height:100vh; }
+  .topbar {
+    background:white; border-bottom:1px solid var(--border); padding:0 2rem;
+    height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:40;
+  }
+  .topbar h1 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; color:var(--text); }
+  .admin-badge {
+    background:var(--green-light); color:var(--green-dark); font-size:0.75rem;
+    font-weight:600; padding:0.25rem 0.75rem; border-radius:100px;
+  }
+  .content { padding:2rem; flex:1; }
 
-/* TOPBAR */
-.main{margin-left:var(--sb-w);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0}
-.topbar{background:var(--cream);border-bottom:1px solid var(--border);padding:0 var(--px);height:var(--top-h);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;gap:1rem}
-.page-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--dark);font-weight:400;flex-shrink:0}
-.page-title small{font-family:'Jost',sans-serif;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:1px}
-.topbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.content{padding:var(--px);flex:1}
+  /* STATS */
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem; }
+  .stat-card {
+    background:white; border-radius:14px; border:1px solid var(--border);
+    padding:1.25rem; transition:box-shadow 0.2s;
+  }
+  .stat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+  .stat-label { font-size:0.78rem; color:var(--text-muted); font-weight:500; margin-bottom:0.4rem; }
+  .stat-value { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:800; color:var(--text); }
+  .stat-sub { font-size:0.75rem; color:var(--green); margin-top:0.2rem; }
 
-/* HAMBURGER (mobile) */
-.sb-toggle{display:none;width:38px;height:38px;background:transparent;border:1px solid var(--border2);border-radius:2px;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent}
-.sb-toggle span{width:16px;height:1.5px;background:var(--ink);display:block}
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(22,19,14,.55);z-index:55;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.sb-overlay.show{display:block}
+  /* SECTION HEADER */
+  .section-head {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;
+  }
+  .section-head h2 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; }
+  .add-btn {
+    background:var(--green); color:white; border:none; padding:0.6rem 1.2rem;
+    border-radius:10px; font-family:'Cormorant Garamond',serif; font-weight:600; font-size:0.85rem;
+    cursor:pointer; transition:background 0.2s; display:flex; align-items:center; gap:0.4rem;
+  }
+  .add-btn:hover { background:var(--green-dark); }
 
-/* STATS */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
-.stat{background:var(--cream);border:1px solid var(--border);padding:1.25rem 1.3rem;position:relative;overflow:hidden}
-.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-l));transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
-@media(hover:hover){.stat:hover::after{transform:scaleX(1)}}
-.stat-ico{width:36px;height:36px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:.9rem}
-.stat-ico svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.7}
-.stat-label{font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem}
-.stat-val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:var(--dark);font-weight:400;line-height:1}
-.stat-sub{font-size:.68rem;color:var(--muted);margin-top:.15rem}
+  /* TABLE */
+  .table-wrap { background:white; border-radius:14px; border:1px solid var(--border); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead { background:var(--bg); }
+  th { padding:0.75rem 1rem; text-align:left; font-size:0.78rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  td { padding:0.85rem 1rem; font-size:0.88rem; border-top:1px solid var(--border); vertical-align:middle; }
+  tr:hover td { background:#f9fafb; }
+  .badge {
+    display:inline-block; padding:0.2rem 0.65rem; border-radius:100px;
+    font-size:0.72rem; font-weight:600;
+  }
+  .badge-single { background:#E1F5EE; color:#085041; }
+  .badge-bedsitter { background:#FAEEDA; color:#633806; }
+  .badge-one { background:#E6F1FB; color:#042C53; }
+  .badge-available { background:#E1F5EE; color:#085041; }
+  .badge-taken { background:#fef2f2; color:#991b1b; }
+  .badge-confirmed { background:#E1F5EE; color:#085041; }
+  .badge-pending { background:#FAEEDA; color:#633806; }
+  .badge-failed { background:#fef2f2; color:#991b1b; }
+  .action-btn {
+    padding:0.3rem 0.75rem; border-radius:7px; font-size:0.78rem; font-weight:500;
+    cursor:pointer; transition:all 0.15s; border:1px solid;
+  }
+  .edit-btn { background:var(--green-light); color:var(--green-dark); border-color:var(--green-mid); }
+  .edit-btn:hover { background:var(--green-mid); }
+  .del-btn { background:var(--red-light); color:var(--red); border-color:#fecaca; margin-left:4px; }
+  .del-btn:hover { background:#fee2e2; }
 
-/* CARD */
-.card{background:var(--cream);border:1px solid var(--border);margin-bottom:1.5rem;overflow:hidden}
-.card-head{padding:1rem 1.35rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
-.card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--dark)}
+  /* PHOTO THUMBS */
+  .photo-thumbs { display:flex; gap:4px; }
+  .photo-thumb {
+    width:36px; height:36px; border-radius:6px; object-fit:cover;
+    background:var(--green-light); display:flex; align-items:center; justify-content:center;
+    font-size:0.65rem; color:var(--green-dark); font-weight:500; overflow:hidden;
+  }
+  .photo-thumb img { width:100%; height:100%; object-fit:cover; }
 
-/* TABLE */
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tbl{width:100%;border-collapse:collapse;min-width:520px}
-.tbl thead tr{background:var(--linen)}
-.tbl th{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:.75rem 1.1rem;text-align:left;font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
-.tbl td{font-size:.8rem;color:var(--ink);padding:.85rem 1.1rem;border-bottom:1px solid var(--border);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-@media(hover:hover){.tbl tr:hover td{background:rgba(248,244,238,.6)}}
-.tbl-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+  /* MODAL */
+  .overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+    z-index:200; align-items:center; justify-content:center; padding:1rem;
+  }
+  .overlay.open { display:flex; }
+  .modal {
+    background:white; border-radius:20px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.15);
+    animation:slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from{transform:translateY(16px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-head {
+    padding:1.5rem 1.5rem 0; display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; background:white; z-index:1; padding-bottom:1rem;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-head h3 { font-family:'Cormorant Garamond',serif; font-weight:700; font-size:1.1rem; }
+  .modal-close { background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--text-muted); }
+  .modal-body { padding:1.5rem; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .form-group { margin-bottom:1rem; }
+  .form-group label { display:block; font-size:0.82rem; font-weight:500; margin-bottom:0.35rem; color:var(--text); }
+  .form-group input, .form-group select, .form-group textarea {
+    width:100%; padding:0.7rem 0.9rem; border:1.5px solid var(--border);
+    border-radius:10px; font-family:'Jost',sans-serif; font-size:0.9rem;
+    color:var(--text); background:white; outline:none; transition:border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--green); }
+  .form-group textarea { resize:vertical; min-height:80px; }
+  .checkbox-row { display:flex; gap:1.5rem; margin-bottom:1rem; }
+  .checkbox-label { display:flex; align-items:center; gap:0.5rem; font-size:0.88rem; cursor:pointer; }
+  .checkbox-label input[type=checkbox] { width:16px; height:16px; accent-color:var(--green); }
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;font-size:.61rem;letter-spacing:.05em;border-radius:12px;font-weight:500;white-space:nowrap}
-.badge-green{background:#D8F3DC;color:#2D6A4F}
-.badge-amber{background:#FEF3C7;color:#92400E}
-.badge-red{background:#FCE7E8;color:#9B2335}
-.badge-gray{background:var(--linen);color:var(--muted)}
-.badge-gold{background:var(--gold-xl);color:#7A5C2A}
+  /* PHOTO UPLOAD */
+  .upload-zone {
+    border:2px dashed var(--border); border-radius:12px; padding:1.5rem;
+    text-align:center; cursor:pointer; transition:all 0.2s; margin-bottom:0.75rem;
+  }
+  .upload-zone:hover, .upload-zone.drag { border-color:var(--green); background:var(--green-light); }
+  .upload-zone p { font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem; }
+  .upload-icon { font-size:1.8rem; }
+  .upload-previews { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
+  .preview-item {
+    width:72px; height:72px; border-radius:8px; overflow:hidden; position:relative;
+    border:1px solid var(--border);
+  }
+  .preview-item img { width:100%; height:100%; object-fit:cover; }
+  .preview-item .remove-photo {
+    position:absolute; top:2px; right:2px; background:rgba(0,0,0,0.6);
+    color:white; border:none; border-radius:50%; width:18px; height:18px;
+    font-size:0.7rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
 
-/* THUMB */
-.thumb{width:52px;height:38px;object-fit:cover;border:1px solid var(--border)}
-.thumb-ph{width:52px;height:38px;background:var(--linen);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
-.thumb-ph svg{width:15px;height:15px;stroke:var(--border2);fill:none}
+  /* SAVE BTN */
+  .save-btn {
+    width:100%; padding:0.85rem; background:var(--green); color:white; border:none;
+    border-radius:10px; font-family:'Cormorant Garamond',serif; font-weight:700; font-size:0.95rem;
+    cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+  }
+  .save-btn:hover:not(:disabled) { background:var(--green-dark); }
+  .save-btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .spinner-sm { width:18px; height:18px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; display:none; }
+  @keyframes spin { to{transform:rotate(360deg)} }
 
-/* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(22,19,14,.76);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.25rem;opacity:0;pointer-events:none;transition:opacity .3s}
-.overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--cream);width:100%;max-width:540px;max-height:92svh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(16px);transition:transform .3s var(--ease)}
-.overlay.open .modal{transform:translateY(0)}
-.m-head{padding:1.4rem 1.6rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--cream);z-index:1}
-.m-label{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
-.m-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--dark)}
-.m-close{width:32px;height:32px;min-width:32px;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--t);-webkit-tap-highlight-color:transparent}
-.m-close:hover,.m-close:active{border-color:var(--gold);background:var(--gold)}
-.m-close:hover svg,.m-close:active svg{stroke:#fff}
-.m-close svg{width:12px;height:12px;stroke:var(--ink);fill:none;stroke-width:2;transition:stroke var(--t)}
-.m-body{padding:1.4rem 1.6rem}
-.field{margin-bottom:1rem}
-.field label{display:block;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.38rem}
-.field input,.field textarea,.field select{width:100%;background:#fff;border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:.87rem;color:var(--dark);outline:none;transition:border-color var(--t);-webkit-appearance:none;border-radius:0}
-.field input,.field select{height:42px;padding:0 12px}
-.field textarea{padding:9px 12px;resize:vertical;min-height:76px}
-.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
-.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8070'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;cursor:pointer}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
-.toggle-row{display:flex;flex-wrap:wrap;gap:.9rem;margin-bottom:1rem}
-.toggle{display:flex;align-items:center;gap:7px;font-size:.79rem;color:var(--ink);cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;min-height:32px}
-.toggle input{width:15px;height:15px;cursor:pointer;accent-color:var(--gold);flex-shrink:0}
-.divider{height:1px;background:var(--border);margin:1.1rem 0}
-.sec-label-sm{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.55rem}
-.photo-drop{border:1.5px dashed var(--border2);padding:1.5rem;text-align:center;cursor:pointer;transition:border-color var(--t),background var(--t);background:#fff}
-.photo-drop:hover,.photo-drop:active{border-color:var(--gold);background:var(--gold-xl)}
-.photo-drop svg{width:26px;height:26px;stroke:var(--muted);fill:none;stroke-width:1.5;margin-bottom:.45rem}
-.photo-drop p{font-size:.76rem;color:var(--muted)}
-.photo-drop p strong{color:var(--ink)}
-.photo-drop input{display:none}
-.photo-preview{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
-.ppi{position:relative;width:68px;height:52px}
-.ppi img{width:100%;height:100%;object-fit:cover;border:1px solid var(--border)}
-.ppd{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:var(--dark);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:9px;color:#fff;border:none;-webkit-tap-highlight-color:transparent}
+  /* TOAST */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; background:var(--green-deep);
+    color:white; padding:0.85rem 1.25rem; border-radius:12px; font-size:0.88rem;
+    font-weight:500; z-index:999; transform:translateY(80px); opacity:0;
+    transition:all 0.3s; pointer-events:none;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast.error { background:var(--red); }
 
-/* GUARD */
-#guard{position:fixed;inset:0;background:var(--linen);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:500;padding:2rem;text-align:center}
-.guard-icon{width:56px;height:56px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem}
-.guard-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5}
-.guard-t{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--dark);margin-bottom:.45rem}
-.guard-d{font-size:.8rem;color:var(--muted);margin-bottom:1.4rem}
+  /* PAGE SECTIONS */
+  .page { display:none; }
+  .page.active { display:block; }
 
-/* TOAST */
-.toast{position:fixed;bottom:calc(1.5rem + var(--sb));left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark);color:#fff;padding:12px 16px;font-size:.76rem;z-index:400;display:flex;align-items:center;gap:8px;max-width:min(300px,90vw);opacity:0;transition:all var(--t);border-left:3px solid var(--gold)}
-.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-.toast.err{border-left-color:#e57373}
-.toast svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0}
-.toast.err svg{stroke:#e57373}
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:3rem; color:var(--text-muted); }
+  .empty-state .icon { font-size:2.5rem; margin-bottom:0.75rem; }
 
-/* TABS */
-.tab{display:none}.tab.active{display:block}
+  /* ACCESS DENIED */
+  .access-denied { display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:1rem; }
 
-/* ══════════ RESPONSIVE ══════════ */
+  @media(max-width:768px) {
+    .sidebar { transform:translateX(-100%); }
+    .main { margin-left:0; }
+    .form-row { grid-template-columns:1fr; }
+  }
 
-/* TV 1600px+ */
-@media(min-width:1600px){
-  :root{--sb-w:260px;--px:2.5rem}
-  .stat-grid{grid-template-columns:repeat(4,1fr)}
-  .stat-val{font-size:2.4rem}
-}
-
-/* Tablet landscape 901–1199px */
-@media(min-width:901px) and (max-width:1199px){
-  :root{--sb-w:200px;--px:1.5rem}
-  .stat-grid{grid-template-columns:repeat(2,1fr)}
-}
-
-/* Tablet portrait 641–900px */
-@media(min-width:641px) and (max-width:900px){
-  :root{--sb-w:0px;--px:1.25rem}
-  .sidebar{transform:translateX(-220px);width:220px}
-  .sidebar.open{transform:translateX(0)}
-  .sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity var(--t)}
-  .sb-overlay.show{opacity:1;pointer-events:all}
-  .main{margin-left:0}
-  .sb-toggle{display:flex}
-  .stat-grid{grid-template-columns:repeat(2,1fr)}
-  .field-row{grid-template-columns:1fr 1fr}
-}
-
-/* Large phone 481–640px */
-@media(min-width:481px) and (max-width:640px){
-  :root{--sb-w:0px;--px:1rem;--top-h:56px}
-  .sidebar{transform:translateX(-220px);width:220px}
-  .sidebar.open{transform:translateX(0)}
-  .sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity var(--t)}
-  .sb-overlay.show{opacity:1;pointer-events:all}
-  .main{margin-left:0}
-  .sb-toggle{display:flex}
-  .stat-grid{grid-template-columns:1fr 1fr}
-  .topbar-right .btn:not(.btn-gold){display:none}
-  .field-row{grid-template-columns:1fr}
-  .overlay{align-items:flex-end;padding:0}
-  .modal{max-width:100%;max-height:93svh;border-radius:14px 14px 0 0;transform:translateY(100%)}
-  .overlay.open .modal{transform:translateY(0)}
-  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border2);border-radius:2px;margin:.7rem auto -.2rem}
-}
-
-/* Small phone ≤480px */
-@media(max-width:480px){
-  :root{--sb-w:0px;--px:.9rem;--top-h:54px}
-  .sidebar{transform:translateX(-220px);width:220px}
-  .sidebar.open{transform:translateX(0)}
-  .sb-overlay{display:block;opacity:0;pointer-events:none;transition:opacity var(--t)}
-  .sb-overlay.show{opacity:1;pointer-events:all}
-  .main{margin-left:0}
-  .sb-toggle{display:flex}
-  .stat-grid{grid-template-columns:1fr 1fr;gap:.75rem}
-  .stat{padding:1rem}
-  .stat-val{font-size:1.6rem}
-  .topbar-right .btn:not(.btn-gold){display:none}
-  .page-title{font-size:1.1rem}
-  .content{padding:.9rem}
-  .card-head{padding:.85rem 1rem}
-  .m-head{padding:1.1rem 1.1rem .85rem}
-  .m-body{padding:1rem 1.1rem}
-  .field-row{grid-template-columns:1fr}
-  .overlay{align-items:flex-end;padding:0}
-  .modal{max-width:100%;max-height:95svh;border-radius:16px 16px 0 0;transform:translateY(100%)}
-  .overlay.open .modal{transform:translateY(0)}
-  .modal::before{content:'';display:block;width:36px;height:4px;background:var(--border2);border-radius:2px;margin:.75rem auto -.25rem}
-}
-
-/* analytics chart */
-.chart-wrap{padding:1.25rem 1.35rem}
-canvas{max-height:220px}
-/* availability toggle */
-.avail-toggle{display:inline-flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.avail-track{width:34px;height:19px;background:var(--border2);border-radius:10px;position:relative;transition:background .2s;flex-shrink:0}
-.avail-track.on{background:var(--gold)}
-.avail-knob{position:absolute;top:2px;left:2px;width:15px;height:15px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.avail-track.on .avail-knob{transform:translateX(15px)}
-
+  /* MOBILE SIDEBAR */
+  @media(max-width:768px){
+    .sidebar{transform:translateX(-100%);transition:transform 0.3s ease;width:240px;}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0!important;}
+    .mob-toggle{display:flex!important;}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:49;}
+    .sidebar-overlay.open{display:block;}
+    .topbar{padding:0 1rem;}
+    .content{padding:1.25rem 1rem;}
+    .stats-grid{grid-template-columns:1fr 1fr;}
+    table{font-size:0.8rem;}
+    th,td{padding:0.6rem 0.75rem;}
+    .form-row{grid-template-columns:1fr;}
+    .modal{max-width:100%;margin:0.5rem;}
+  }
+  .mob-toggle{
+    display:none;background:none;border:none;cursor:pointer;
+    padding:0.5rem;color:var(--text-muted);
+  }
+  .mob-toggle svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;}
 </style>
 </head>
 <body>
 
-<!-- GUARD -->
-<div id="guard">
-  <div class="guard-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-  <h2 class="guard-t">Admin Access Only</h2>
-  <p class="guard-d">This panel is restricted to administrators.</p>
-  <a href="login.html" class="btn btn-gold">Go to Login</a>
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" style="display:flex;position:fixed;inset:0;background:white;z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
+  <div style="width:48px;height:48px;border:3px solid #E1F5EE;border-top-color:#1D9E75;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <p style="font-family:'DM Sans',sans-serif;font-size:0.9rem;color:#6b7280;">Verifying access...</p>
 </div>
 
-<!-- SIDEBAR OVERLAY -->
-<div class="sb-overlay" id="sb-overlay" onclick="closeSb()"></div>
+<!-- ACCESS DENIED (shown if not admin) -->
+<div id="accessDenied" style="display:none;position:fixed;inset:0;background:white;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:1rem;">
+  <div style="font-size:3rem;">🔒</div>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;">Admin Access Only</h2>
+  <p style="color:var(--text-muted);font-size:0.9rem;" id="accessDeniedMsg">This page is restricted to administrators.</p>
+  <a href="login.html" style="background:var(--green);color:white;padding:0.7rem 1.5rem;border-radius:10px;text-decoration:none;font-family:'Cormorant Garamond',serif;font-weight:600;">Go to Login</a>
+</div>
 
-<div class="layout">
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="sb-logo">
-      <div class="sb-logo-text">Nest<b>Finder</b> CUK</div>
-      <div class="sb-logo-sub">Admin Panel</div>
-    </div>
-    <div class="sb-nav">
-      <div class="sb-section">Main</div>
-      <div class="sb-link active" onclick="tab('dash',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</div>
-      <div class="sb-link" onclick="tab('listings',this)"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Listings</div>
-      <div class="sb-section">Manage</div>
-      <div class="sb-link" onclick="tab('payments',this)"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>Payments</div>
-      <div class="sb-link" onclick="tab('students',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Students</div>
-    </div>
-    <div class="sb-footer">
-      <div class="sb-user"><strong id="sb-name">Admin</strong>Logged in as administrator</div>
-      <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="signOut()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Sign Out
-      </button>
-    </div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    Nest<span>Finder</span> CUK
+    <small>Admin Panel</small>
+    <small id="adminName" style="color:rgba(255,255,255,0.5);font-size:0.65rem;display:block;margin-top:2px;"></small>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('listings')">
+      <span class="icon">🏠</span> Listings
+    </button>
+    <button class="nav-item" onclick="showPage('payments')">
+      <span class="icon">💳</span> Payments
+    </button>
+    <button class="nav-item" onclick="showPage('users')">
+      <span class="icon">👥</span> Students
+    </button>
+    <div style="height:1px;background:rgba(255,255,255,0.08);margin:0.5rem 0;"></div>
+    <button class="nav-item" onclick="showPage('golive')">
+      <span class="icon">🚀</span> Go Live
+    </button>
+    <button class="nav-item" onclick="showPage('seo')">
+      <span class="icon">🔍</span> SEO & Share
+    </button>
   </nav>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div style="display:flex;align-items:center;gap:10px">
-        <button class="sb-toggle" onclick="openSb()" aria-label="Menu"><span></span><span></span><span></span></button>
-        <div class="page-title"><small id="pg-small">Overview</small><span id="pg-title">Dashboard</span></div>
-      </div>
-      <div class="topbar-right">
-        <a href="index.html" class="btn btn-ghost btn-sm" target="_blank">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          View Site
-        </a>
-        <button class="btn btn-gold btn-sm" onclick="openAdd()">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Listing
-        </button>
-      </div>
-    </div>
-
-    <div class="content">
-
-      <!-- DASHBOARD -->
-      <div id="t-dash" class="tab active">
-        <div class="stat-grid">
-          <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div><div class="stat-label">Total Listings</div><div class="stat-val" id="s-listings">—</div><div class="stat-sub">active houses</div></div>
-          <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="stat-label">Available Now</div><div class="stat-val" id="s-avail">—</div><div class="stat-sub">ready to view</div></div>
-          <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-label">Students</div><div class="stat-val" id="s-students">—</div><div class="stat-sub">registered users</div></div>
-          <div class="stat"><div class="stat-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="stat-label">Revenue</div><div class="stat-val" id="s-rev">—</div><div class="stat-sub">viewing fees</div></div>
-        </div>
-        <div class="card" style="margin-bottom:1.5rem">
-          <div class="card-head"><div class="card-title">Revenue — Last 7 Days</div></div>
-          <div class="chart-wrap"><canvas id="rev-chart"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-head"><div class="card-title">Recent Payments</div><button class="btn btn-ghost btn-sm" onclick="tab('payments',null)">View All</button></div>
-          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Listing</th><th>M-Pesa Ref</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recent-pay"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- LISTINGS -->
-      <div id="t-listings" class="tab">
-        <div class="card">
-          <div class="card-head"><div class="card-title">House Listings</div><button class="btn btn-gold btn-sm" onclick="openAdd()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add New</button></div>
-          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Photo</th><th>Title</th><th>Type</th><th>Price</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody id="list-tbl"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- PAYMENTS -->
-      <div id="t-payments" class="tab">
-        <div class="card">
-          <div class="card-head"><div class="card-title">All Payments</div><button class="btn btn-ghost btn-sm" onclick="exportCSV()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button></div>
-          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>M-Pesa Ref</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="pay-tbl"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
-        </div>
-      </div>
-
-      <!-- STUDENTS -->
-      <div id="t-students" class="tab">
-        <div class="card">
-          <div class="card-head"><div class="card-title">Registered Students</div></div>
-          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead><tbody id="stu-tbl"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">Loading…</td></tr></tbody></table></div>
-        </div>
-      </div>
-
-    </div>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
   </div>
-</div>
+</aside>
 
-<!-- ADD/EDIT MODAL -->
-<div class="overlay" id="ov" onclick="bgClose(event)">
-  <div class="modal">
-    <div class="m-head">
-      <div><div class="m-label">Listing Management</div><div class="m-title" id="m-title">Add New Listing</div></div>
-      <button class="m-close" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="mob-toggle" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 id="pageTitle">Dashboard</h1>
     </div>
-    <div class="m-body">
-      <input type="hidden" id="edit-id"/>
-      <div class="field"><label>Listing Title</label><input type="text" id="f-title" placeholder="e.g. Spacious Bedsitter near Main Gate"/></div>
-      <div class="field-row">
-        <div class="field"><label>Room Type</label><select id="f-type"><option value="single">Single Room</option><option value="bedsitter">Bedsitter</option><option value="one-bedroom">One Bedroom</option></select></div>
-        <div class="field"><label>Monthly Price (Ksh)</label><input type="number" id="f-price" placeholder="e.g. 7500"/></div>
+    <span class="admin-badge">Admin</span>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="stat-label">Total Listings</div><div class="stat-value" id="statListings">—</div><div class="stat-sub">Active houses</div></div>
+        <div class="stat-card"><div class="stat-label">Available Now</div><div class="stat-value" id="statAvailable">—</div><div class="stat-sub">Ready to view</div></div>
+        <div class="stat-card"><div class="stat-label">Total Students</div><div class="stat-value" id="statStudents">—</div><div class="stat-sub">Registered users</div></div>
+        <div class="stat-card"><div class="stat-label">Total Payments</div><div class="stat-value" id="statPayments">—</div><div class="stat-sub">Viewing fees collected</div></div>
       </div>
-      <div class="field"><label>Location</label><input type="text" id="f-loc" placeholder="e.g. Near Gate A, Karatina Road"/></div>
-      <div class="field"><label>Description</label><textarea id="f-desc" placeholder="Describe the house — size, condition, surroundings…"></textarea></div>
-      <div class="toggle-row">
-        <label class="toggle"><input type="checkbox" id="f-water"/> Water Included</label>
-        <label class="toggle"><input type="checkbox" id="f-wifi"/> WiFi Available</label>
-        <label class="toggle"><input type="checkbox" id="f-avail" checked/> Available Now</label>
+
+      <div class="section-head">
+        <h2>Recent Payments</h2>
       </div>
-      <div class="divider"></div>
-      <div class="sec-label-sm">Caretaker Contact</div>
-      <div class="field-row">
-        <div class="field"><label>Caretaker Name</label><input type="text" id="f-cname" placeholder="Full name"/></div>
-        <div class="field"><label>Caretaker Phone</label><input type="tel" id="f-cphone" placeholder="07XX XXX XXX" inputmode="tel"/></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody id="recentPaymentsBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+        </table>
       </div>
-      <div class="divider"></div>
-      <div class="sec-label-sm">House Photos (up to 6)</div>
-      <div class="photo-drop" onclick="document.getElementById('photo-inp').click()" ondragover="event.preventDefault()" ondrop="dropFiles(event)">
-        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <p><strong>Tap to upload</strong> or drag &amp; drop photos here</p>
-        <p style="font-size:.68rem;margin-top:3px">JPG, PNG — max 5MB each</p>
-        <input type="file" id="photo-inp" accept="image/*" multiple onchange="addPhotos(this.files)"/>
+    </div>
+
+    <!-- LISTINGS -->
+    <div class="page" id="page-listings">
+      <div class="section-head">
+        <h2>House Listings</h2>
+        <button class="add-btn" onclick="openListingModal()">+ Add Listing</button>
       </div>
-      <div class="photo-preview" id="photo-prev"></div>
-      <div style="height:1.25rem"></div>
-      <button class="btn btn-gold btn-full" onclick="saveListing()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save Listing
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Photos</th><th>Title</th><th>Type</th><th>Price</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="listingsBody"><tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div>Loading listings...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div class="section-head">
+        <h2>All Payments</h2>
+        <button class="add-btn" onclick="exportCSV()" style="background:var(--green-dark);">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="paymentsBody"><tr><td colspan="8"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="page" id="page-users">
+      <div class="section-head"><h2>Registered Students</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Action</th></tr></thead>
+          <tbody id="usersBody"><tr><td colspan="5"><div class="empty-state"><div class="icon">⏳</div>Loading...</div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- GO LIVE PAGE -->
+    <div class="page" id="page-golive">
+      <div style="max-width:700px;">
+
+        <div style="background:linear-gradient(135deg,#085041,#1D9E75);border-radius:14px;padding:2rem;margin-bottom:1.5rem;color:white;">
+          <div style="font-size:1.5rem;margin-bottom:0.5rem;">🚀 Switch to Real M-Pesa Payments</div>
+          <p style="opacity:0.8;font-size:0.9rem;line-height:1.7;">You are currently on Sandbox (test mode). Follow these steps to go live and collect real Ksh 250 payments from students.</p>
+        </div>
+
+        <div class="table-wrap" style="margin-bottom:1.5rem;">
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 1 — Apply for Go Live on Daraja</div>
+            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
+              <li>Go to <strong>developer.safaricom.co.ke</strong> → click <strong>Go Live</strong> in left sidebar</li>
+              <li>Fill in your business details — you need a <strong>registered business or M-Pesa Paybill/Till number</strong></li>
+              <li>For a personal Till: go to any Safaricom shop with your ID and register a <strong>Lipa Na M-Pesa Till</strong> (free)</li>
+              <li>Submit the Go Live form — Safaricom reviews in 2–5 business days</li>
+              <li>You will receive your <strong>live Consumer Key, Consumer Secret, Shortcode and Passkey</strong> via email</li>
+            </ol>
+          </div>
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 2 — Update Vercel Environment Variables</div>
+            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">Once you have your live credentials, go to <strong>vercel.com → nest-finder-cuk → Settings → Environment Variables</strong> and update:</p>
+            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;line-height:2;">
+              MPESA_ENV = <strong>live</strong><br>
+              MPESA_CONSUMER_KEY = <em>your live key</em><br>
+              MPESA_CONSUMER_SECRET = <em>your live secret</em><br>
+              MPESA_SHORTCODE = <em>your Till/Paybill number</em><br>
+              MPESA_PASSKEY = <em>your live passkey</em><br>
+              MPESA_CALLBACK_URL = https://nest-finder-cuk.vercel.app/api/mpesa-callback
+            </div>
+          </div>
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 3 — Get Supabase Service Key</div>
+            <p style="font-size:0.85rem;color:#6b7280;line-height:1.7;">Go to <strong>supabase.com → nestfinder-cuk → Settings → API</strong>. Copy the <strong>service_role</strong> key (the secret one). Add it to Vercel as <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">SUPABASE_SERVICE_KEY</code>. This lets the callback function confirm payments automatically.</p>
+          </div>
+          <div style="padding:1.25rem;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">Step 4 — Redeploy on Vercel</div>
+            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">After updating all variables, go to <strong>Vercel → Deployments → Redeploy</strong>. Students will now pay real money and contacts unlock automatically.</p>
+            <div style="background:#E1F5EE;border:1px solid #9FE1CB;border-radius:8px;padding:0.75rem 1rem;font-size:0.84rem;color:#085041;">
+              💡 <strong>Until then:</strong> Students pay in sandbox (test mode). You manually confirm payments from the Payments tab above. Contacts still unlock correctly.
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-bottom:1.5rem;">
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:1rem;">📧 Email Notifications — When Students Pay</div>
+            <p style="font-size:0.85rem;color:#6b7280;line-height:1.7;margin-bottom:1rem;">To get email alerts when a student pays, add this to your <strong>mpesa-callback.js</strong> Vercel function after the payment is confirmed:</p>
+            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;overflow-x:auto;">
+// Send email via Resend (free tier — 100 emails/day)<br>
+// 1. Sign up free at resend.com, get API key<br>
+// 2. Add RESEND_API_KEY to Vercel env vars<br>
+// 3. Add this after payment is confirmed:<br><br>
+await fetch('https://api.resend.com/emails', {<br>
+&nbsp;&nbsp;method: 'POST',<br>
+&nbsp;&nbsp;headers: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'Authorization': 'Bearer ' + process.env.RESEND_API_KEY,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'Content-Type': 'application/json'<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;body: JSON.stringify({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from: 'NestFinder CUK &lt;noreply@nestfinder.co.ke&gt;',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to: ['waren23greg@student.cuk.ac.ke'],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;subject: 'New Payment — Ksh 250 received',<br>
+&nbsp;&nbsp;&nbsp;&nbsp;html: `&lt;p&gt;A student just paid Ksh 250.&lt;br&gt;Ref: ${mpesaRef}&lt;br&gt;Phone: ${phone}&lt;/p&gt;`<br>
+&nbsp;&nbsp;})<br>
+});
+            </div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">🌐 Custom Domain — nestfinder.co.ke</div>
+            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
+              <li>Buy <strong>nestfinder.co.ke</strong> at <strong>KENICregistry.or.ke</strong> or <strong>truehost.co.ke</strong> (~Ksh 1,500/yr)</li>
+              <li>In Vercel → <strong>Settings → Domains</strong> → Add <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">nestfinder.co.ke</code></li>
+              <li>Vercel shows you DNS records to add — go to your domain registrar and add them</li>
+              <li>SSL certificate is automatic — site goes live on your domain in ~10 minutes</li>
+              <li>Update <strong>MPESA_CALLBACK_URL</strong> in Vercel to <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">https://nestfinder.co.ke/api/mpesa-callback</code></li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEO PAGE -->
+    <div class="page" id="page-seo">
+      <div style="max-width:700px;">
+
+        <div style="background:linear-gradient(135deg,#1a1510,#3a3028);border-radius:14px;padding:2rem;margin-bottom:1.5rem;color:white;">
+          <div style="font-size:1.5rem;margin-bottom:0.5rem;">🔍 SEO & Google Discovery</div>
+          <p style="opacity:0.8;font-size:0.9rem;line-height:1.7;">Help students find NestFinder CUK on Google. These steps are free and take under 30 minutes.</p>
+        </div>
+
+        <div class="table-wrap" style="margin-bottom:1.5rem;">
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 1 — Submit to Google Search Console</div>
+            <ol style="padding-left:1.25rem;font-size:0.88rem;line-height:2;color:#4b5563;">
+              <li>Go to <strong>search.google.com/search-console</strong> → Add property</li>
+              <li>Enter <strong>nest-finder-cuk.vercel.app</strong> (or your custom domain)</li>
+              <li>Verify ownership via HTML tag — add the tag to your index.html &lt;head&gt;</li>
+              <li>Submit sitemap: <strong>nest-finder-cuk.vercel.app/sitemap.xml</strong></li>
+            </ol>
+          </div>
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 2 — Add these meta tags to index.html &lt;head&gt;</div>
+            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;overflow-x:auto;">
+&lt;meta name="description" content="Find affordable student housing near The Cooperative University of Kenya. Single rooms Ksh 3,500–5,500, Bedsitters Ksh 6,000–10,000, One bedrooms Ksh 10,000–13,000. Verified listings, no scammers."&gt;<br>
+&lt;meta name="keywords" content="CUK student housing, Cooperative University Kenya rentals, student bedsitter Karen, single room Rongai, student accommodation Langata"&gt;<br>
+&lt;meta property="og:title" content="NestFinder CUK — Student Housing"&gt;<br>
+&lt;meta property="og:description" content="Safe verified student housing near CUK. Browse free, pay Ksh 250 to unlock caretaker contact."&gt;<br>
+&lt;meta property="og:url" content="https://nest-finder-cuk.vercel.app"&gt;<br>
+&lt;meta property="og:type" content="website"&gt;<br>
+&lt;meta name="robots" content="index, follow"&gt;
+            </div>
+          </div>
+          <div style="padding:1.25rem;border-bottom:1px solid var(--border);">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 3 — Create sitemap.xml</div>
+            <p style="font-size:0.85rem;color:#6b7280;margin-bottom:0.75rem;">Create a file called <strong>sitemap.xml</strong> in your project root:</p>
+            <div style="background:#f3f4f6;border-radius:8px;padding:1rem;font-family:monospace;font-size:0.78rem;line-height:1.8;">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>
+&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;<br>
+&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/&lt;/loc&gt;&lt;priority&gt;1.0&lt;/priority&gt;&lt;/url&gt;<br>
+&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/login.html&lt;/loc&gt;&lt;priority&gt;0.8&lt;/priority&gt;&lt;/url&gt;<br>
+&nbsp;&nbsp;&lt;url&gt;&lt;loc&gt;https://nest-finder-cuk.vercel.app/payments.html&lt;/loc&gt;&lt;priority&gt;0.6&lt;/priority&gt;&lt;/url&gt;<br>
+&lt;/urlset&gt;
+            </div>
+          </div>
+          <div style="padding:1.25rem;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.75rem;">Step 4 — Share on Social Media</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#1877F2;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on Facebook</a>
+              <a href="https://twitter.com/intent/tweet?text=Find%20affordable%20student%20housing%20near%20CUK%20%F0%9F%8F%A0&url=https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#1DA1F2;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on Twitter/X</a>
+              <a href="https://wa.me/?text=Find%20affordable%20verified%20student%20housing%20near%20CUK%20%F0%9F%8F%A0%20https://nest-finder-cuk.vercel.app" target="_blank" style="display:inline-flex;align-items:center;gap:0.5rem;background:#25D366;color:white;padding:0.6rem 1.1rem;border-radius:8px;text-decoration:none;font-size:0.85rem;width:fit-content;">Share on WhatsApp</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- LISTING MODAL -->
+<div class="overlay" id="listingOverlay" onclick="closeOnBg(event,'listingOverlay')">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Add New Listing</h3>
+      <button class="modal-close" onclick="closeModal('listingOverlay')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editingId">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="fTitle" placeholder="e.g. Cosy Single Room — Karen">
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="fType">
+            <option value="single">Single Room</option>
+            <option value="bedsitter">Bedsitter</option>
+            <option value="one-bedroom">One Bedroom</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Monthly Price (Ksh)</label>
+          <input type="number" id="fPrice" placeholder="e.g. 4500">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" id="fLocation" placeholder="e.g. Karen Road, 10 min walk">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="fDescription" placeholder="Describe the house — size, condition, surroundings..."></textarea>
+      </div>
+
+      <div class="checkbox-row">
+        <label class="checkbox-label"><input type="checkbox" id="fWater"> Water Included</label>
+        <label class="checkbox-label"><input type="checkbox" id="fWifi"> WiFi Available</label>
+        <label class="checkbox-label"><input type="checkbox" id="fAvailable" checked> Available Now</label>
+      </div>
+
+      <div class="form-group">
+        <label>Caretaker Name</label>
+        <input type="text" id="fCaretakerName" placeholder="e.g. Mama Wanjiku">
+      </div>
+      <div class="form-group">
+        <label>Caretaker Phone</label>
+        <input type="tel" id="fCaretakerPhone" placeholder="07XXXXXXXX">
+      </div>
+
+      <div class="form-group">
+        <label>House Photos (max 6)</label>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('photoInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <div class="upload-icon">📷</div>
+          <p>Click to upload or drag & drop photos here</p>
+          <p style="font-size:0.75rem;margin-top:0.25rem;">JPG, PNG — max 5MB each</p>
+        </div>
+        <input type="file" id="photoInput" multiple accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+        <div class="upload-previews" id="uploadPreviews"></div>
+      </div>
+
+      <div id="formError" style="background:var(--red-light);border:1px solid #fecaca;border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--red);display:none;margin-bottom:1rem;"></div>
+
+      <button class="save-btn" id="saveBtn" onclick="saveListing()">
+        <div class="spinner-sm" id="saveSpinner"></div>
+        <span id="saveBtnText">Save Listing</span>
       </button>
     </div>
   </div>
 </div>
 
-<div class="toast" id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-txt"></span></div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-const SURL='https://mtycapgbtvpczvswpjpo.supabase.co';
-const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-const {createClient}=supabase;
-const sb=createClient(SURL,SKEY);
-const TL={single:'Single Room',bedsitter:'Bedsitter','one-bedroom':'One Bedroom'};
-let user=null,photoFiles=[],existingPhotos=[],listingsCache=[];
+const SUPABASE_URL = 'https://mtycapgbtvpczvswpjpo.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ikfawEkiP9A6I9Exk0xN-w_JgqsG7-C';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function openSb(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('show');}
-function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('show');}
+let currentAdmin = null;
+let pendingPhotos = [];
+let existingPhotos = [];
 
+async function init() {
+  // Show a loading overlay while we verify auth — prevents flash of login redirect
+  document.getElementById('loadingOverlay').style.display = 'flex';
 
-/* ── REVENUE CHART ── */
-let revChart=null;
-async function drawRevenueChart(){
-  const {data}=await sb.from('payments').select('amount,created_at').eq('status','confirmed').order('created_at',{ascending:true});
-  // build last 7 days
-  const days=[];
-  const totals=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    const label=d.toLocaleDateString('en-KE',{weekday:'short',day:'numeric'});
-    const ds=d.toISOString().slice(0,10);
-    const dayTotal=(data||[]).filter(p=>p.created_at.slice(0,10)===ds).reduce((s,p)=>s+(p.amount||0),0);
-    days.push(label);totals.push(dayTotal);
-  }
-  const ctx=document.getElementById('rev-chart');if(!ctx)return;
-  if(revChart)revChart.destroy();
-  revChart=new Chart(ctx,{
-    type:'bar',
-    data:{labels:days,datasets:[{
-      label:'Revenue (Ksh)',data:totals,
-      backgroundColor:'rgba(184,149,90,.35)',
-      borderColor:'rgba(184,149,90,.85)',
-      borderWidth:1.5,borderRadius:3
-    }]},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'Ksh '+ctx.parsed.y.toLocaleString()}}},
-      scales:{
-        x:{grid:{display:false},ticks:{font:{size:11},color:'#8A8070'}},
-        y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{size:11},color:'#8A8070',callback:v=>'Ksh '+v.toLocaleString()},beginAtZero:true}
-      }
+  // Wait for Supabase to fully restore session from storage
+  const { data: { session } } = await sb.auth.getSession();
+
+  if (!session) {
+    // Try once more after a short delay (handles slow session restore)
+    await new Promise(r => setTimeout(r, 800));
+    const { data: { session: session2 } } = await sb.auth.getSession();
+    if (!session2) {
+      window.location.href = 'login.html';
+      return;
     }
-  });
+  }
+
+  const activeSession = session || (await sb.auth.getSession()).data.session;
+
+  // Retry profile fetch up to 3 times — network can be slow
+  let profile = null;
+  for (let i = 0; i < 3; i++) {
+    const { data } = await sb.from('profiles')
+      .select('role,full_name')
+      .eq('id', activeSession.user.id)
+      .single();
+    if (data) { profile = data; break; }
+    await new Promise(r => setTimeout(r, 500));
+  }
+
+  document.getElementById('loadingOverlay').style.display = 'none';
+
+  if (!profile) {
+    // Profile not created yet — this can happen if trigger is slow
+    // Show access denied with a helpful message
+    document.getElementById('accessDenied').style.display = 'flex';
+    document.getElementById('accessDeniedMsg').textContent =
+      'Your profile is still being set up. Please wait a moment and refresh.';
+    return;
+  }
+
+  if (profile.role !== 'admin') {
+    document.getElementById('accessDenied').style.display = 'flex';
+    return;
+  }
+
+  currentAdmin = activeSession.user;
+  // Show admin name in sidebar
+  const name = profile.full_name?.split(' ')[0] || 'Admin';
+  document.getElementById('adminName').textContent = name;
+  loadDashboard();
 }
 
-/* ── AVAILABILITY TOGGLE ── */
-async function toggleAvail(id,newVal){
-  const {error}=await sb.from('listings').update({available:newVal}).eq('id',id);
-  if(error){toast('Update failed','err');return;}
-  toast(newVal?'Marked as Available':'Marked as Taken');
-  loadListings();loadDash();
+// Also listen for auth state changes — catches session restored after page load
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_OUT') {
+    window.location.href = 'login.html';
+  }
+});
+
+async function signOut() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
 }
 
-/* ── EXPORT CSV ── */
-async function exportCSV(){
-  const {data}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
-  if(!data?.length){toast('No payments to export','err');return;}
-  const rows=[['Date','Student','Phone','Listing','M-Pesa Ref','Amount','Status']];
-  data.forEach(p=>{
-    rows.push([
-      new Date(p.created_at).toLocaleDateString(),
-      p.profiles?.full_name||'',
-      p.phone||'',
-      p.listings?.title||'',
-      p.mpesa_ref||'',
-      p.amount||0,
-      p.status||''
-    ]);
-  });
-  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('
-');
-  const blob=new Blob([csv],{type:'text/csv'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='nestfinder-payments-'+new Date().toISOString().slice(0,10)+'.csv';
-  a.click();URL.revokeObjectURL(url);
-  toast('CSV exported!');
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelector(`[onclick="showPage('${name}')"]`).classList.add('active');
+  const titles = { dashboard:'Dashboard', listings:'House Listings', payments:'Payments', users:'Students', golive:'Go Live — Real Payments', seo:'SEO & Sharing' };
+  document.getElementById('pageTitle').textContent = titles[name];
+  if (name === 'listings') loadListings();
+  if (name === 'payments') loadPayments();
+  if (name === 'users') loadUsers();
+  if (name === 'golive') renderGoLive();
+  if (name === 'seo') renderSEO();
 }
 
-
-async function init(){
-  const {data:{user:u}}=await sb.auth.getUser();
-  if(!u){showGuard();return;}
-  const {data:p}=await sb.from('profiles').select('role,full_name').eq('id',u.id).single();
-  if(p?.role!=='admin'){showGuard();return;}
-  user=u;
-  document.getElementById('sb-name').textContent=p.full_name||u.email;
-  document.getElementById('guard').style.display='none';
-  loadDash();loadListings();loadPayments();loadStudents();
+function toast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(() => t.className = 'toast', 3000);
 }
 
-function showGuard(){document.getElementById('guard').style.display='flex';}
-async function signOut(){await sb.auth.signOut();location.href='login.html';}
-
-const tabTitles={dash:{sm:'Overview',t:'Dashboard'},listings:{sm:'Listings',t:'House Listings'},payments:{sm:'Payments',t:'All Payments'},students:{sm:'Students',t:'Registered Students'}};
-function tab(id,el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('t-'+id).classList.add('active');
-  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
-  if(el)el.classList.add('active');
-  const tt=tabTitles[id];
-  if(tt){document.getElementById('pg-small').textContent=tt.sm;document.getElementById('pg-title').textContent=tt.t;}
-  closeSb();
-}
-
-async function loadDash(){
-  const [{data:ls},{data:ps},{data:stu},{data:rev}]=await Promise.all([
-    sb.from('listings').select('id,available'),
-    sb.from('listings').select('id').eq('available',true),
-    sb.from('profiles').select('id').eq('role','student'),
-    sb.from('payments').select('amount').eq('status','confirmed')
+async function loadDashboard() {
+  const [l, p, u] = await Promise.all([
+    sb.from('listings').select('id,available', {count:'exact'}),
+    sb.from('payments').select('id,status', {count:'exact'}),
+    sb.from('profiles').select('id', {count:'exact'}).eq('role','student')
   ]);
-  document.getElementById('s-listings').textContent=ls?.length||0;
-  document.getElementById('s-avail').textContent=ps?.length||0;
-  document.getElementById('s-students').textContent=stu?.length||0;
-  document.getElementById('s-rev').textContent='Ksh '+((rev||[]).reduce((a,p)=>a+(p.amount||0),0)).toLocaleString();
-  drawRevenueChart();
-  const {data:rp}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(6);
-  const tb=document.getElementById('recent-pay');
-  if(!rp?.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">No payments yet</td></tr>`;return;}
-  tb.innerHTML=rp.map(p=>`<tr><td>${p.profiles?.full_name||'—'}</td><td>${p.listings?.title||'—'}</td><td style="font-family:monospace;font-size:.72rem">${p.mpesa_ref||'—'}</td><td>Ksh ${(p.amount||0).toLocaleString()}</td><td><span class="badge ${p.status==='confirmed'?'badge-green':p.status==='failed'?'badge-red':'badge-amber'}">${p.status}</span></td><td>${new Date(p.created_at).toLocaleDateString()}</td></tr>`).join('');
+
+  document.getElementById('statListings').textContent = l.count ?? 0;
+  document.getElementById('statAvailable').textContent = (l.data||[]).filter(x=>x.available).length;
+  document.getElementById('statStudents').textContent = u.count ?? 0;
+  const confirmed = (p.data||[]).filter(x=>x.status==='confirmed');
+  document.getElementById('statPayments').textContent = 'Ksh ' + (confirmed.length * 250).toLocaleString();
+
+  const { data: payments } = await sb.from('payments')
+    .select('*, profiles(full_name), listings(title)')
+    .order('created_at', {ascending:false}).limit(8);
+
+  const tbody = document.getElementById('recentPaymentsBody');
+  if (!payments?.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
+  tbody.innerHTML = payments.map(p => `
+    <tr>
+      <td>${p.profiles?.full_name || '—'}</td>
+      <td>${p.listings?.title || '—'}</td>
+      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+      <td style="font-family:monospace;font-size:0.8rem;">${p.mpesa_ref || '—'}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td>${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+    </tr>`).join('');
 }
 
-async function loadListings(){
-  const {data}=await sb.from('listings').select('*').order('created_at',{ascending:false});
-  listingsCache=data||[];
-  const tb=document.getElementById('list-tbl');
-  if(!data?.length){tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">No listings yet — add one!</td></tr>`;return;}
-  tb.innerHTML=data.map(l=>{
-    const ph=l.photos?.[0];
-    const img=ph?`<img src="${ph}" class="thumb" alt=""/>`:`<div class="thumb-ph"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>`;
-    return `<tr><td>${img}</td><td style="font-weight:500;max-width:140px">${l.title}</td><td>${TL[l.type]||l.type}</td><td>Ksh ${(l.price||0).toLocaleString()}</td><td style="color:var(--muted);max-width:110px">${l.location}</td>
-    <td><div class="avail-toggle" onclick="toggleAvail('${l.id}',${!l.available})" title="Toggle availability"><div class="avail-track${l.available?' on':''}"><div class="avail-knob"></div></div><span style="font-size:.7rem;color:var(--muted)">${l.available?'Available':'Taken'}</span></div></td>
-    <td><div class="tbl-actions"><button class="btn btn-ghost btn-sm" onclick="openEdit('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button><button class="btn btn-danger" onclick="delListing('${l.id}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Del</button></div></td></tr>`;
-  }).join('');
+async function loadListings() {
+  const { data } = await sb.from('listings').select('*').order('created_at', {ascending:false});
+  const tbody = document.getElementById('listingsBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">🏠</div>No listings yet. Add your first one!</div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(h => `
+    <tr>
+      <td>
+        <div class="photo-thumbs">
+          ${(h.photos||[]).slice(0,3).map(url=>`<div class="photo-thumb"><img src="${url}" onerror="this.parentElement.textContent='📷'"></div>`).join('')}
+          ${!(h.photos||[]).length ? '<div class="photo-thumb">📷</div>' : ''}
+        </div>
+      </td>
+      <td style="font-weight:500;max-width:180px;">${h.title}</td>
+      <td><span class="badge badge-${h.type==='one-bedroom'?'one':h.type}">${h.type}</span></td>
+      <td>Ksh ${h.price.toLocaleString()}</td>
+      <td style="font-size:0.82rem;color:var(--text-muted);">${h.location}</td>
+      <td><span class="badge ${h.available?'badge-available':'badge-taken'}">${h.available?'Available':'Taken'}</span></td>
+      <td>
+        <button class="action-btn edit-btn" onclick="editListing('${h.id}')">Edit</button>
+        <button class="action-btn" onclick="toggleAvailable('${h.id}',${h.available})" style="background:${h.available?'var(--amber-light)':'var(--green-light)'};color:${h.available?'#633806':'var(--green-dark)'};border-color:${h.available?'#FAC775':'var(--green-mid)'};">${h.available?'Mark Taken':'Mark Free'}</button>
+        <button class="action-btn del-btn" onclick="deleteListing('${h.id}','${h.title.replace(/'/g,'')}')">Delete</button>
+      </td>
+    </tr>`).join('');
 }
 
-async function loadPayments(){
-  const {data}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
-  const tb=document.getElementById('pay-tbl');
-  if(!data?.length){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">No payments yet</td></tr>`;return;}
-  tb.innerHTML=data.map(p=>`<tr><td>${p.profiles?.full_name||'—'}</td><td style="font-size:.74rem;color:var(--muted)">${p.phone||'—'}</td><td>${p.listings?.title||'—'}</td><td style="font-family:monospace;font-size:.72rem">${p.mpesa_ref||'—'}</td><td>Ksh ${(p.amount||0).toLocaleString()}</td><td><span class="badge ${p.status==='confirmed'?'badge-green':p.status==='failed'?'badge-red':'badge-amber'}">${p.status}</span></td><td>${new Date(p.created_at).toLocaleDateString()}</td><td>${p.status==='pending'?`<button class="btn btn-success" onclick="confirmPay('${p.id}')">Confirm</button>`:'—'}</td></tr>`).join('');
+async function loadPayments() {
+  const { data } = await sb.from('payments')
+    .select('*, profiles(full_name), listings(title)')
+    .order('created_at', {ascending:false});
+
+  const tbody = document.getElementById('paymentsBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">💳</div>No payments yet.</div></td></tr>'; return; }
+
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td>${p.profiles?.full_name || '—'}</td>
+      <td>${p.phone || '—'}</td>
+      <td style="max-width:160px;font-size:0.82rem;">${p.listings?.title || '—'}</td>
+      <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+      <td style="font-family:monospace;font-size:0.78rem;">${p.mpesa_ref || '—'}</td>
+      <td><span class="badge badge-${p.status}">${p.status}</span></td>
+      <td style="font-size:0.82rem;">${new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+      <td>
+        ${p.status==='pending' ? `<button class="action-btn edit-btn" onclick="confirmPayment('${p.id}')">Confirm</button>` : ''}
+      </td>
+    </tr>`).join('');
 }
 
-async function confirmPay(id){await sb.from('payments').update({status:'confirmed'}).eq('id',id);toast('Payment confirmed');loadPayments();loadDash();}
-
-async function loadStudents(){
-  const {data}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
-  const tb=document.getElementById('stu-tbl');
-  if(!data?.length){tb.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">No students yet</td></tr>`;return;}
-  tb.innerHTML=data.map(s=>`<tr><td style="font-weight:500">${s.full_name||'—'}</td><td style="color:var(--muted)">${s.phone||'—'}</td><td><span class="badge ${s.role==='admin'?'badge-gold':'badge-gray'}">${s.role||'student'}</span></td><td>${new Date(s.created_at).toLocaleDateString()}</td><td>${s.role!=='admin'?`<button class="btn btn-ghost btn-sm" onclick="makeAdmin('${s.id}')">Make Admin</button>`:'—'}</td></tr>`).join('');
+async function confirmPayment(id) {
+  const { error } = await sb.from('payments').update({status:'confirmed'}).eq('id', id);
+  if (error) { toast('Failed to confirm', true); return; }
+  toast('Payment confirmed ✓');
+  loadPayments();
 }
 
-async function makeAdmin(id){if(!confirm('Make this user an admin?'))return;await sb.from('profiles').update({role:'admin'}).eq('id',id);toast('User promoted');loadStudents();}
+async function loadUsers() {
+  const { data } = await sb.from('profiles').select('*').order('created_at', {ascending:false});
+  const tbody = document.getElementById('usersBody');
+  if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">👥</div>No students yet.</div></td></tr>'; return; }
 
-function openAdd(){
-  document.getElementById('m-title').textContent='Add New Listing';
-  document.getElementById('edit-id').value='';
-  ['f-title','f-loc','f-desc','f-cname','f-cphone'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-price').value='';
-  document.getElementById('f-type').value='single';
-  document.getElementById('f-water').checked=false;
-  document.getElementById('f-wifi').checked=false;
-  document.getElementById('f-avail').checked=true;
-  photoFiles=[];existingPhotos=[];
-  document.getElementById('photo-prev').innerHTML='';
-  document.getElementById('ov').classList.add('open');
-  document.body.style.overflow='hidden';
+  tbody.innerHTML = data.map(u => `
+    <tr>
+      <td style="font-weight:500;">${u.full_name || '—'}</td>
+      <td>${u.phone || '—'}</td>
+      <td><span class="badge ${u.role==='admin'?'badge-one':'badge-available'}">${u.role}</span></td>
+      <td style="font-size:0.82rem;">${new Date(u.created_at).toLocaleDateString('en-KE')}</td>
+      <td>
+        ${u.role !== 'admin' ? `<button class="action-btn edit-btn" onclick="makeAdmin('${u.id}')">Make Admin</button>` : '<span style="font-size:0.78rem;color:var(--text-muted);">Admin</span>'}
+      </td>
+    </tr>`).join('');
 }
 
-async function openEdit(id){
-  const l=listingsCache.find(x=>x.id===id);if(!l)return;
-  document.getElementById('m-title').textContent='Edit Listing';
-  document.getElementById('edit-id').value=l.id;
-  document.getElementById('f-title').value=l.title||'';
-  document.getElementById('f-type').value=l.type||'single';
-  document.getElementById('f-price').value=l.price||'';
-  document.getElementById('f-loc').value=l.location||'';
-  document.getElementById('f-desc').value=l.description||'';
-  document.getElementById('f-water').checked=!!l.water_included;
-  document.getElementById('f-wifi').checked=!!l.wifi_available;
-  document.getElementById('f-avail').checked=l.available!==false;
-  photoFiles=[];existingPhotos=l.photos||[];renderPrevs();
-  const {data}=await sb.from('caretaker_contacts').select('caretaker_name,phone').eq('listing_id',id).maybeSingle();
-  document.getElementById('f-cname').value=data?.caretaker_name||'';
-  document.getElementById('f-cphone').value=data?.phone||'';
-  document.getElementById('ov').classList.add('open');
-  document.body.style.overflow='hidden';
+async function makeAdmin(id) {
+  if (!confirm('Make this user an admin? They will have full access.')) return;
+  await sb.from('profiles').update({role:'admin'}).eq('id', id);
+  toast('User is now an admin');
+  loadUsers();
 }
 
-function closeModal(){document.getElementById('ov').classList.remove('open');document.body.style.overflow='';}
-function bgClose(e){if(e.target===e.currentTarget)closeModal();}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeSb();}});
-
-function addPhotos(files){
-  const max=6-existingPhotos.length-photoFiles.length;
-  photoFiles.push(...Array.from(files).slice(0,max));
-  renderPrevs();
-}
-function dropFiles(e){e.preventDefault();addPhotos(e.dataTransfer.files);}
-function renderPrevs(){
-  const prev=document.getElementById('photo-prev');
-  const all=[...existingPhotos.map(u=>({t:'url',u})),...photoFiles.map(f=>({t:'file',f}))];
-  prev.innerHTML='';
-  all.forEach((item)=>{
-    const div=document.createElement('div');div.className='ppi';
-    const img=document.createElement('img');
-    if(item.t==='url')img.src=item.u;
-    else{const r=new FileReader();r.onload=e=>img.src=e.target.result;r.readAsDataURL(item.f);}
-    const del=document.createElement('button');del.className='ppd';del.textContent='×';
-    del.onclick=()=>{
-      if(item.t==='url')existingPhotos.splice(existingPhotos.indexOf(item.u),1);
-      else photoFiles.splice(photoFiles.indexOf(item.f),1);
-      renderPrevs();
-    };
-    div.appendChild(img);div.appendChild(del);prev.appendChild(div);
-  });
+function openListingModal(data=null) {
+  document.getElementById('editingId').value = '';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fType').value = 'single';
+  document.getElementById('fPrice').value = '';
+  document.getElementById('fLocation').value = '';
+  document.getElementById('fDescription').value = '';
+  document.getElementById('fWater').checked = false;
+  document.getElementById('fWifi').checked = false;
+  document.getElementById('fAvailable').checked = true;
+  document.getElementById('fCaretakerName').value = '';
+  document.getElementById('fCaretakerPhone').value = '';
+  document.getElementById('modalTitle').textContent = 'Add New Listing';
+  document.getElementById('saveBtnText').textContent = 'Save Listing';
+  pendingPhotos = [];
+  existingPhotos = [];
+  renderPreviews();
+  document.getElementById('formError').style.display = 'none';
+  document.getElementById('listingOverlay').classList.add('open');
 }
 
-async function saveListing(){
-  const title=document.getElementById('f-title').value.trim();
-  const price=parseInt(document.getElementById('f-price').value);
-  const loc=document.getElementById('f-loc').value.trim();
-  if(!title||!price||!loc){toast('Fill in title, price and location','err');return;}
-  const cname=document.getElementById('f-cname').value.trim();
-  const cphone=document.getElementById('f-cphone').value.trim();
-  if(!cname||!cphone){toast('Add caretaker contact','err');return;}
+async function editListing(id) {
+  const { data: h } = await sb.from('listings').select('*').eq('id', id).single();
+  const { data: c } = await sb.from('caretaker_contacts').select('*').eq('listing_id', id).single();
 
-  // Show saving state on button
-  const saveBtn=document.querySelector('#ov .btn-gold');
-  const origTxt=saveBtn.innerHTML;
-  saveBtn.disabled=true;
-  saveBtn.innerHTML='<div class="spin-small" style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Uploading photos…';
+  document.getElementById('editingId').value = id;
+  document.getElementById('fTitle').value = h.title;
+  document.getElementById('fType').value = h.type;
+  document.getElementById('fPrice').value = h.price;
+  document.getElementById('fLocation').value = h.location;
+  document.getElementById('fDescription').value = h.description || '';
+  document.getElementById('fWater').checked = h.water_included;
+  document.getElementById('fWifi').checked = h.wifi_available;
+  document.getElementById('fAvailable').checked = h.available;
+  document.getElementById('fCaretakerName').value = c?.caretaker_name || '';
+  document.getElementById('fCaretakerPhone').value = c?.phone || '';
+  document.getElementById('modalTitle').textContent = 'Edit Listing';
+  document.getElementById('saveBtnText').textContent = 'Update Listing';
+  pendingPhotos = [];
+  existingPhotos = h.photos || [];
+  renderPreviews();
+  document.getElementById('formError').style.display = 'none';
+  document.getElementById('listingOverlay').classList.add('open');
+}
 
-  // Upload all photos IN PARALLEL (much faster than sequential)
-  let photoUrls=[...existingPhotos];
-  if(photoFiles.length){
-    toast('Uploading '+photoFiles.length+' photo'+(photoFiles.length>1?'s':'')+'…');
-    const uploads=photoFiles.map(async f=>{
-      const ext=f.name.split('.').pop().toLowerCase().replace('jpeg','jpg');
-      const path=`listings/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const {error:uerr}=await sb.storage.from('house-photos').upload(path,f,{cacheControl:'3600',upsert:false});
-      if(uerr)throw new Error('Upload failed: '+uerr.message);
-      return sb.storage.from('house-photos').getPublicUrl(path).data.publicUrl;
-    });
-    try{
-      const urls=await Promise.all(uploads);
-      photoUrls=[...photoUrls,...urls];
-    }catch(err){
-      toast(err.message,'err');
-      saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;
-    }
+function handlePhotoSelect(e) {
+  const files = Array.from(e.target.files);
+  const total = existingPhotos.length + pendingPhotos.length + files.length;
+  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
+  pendingPhotos.push(...files);
+  renderPreviews();
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  const total = existingPhotos.length + pendingPhotos.length + files.length;
+  if (total > 6) { showFormError('Maximum 6 photos allowed.'); return; }
+  pendingPhotos.push(...files);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const container = document.getElementById('uploadPreviews');
+  const existingHtml = existingPhotos.map((url, i) => `
+    <div class="preview-item">
+      <img src="${url}">
+      <button class="remove-photo" onclick="removeExisting(${i})">✕</button>
+    </div>`).join('');
+  const pendingHtml = pendingPhotos.map((f, i) => `
+    <div class="preview-item">
+      <img src="${URL.createObjectURL(f)}">
+      <button class="remove-photo" onclick="removePending(${i})">✕</button>
+    </div>`).join('');
+  container.innerHTML = existingHtml + pendingHtml;
+}
+
+function removeExisting(i) { existingPhotos.splice(i, 1); renderPreviews(); }
+function removePending(i) { pendingPhotos.splice(i, 1); renderPreviews(); }
+
+function showFormError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function saveListing() {
+  const title = document.getElementById('fTitle').value.trim();
+  const type = document.getElementById('fType').value;
+  const price = parseInt(document.getElementById('fPrice').value);
+  const location = document.getElementById('fLocation').value.trim();
+  const description = document.getElementById('fDescription').value.trim();
+  const water_included = document.getElementById('fWater').checked;
+  const wifi_available = document.getElementById('fWifi').checked;
+  const available = document.getElementById('fAvailable').checked;
+  const caretakerName = document.getElementById('fCaretakerName').value.trim();
+  const caretakerPhone = document.getElementById('fCaretakerPhone').value.trim();
+  const editingId = document.getElementById('editingId').value;
+
+  if (!title || !price || !location) { showFormError('Title, price, and location are required.'); return; }
+  if (!caretakerName || !caretakerPhone) { showFormError('Caretaker name and phone are required.'); return; }
+
+  document.getElementById('saveBtn').disabled = true;
+  document.getElementById('saveSpinner').style.display = 'block';
+  document.getElementById('saveBtnText').textContent = 'Saving...';
+  document.getElementById('formError').style.display = 'none';
+
+  // Upload photos in parallel for speed
+  let uploadedUrls = [...existingPhotos];
+  if (pendingPhotos.length) {
+    document.getElementById('saveBtnText').textContent = `Uploading ${pendingPhotos.length} photo${pendingPhotos.length>1?'s':''}...`;
+    const uploads = await Promise.all(pendingPhotos.map(async file => {
+      const ext = file.name.split('.').pop().toLowerCase();
+      const path = `listings/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await sb.storage.from('house-photos').upload(path, file, { cacheControl:'3600', upsert:false });
+      if (upErr) throw new Error('Photo upload failed: ' + upErr.message);
+      const { data: urlData } = sb.storage.from('house-photos').getPublicUrl(path);
+      return urlData.publicUrl;
+    }));
+    uploadedUrls = [...uploadedUrls, ...uploads];
+  }
+  document.getElementById('saveBtnText').textContent = 'Saving listing...';
+
+  const payload = { title, type, price, location, description, water_included, wifi_available, available, photos: uploadedUrls };
+
+  let listingId = editingId;
+  if (editingId) {
+    const { error } = await sb.from('listings').update(payload).eq('id', editingId);
+    if (error) { showFormError('Update failed: ' + error.message); resetSaveBtn(); return; }
+  } else {
+    const { data, error } = await sb.from('listings').insert(payload).select().single();
+    if (error) { showFormError('Save failed: ' + error.message + ' — make sure you are set as admin in Supabase.'); resetSaveBtn(); return; }
+    listingId = data.id;
   }
 
-  saveBtn.innerHTML='<div class="spin-small" style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite"></div> Saving listing…';
+  // Upsert caretaker contact (delete+insert to avoid constraint issues)
+  await sb.from('caretaker_contacts').delete().eq('listing_id', listingId);
+  const { error: ctErr } = await sb.from('caretaker_contacts').insert({ listing_id: listingId, caretaker_name: caretakerName, phone: caretakerPhone });
+  if (ctErr) { showFormError('Caretaker save failed: ' + ctErr.message); resetSaveBtn(); return; }
 
-  const payload={title,type:document.getElementById('f-type').value,price,location:loc,
-    description:document.getElementById('f-desc').value.trim(),
-    water_included:document.getElementById('f-water').checked,
-    wifi_available:document.getElementById('f-wifi').checked,
-    available:document.getElementById('f-avail').checked,photos:photoUrls};
-
-  const eid=document.getElementById('edit-id').value;
-  let lid=eid;
-
-  if(eid){
-    const {error}=await sb.from('listings').update(payload).eq('id',eid);
-    if(error){toast('Update failed: '+error.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
-  }else{
-    const {data,error}=await sb.from('listings').insert(payload).select().single();
-    if(error){toast('Save failed: '+error.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
-    lid=data.id;
-  }
-
-  // Save caretaker — try upsert first, fall back to delete+insert if no constraint yet
-  const {error:cerr}=await sb.from('caretaker_contacts')
-    .upsert({listing_id:lid,caretaker_name:cname,phone:cphone},{onConflict:'listing_id',ignoreDuplicates:false});
-  if(cerr){
-    // Fallback: delete old then insert fresh
-    await sb.from('caretaker_contacts').delete().eq('listing_id',lid);
-    const {error:cerr2}=await sb.from('caretaker_contacts').insert({listing_id:lid,caretaker_name:cname,phone:cphone});
-    if(cerr2){toast('Caretaker save failed: '+cerr2.message,'err');saveBtn.disabled=false;saveBtn.innerHTML=origTxt;return;}
-  }
-
-  saveBtn.disabled=false;saveBtn.innerHTML=origTxt;
-  toast(eid?'Listing updated!':'Listing saved! ✓');
-  closeModal();loadListings();loadDash();
+  resetSaveBtn();
+  closeModal('listingOverlay');
+  toast(editingId ? 'Listing updated ✓' : 'Listing added ✓');
+  loadListings();
 }
 
-async function delListing(id){
-  if(!confirm('Delete this listing?'))return;
-  await sb.from('caretaker_contacts').delete().eq('listing_id',id);
-  await sb.from('listings').delete().eq('id',id);
-  toast('Listing deleted');loadListings();loadDash();
+function resetSaveBtn() {
+  document.getElementById('saveBtn').disabled = false;
+  document.getElementById('saveSpinner').style.display = 'none';
+  document.getElementById('saveBtnText').textContent = document.getElementById('editingId').value ? 'Update Listing' : 'Save Listing';
 }
 
-function toast(msg,type=''){
-  const t=document.getElementById('toast');
-  t.className='toast'+(type?' '+type:'')+' show';
-  document.getElementById('toast-txt').textContent=msg;
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);
+
+async function toggleAvailable(id, current) {
+  const { error } = await sb.from('listings').update({ available: !current }).eq('id', id);
+  if (error) { toast('Failed to update: ' + error.message, true); return; }
+  toast(!current ? 'Listing marked available ✓' : 'Listing marked as taken ✓');
+  loadListings();
 }
+
+async function deleteListing(id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  const { error } = await sb.from('listings').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, true); return; }
+  toast('Listing deleted');
+  loadListings();
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeOnBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+
+
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+
+async function exportCSV() {
+  const { data } = await sb.from('payments').select('*, profiles(full_name), listings(title)').order('created_at', {ascending:false});
+  if (!data?.length) { toast('No payments to export', true); return; }
+  const rows = [['Date','Student','Listing','Amount','M-Pesa Ref','Status','Phone']];
+  data.forEach(p => rows.push([
+    new Date(p.created_at).toLocaleDateString('en-KE'),
+    p.profiles?.full_name || '—',
+    p.listings?.title || '—',
+    'Ksh ' + (p.amount || 250),
+    p.mpesa_ref || '—',
+    p.status,
+    p.phone || '—'
+  ]));
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'nestfinder-payments-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('CSV exported ✓');
+}
+
+function renderGoLive() { /* content is static HTML */ }
+function renderSEO() { /* content is static HTML */ }
 
 init();
 </script>
