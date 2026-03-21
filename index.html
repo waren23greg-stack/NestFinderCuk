@@ -1919,7 +1919,10 @@ function pickStar(v){
 }
 
 async function loadReviews(lid){
-  const {data}=await sb.from('reviews').select('*,profiles(full_name)').eq('listing_id',lid).order('created_at',{ascending:false});
+  const _t=localStorage.getItem('sb-token');
+  const _h={'apikey':'','Authorization':'Bearer '+(_t||'')};
+  const _r=await fetch('/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{headers:_h});
+  const data=await _r.json().catch(()=>null);
   const list=document.getElementById('review-list');
   const avgEl=document.getElementById('avg-rating');
   if(!data||!data.length){
@@ -1949,9 +1952,13 @@ async function submitReview(){
   if(!user){toast('Sign in to leave a review','err');return;}
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
-  const {error}=await sb.from('reviews').upsert({
-    listing_id:cur.id,user_id:user.id,rating:pickedStar,comment
-  },{onConflict:'listing_id,user_id'});
+  const _t2=localStorage.getItem('sb-token');
+  const _sr=await fetch('/rest/v1/reviews',{
+    method:'POST',
+    headers:{'apikey':'','Authorization':'Bearer '+_t2,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment})
+  });
+  const error=_sr.ok?null:{message:'Failed to submit review ('+_sr.status+')'};
   if(error){toast('Review failed: '+error.message,'err');return;}
   toast('Review submitted — thank you!');
   document.getElementById('review-txt').value='';
