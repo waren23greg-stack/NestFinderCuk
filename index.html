@@ -1601,7 +1601,12 @@ function waShareCard(id,title){
 }
 
 async function showContact(lid){
-  const {data}=await sb.from('caretaker_contacts').select('caretaker_name,phone').eq('listing_id',lid).maybeSingle();
+  const _t=localStorage.getItem('sb-token');
+  const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/caretaker_contacts?select=caretaker_name,phone&listing_id=eq.'+lid,{
+    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'')}
+  });
+  const _d=await _r.json();
+  const data=Array.isArray(_d)&&_d.length>0?_d[0]:null;
   if(data){
     document.getElementById('cb-name').textContent=data.caretaker_name;
     document.getElementById('cb-phone').textContent=data.phone;
@@ -1891,7 +1896,8 @@ function doShare(l){
    WHATSAPP
 ══════════════════════════════════════════ */
 function setWhatsApp(phone,name){
-  const clean=phone.replace(/\D/g,'');
+  if(!phone||phone===undefined)return;
+  const clean=String(phone).replace(/\D/g,'');
   const intl=clean.startsWith('0')?'254'+clean.slice(1):clean.startsWith('254')?clean:'254'+clean;
   const msg=encodeURIComponent(`Hello ${name}, I found your listing on NestFinder CUK and I'm interested in viewing the house. Could we arrange a time?`);
   document.getElementById('cb-wa').href=`https://wa.me/${intl}?text=${msg}`;
