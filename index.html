@@ -631,6 +631,34 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .r-done-ring svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.5;}
 .r-done h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--dark);margin-bottom:.4rem;}
 .r-done p{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.7;}
+
+/* price range slider */
+.price-slider-wrap{display:flex;align-items:center;gap:10px;padding:0 2px;}
+.price-range-label{font-size:.72rem;color:var(--muted);white-space:nowrap;font-weight:300;}
+.price-range-label span{color:var(--dark);font-weight:500;}
+input[type=range].price-range{
+  -webkit-appearance:none;appearance:none;
+  height:3px;background:var(--border);border-radius:2px;outline:none;cursor:pointer;
+  flex:1;min-width:80px;
+}
+input[type=range].price-range::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;border-radius:50%;
+  background:var(--gold);border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(22,19,14,.2);cursor:pointer;transition:transform .15s;
+}
+input[type=range].price-range::-webkit-slider-thumb:hover{transform:scale(1.15);}
+input[type=range].price-range::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--gold);border:2px solid #fff;cursor:pointer;
+}
+/* distance badge on cards */
+.lcard-dist{display:inline-flex;align-items:center;gap:3px;font-size:.62rem;color:var(--muted);margin-left:auto;}
+.lcard-dist svg{width:10px;height:10px;stroke:var(--gold);fill:none;stroke-width:2;flex-shrink:0;}
+/* WA share pill on cards */
+.wa-share{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#25D366;color:#fff;border-radius:20px;font-size:.65rem;font-weight:500;cursor:pointer;border:none;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.wa-share:hover{background:#1da851;}
+.wa-share svg{width:11px;height:11px;fill:currentColor;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -722,6 +750,10 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
     <div class="chips">
       <div class="chip" data-f="water" onclick="toggleChip(this)"><div class="chip-dot"></div>Water</div>
       <div class="chip" data-f="wifi" onclick="toggleChip(this)"><div class="chip-dot"></div>WiFi</div>
+    </div>
+    <div class="price-slider-wrap" style="flex:1;min-width:200px;">
+      <div class="price-range-label">Max: <span id="priceLabel">13,000</span></div>
+      <input type="range" class="price-range" id="priceRange" min="3500" max="13000" step="500" value="13000" oninput="onPriceRange(this.value)"/>
     </div>
   </div>
 </div>
@@ -1164,21 +1196,46 @@ function render(list,g){
   <div class="lcard-body">
     <div class="lcard-type">${TL[l.type]||l.type}</div>
     ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${l.title}</div>
-    <div class="lcard-loc"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.location}</div>
+    <div class="lcard-loc">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      ${l.location}
+      <span class="lcard-dist"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${distFromCUK(l.location)}</span>
+    </div>
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
     <div class="lcard-foot">
       <div class="lcard-price">Ksh ${(l.price||0).toLocaleString()}<span>/ mo</span></div>
-      <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>
-        Get Contact
-      </button>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <button class="wa-share" onclick="event.stopPropagation();waShareCard('${l.id}','${l.title.replace(/'/g,'')}')">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Share
+        </button>
+        <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>
+          Get Contact
+        </button>
+      </div>
     </div>
   </div>
 </div>`}).join('');
 }
 
 function emptyState(){document.getElementById('lg').innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p>No listings yet — check back soon</p></div>`;}
-function doFilter(){const q=document.getElementById('q').value.toLowerCase(),t=document.getElementById('tfilter').value;render(listings.filter(l=>(!q||(l.title+l.location).toLowerCase().includes(q))&&(!t||l.type===t)&&(!wOn||l.water_included)&&(!wfOn||l.wifi_available)));}
+function doFilter(){
+  const q=document.getElementById('q').value.toLowerCase();
+  const t=document.getElementById('tfilter').value;
+  const maxP=parseInt(document.getElementById('priceRange')?.value||13000);
+  render(listings.filter(l=>
+    (!q||(l.title+l.location).toLowerCase().includes(q))&&
+    (!t||l.type===t)&&
+    (!wOn||l.water_included)&&
+    (!wfOn||l.wifi_available)&&
+    (l.price<=maxP)
+  ));
+}
+function onPriceRange(v){
+  document.getElementById('priceLabel').textContent=parseInt(v).toLocaleString();
+  doFilter();
+}
 function toggleChip(el){const f=el.dataset.f,on=el.classList.toggle('on');if(f==='water')wOn=on;if(f==='wifi')wfOn=on;doFilter();}
 function fav(e,id){
   e.stopPropagation();
@@ -1312,6 +1369,32 @@ async function submitManualPay(){
     if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id);sec('succ');}
   },5000);
 }
+function distFromCUK(location){
+  const loc=(location||'').toLowerCase();
+  // Approximate distances based on location keywords
+  const dists={
+    'karen':['karen','ngong rd','ngong road'],
+    'rongai':['rongai','kiserian'],
+    'langata':['langata','lang'ata'],
+    'otiende':['otiende'],
+    'dagoretti':['dagoretti','kawangware'],
+    'kikuyu':['kikuyu'],
+    'ngong':['ngong town'],
+    'kitengela':['kitengela'],
+  };
+  const km={karen:'~2 km',rongai:'~8 km',langata:'~4 km',otiende:'~3 km',dagoretti:'~5 km',kikuyu:'~12 km',ngong:'~15 km',kitengela:'~20 km'};
+  for(const [key,words] of Object.entries(dists)){
+    if(words.some(w=>loc.includes(w))) return km[key]+' from CUK';
+  }
+  return 'near CUK';
+}
+
+function waShareCard(id,title){
+  const url=encodeURIComponent(window.location.origin+'/?listing='+id);
+  const msg=encodeURIComponent('Check out this listing on NestFinder CUK: '+title+' — '+decodeURIComponent(url));
+  window.open('https://wa.me/?text='+msg,'_blank');
+}
+
 async function showContact(lid){
   const {data}=await sb.from('caretaker_contacts').select('caretaker_name,phone').eq('listing_id',lid).maybeSingle();
   if(data){
@@ -1321,6 +1404,20 @@ async function showContact(lid){
     setWhatsApp(data.phone,data.caretaker_name);
     sec('succ');
     toast('Contact unlocked!');
+    // Email student confirmation
+    try{
+      const {data:lst}=await sb.from('listings').select('title,location').eq('id',lid).maybeSingle();
+      await fetch('/api/notify-student',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          user_id:user?.id,
+          listing_title:lst?.title||'Listing',
+          listing_location:lst?.location||'',
+          caretaker_name:data.caretaker_name,
+          caretaker_phone:data.phone
+        })
+      }).catch(()=>{});
+    }catch(e){}
     loadReviews(lid);
     pickedStar=0;
     document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));

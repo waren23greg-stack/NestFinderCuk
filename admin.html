@@ -371,6 +371,10 @@ tr:hover td{background:var(--linen);}
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
       Students
     </button>
+    <button class="sb-item" onclick="goto('reports',this)">
+      <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      Reports
+    </button>
     <div class="sb-divider"></div>
     <a class="sb-item" href="index.html" style="text-decoration:none;">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -461,6 +465,17 @@ tr:hover td{background:var(--linen);}
       </div>
     </div>
 
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="sec-head">
+        <div><div class="sec-title">Listing Reports</div><div class="sec-sub">Student-submitted reports about listings</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Listing</th><th>Reason</th><th>Details</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody id="reportsBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+
   </div>
 </main>
 
@@ -523,6 +538,31 @@ const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 const sb=supabase.createClient(SU,SK);
 let pendingPhotos=[],existingPhotos=[];
 
+// ── REPORTS ──
+async function loadReports(){
+  const {data}=await sb.from('reports').select('*,listings(title)').order('created_at',{ascending:false});
+  const tb=document.getElementById('reportsBody');
+  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="6">No reports yet.</td></tr>';return;}
+  tb.innerHTML=data.map(r=>`<tr>
+    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;max-width:180px;">${r.listings?.title||r.listing_title||'—'}</td>
+    <td><span class="badge ${r.reason.includes('Scam')||r.reason.includes('fraud')?'badge-failed':'badge-pending'}">${r.reason}</span></td>
+    <td style="font-size:.78rem;color:var(--muted);max-width:200px;">${r.details||'—'}</td>
+    <td><span class="badge ${r.status==='resolved'?'badge-ok':r.status==='reviewed'?'badge-pending':'badge-failed'}">${r.status}</span></td>
+    <td style="font-size:.75rem;">${new Date(r.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+    <td style="display:flex;gap:.35rem;flex-wrap:wrap;">
+      ${r.status==='open'?`<button class="act act-edit" onclick="updateReport('${r.id}','reviewed')">Review</button>`:''}
+      ${r.status!=='resolved'?`<button class="act act-confirm" onclick="updateReport('${r.id}','resolved')">Resolve</button>`:''}
+      ${r.status==='resolved'?'<span style="font-size:.72rem;color:var(--muted);">Done</span>':''}
+    </td>
+  </tr>`).join('');
+}
+
+async function updateReport(id,status){
+  await sb.from('reports').update({status}).eq('id',id);
+  toast(status==='resolved'?'Report resolved ✓':'Marked as reviewed');
+  loadReports();
+}
+
 // ── AUTH ──
 async function init(){
   let session=null;
@@ -557,11 +597,11 @@ sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT')window.location.href='login.
 async function doSignOut(){await sb.auth.signOut();window.location.href='login.html';}
 
 // ── NAVIGATION ──
-const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students'};
+const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students',reports:'Reports'};
 const actions={
   listings:`<button class="topbar-btn tbtn-gold" onclick="openModal()"><svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Listing</button>`,
   payments:`<button class="topbar-btn tbtn-ghost" onclick="exportCSV()"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>`,
-  dashboard:'',students:''
+  dashboard:'',students:'',reports:''
 };
 function goto(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
@@ -574,6 +614,7 @@ function goto(name,btn){
   if(name==='listings')loadListings();
   if(name==='payments')loadPayments();
   if(name==='students')loadStudents();
+  if(name==='reports')loadReports();
 }
 
 // ── TOAST ──
