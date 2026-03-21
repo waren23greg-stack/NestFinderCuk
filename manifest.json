@@ -3,29 +3,30 @@
   "short_name": "NestFinder",
   "description": "Safe, verified student housing near The Cooperative University of Kenya",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#085041",
-  "theme_color": "#1D9E75",
-  "orientation": "portrait-primary",
+  "background_color": "#16130E",
+  "theme_color": "#B8955A",
+  "orientation": "any",
   "icons": [
     {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
   "categories": ["lifestyle", "utilities"],
   "lang": "en-KE",
   "shortcuts": [
-    { "name": "Browse Listings", "url": "/index.html" },
-    { "name": "My Payments", "url": "/payments.html" },
-    { "name": "Sign In", "url": "/login.html" }
+    { "name": "Browse Listings", "url": "/index.html", "description": "Find student housing" },
+    { "name": "My Payments", "url": "/payments.html", "description": "View unlocked contacts" },
+    { "name": "Sign In", "url": "/login.html", "description": "Sign in to your account" }
   ]
 }
