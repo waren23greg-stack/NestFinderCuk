@@ -563,8 +563,6 @@ async function updateReport(id,status){
   loadReports();
 }
 
-// ── AUTH ──
-
 async function refreshToken(){
   var rt=localStorage.getItem('sb-refresh');
   if(!rt)return;
@@ -585,34 +583,32 @@ refreshToken();
 setInterval(refreshToken,50*60*1000);
 
 async function init(){
-  let session=null;
-  for(let i=0;i<3;i++){
-    const {data}=await sb.auth.getSession();
-    if(data.session){session=data.session;break;}
-    await new Promise(r=>setTimeout(r,600));
+  const t=localStorage.getItem('sb-token');
+  if(!t){window.location.href='login.html';return;}
+  try{
+    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
+    });
+    const u=await ur.json();
+    if(!u.id){localStorage.removeItem('sb-token');window.location.href='login.html';return;}
+    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=role,full_name&id=eq.'+u.id,{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
+    });
+    const pd=await pr.json();
+    const profile=Array.isArray(pd)&&pd.length>0?pd[0]:null;
+    document.getElementById('loading').classList.add('hide');
+    if(!profile||profile.role!=='admin'){
+      document.getElementById('denied').classList.add('show');
+      return;
+    }
+    document.getElementById('adminName').textContent=profile.full_name?.split(' ')[0]||'Admin';
+    loadDashboard();
+  }catch(e){
+    console.error('Admin init error',e);
+    window.location.href='login.html';
   }
-  if(!session){window.location.href='login.html';return;}
-
-  let profile=null;
-  for(let i=0;i<3;i++){
-    const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).single();
-    if(data){profile=data;break;}
-    await new Promise(r=>setTimeout(r,500));
-  }
-
-  document.getElementById('loading').classList.add('hide');
-
-  if(!profile||profile.role!=='admin'){
-    if(!profile)document.getElementById('denied-msg').textContent='Your profile is still being set up. Refresh in a moment.';
-    document.getElementById('denied').classList.add('show');
-    return;
-  }
-
-  document.getElementById('adminName').textContent=profile.full_name?.split(' ')[0]||'Admin';
-  loadDashboard();
 }
-
-sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT')window.location.href='login.html';});
+// auth state managed via localStorage
 
 async function doSignOut(){localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');window.location.href='login.html';}
 
