@@ -3,12 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="theme-color" content="#16130E"/>
 <meta name="google-site-verification" content="GddCOA185fc_6suKdNQue_xop2OZirH0lIKNN6-rbI0"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>NestFinder CUK  — Student Housing</title>
+<title>NestFinder CUK — Student Housing</title>
 <meta name="description" content="Find safe, verified, affordable student housing near The Cooperative University of Kenya. Single rooms from Ksh 3,500, bedsitters from Ksh 6,000, one-bedrooms from Ksh 10,000."/>
 <meta name="keywords" content="student housing CUK, student rentals Cooperative University Kenya, bedsitter near CUK, single room Karen, student accommodation Kenya"/>
 <meta name="robots" content="index, follow"/>
@@ -27,125 +26,11 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"RealEstateAgent","name":"NestFinder CUK","description":"Safe, verified student housing listings near The Cooperative University of Kenya","url":"https://nest-finder-cuk.vercel.app","telephone":"+254704285315","address":{"@type":"PostalAddress","addressLocality":"Karen","addressRegion":"Nairobi","addressCountry":"KE"},"priceRange":"Ksh 3,500 – Ksh 13,000"}</script>
 <link rel="manifest" href="/manifest.json"/>
 <link rel="apple-touch-icon" href="/icon.svg"/>
-
+<link rel="icon" type="image/svg+xml" href="/icon.svg"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="NestFinder"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-
-<script>
-function createClient(url,key){
-  var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
-  var _token=null;
-  function getToken(){return _token||localStorage.getItem('sb-token')||key;}
-  var auth={
-    getUser:function(){
-      var t=_token||localStorage.getItem('sb-token');
-      if(!t)return Promise.resolve({data:{user:null}});
-      return fetch(url+'/auth/v1/user',{headers:{'apikey':key,'Authorization':'Bearer '+t}})
-        .then(function(r){return r.json().then(function(d){return{data:{user:r.ok?d:null}};});})
-        .catch(function(){return{data:{user:null}};});
-    },
-    signInWithPassword:function(opts){
-      return fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:h,body:JSON.stringify({email:opts.email,password:opts.password})})
-        .then(function(r){return r.json().then(function(d){
-          if(d.access_token){_token=d.access_token;localStorage.setItem('sb-token',d.access_token);}
-          return r.ok?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
-        });});
-    },
-    signUp:function(opts){
-      var body={email:opts.email,password:opts.password,data:{full_name:(opts.options&&opts.options.data&&opts.options.data.full_name)||''}};
-      return fetch(url+'/auth/v1/signup',{method:'POST',headers:h,body:JSON.stringify(body)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d.user},error:null}:{data:{},error:d};});});
-    },
-    signOut:function(){
-      _token=null;localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-      return Promise.resolve({error:null});
-    },
-    onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};},
-    updateUser:function(attrs){
-      var t=_token||localStorage.getItem('sb-token');
-      return fetch(url+'/auth/v1/user',{method:'PUT',headers:{'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(attrs)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d},error:null}:{data:null,error:d};});});
-    }
-  };
-  var storage={
-    from:function(bucket){
-      return{
-        upload:function(path,file){
-          var t=_token||localStorage.getItem('sb-token');
-          return fetch(url+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+(t||key)},body:file})
-            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
-        },
-        getPublicUrl:function(path){return{data:{publicUrl:url+'/storage/v1/object/public/'+bucket+'/'+path}};}
-      };
-    }
-  };
-  function from(table){
-    var _filters=[];
-    var _select='*';
-    var _order=null;
-    var _single=false;
-    var _maybeSingle=false;
-    var _limit=null;
-    var q={
-      select:function(cols){_select=cols||'*';return q;},
-      eq:function(col,val){_filters.push(col+'=eq.'+encodeURIComponent(val));return q;},
-      neq:function(col,val){_filters.push(col+'=neq.'+encodeURIComponent(val));return q;},
-      order:function(col,opts){_order=col+'.'+(opts&&opts.ascending===false?'desc':'asc');return q;},
-      limit:function(n){_limit=n;return q;},
-      single:function(){_single=true;return q;},
-      maybeSingle:function(){_maybeSingle=true;return q;},
-      insert:function(data){
-        var t=getToken();
-        var ih={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-        return fetch(url+'/rest/v1/'+table,{method:'POST',headers:ih,body:JSON.stringify(data)})
-          .then(function(r){return r.json().then(function(d){return r.ok?{data:Array.isArray(d)?d:[d],error:null}:{data:null,error:d};});});
-      },
-      update:function(data){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var uh={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-            var uu=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(uu,{method:'PATCH',headers:uh,body:JSON.stringify(data)})
-              .then(function(r){return r.json().then(function(d){return{data:d,error:null};}).catch(function(){return{data:null,error:null};});});
-          }
-        };
-      },
-      delete:function(){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var dh={'apikey':key,'Authorization':'Bearer '+t};
-            var du=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(du,{method:'DELETE',headers:dh})
-              .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});});
-          }
-        };
-      },
-      then:function(resolve,reject){
-        var t=getToken();
-        var fh={'apikey':key,'Authorization':'Bearer '+t};
-        var fu=url+'/rest/v1/'+table+'?select='+encodeURIComponent(_select);
-        _filters.forEach(function(f){fu+='&'+f;});
-        if(_order)fu+='&order='+_order;
-        if(_limit)fu+='&limit='+_limit;
-        if(_single)fh['Accept']='application/vnd.pgrst.object+json';
-        return fetch(fu,{headers:fh}).then(function(r){return r.json();}).then(function(d){
-          if(d&&d.code&&d.message){resolve({data:null,error:d});}
-          else if(_single||_maybeSingle){resolve({data:d,error:null});}
-          else{resolve({data:Array.isArray(d)?d:[],error:null});}
-        }).catch(function(e){resolve({data:null,error:e});});
-      }
-    };
-    return q;
-  }
-  return{auth:auth,storage:storage,from:function(t){return from(t);}};
-}
-
-const sb=createClient("https://mtycapgbtvpczvswpjpo.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM");
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;
@@ -184,7 +69,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
 .logo-ring{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center}
 .logo-ring svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.8}
-.logo-text{font-family:'Cormorant Garamond',serif;font-size:1.12rem;color:var(--dark);letter-spacing:.02em;white-space:nowrap}
+.logo-text{font-family:'Cormorant Garamond',serif;font-size:1.12rem;color:var(--dark);letter-spacing:.02em}
 .logo-text b{color:var(--gold);font-weight:500}
 .nav-mid{display:flex;gap:2.25rem}
 .nav-mid a{text-decoration:none;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);transition:color var(--t)}
@@ -261,7 +146,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .lcard{background:#fff;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s;-webkit-tap-highlight-color:transparent}
 @media(hover:hover){.lcard:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(22,19,14,.09);border-color:var(--gold-l)}}
 .lcard:active{transform:scale(.99)}
-.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen)}.lcard-img::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(12,10,6,.72) 100%),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22180%22%20height%3D%2280%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22500%22%20letter-spacing%3D%223%22%20fill%3D%22rgba(255%2C255%2C255%2C0.18)%22%20transform%3D%22rotate(-30%2090%2040)%22%3ETRINITY%20PROPERTY%3C%2Ftext%3E%3C%2Fsvg%3E");background-repeat:no-repeat,repeat;background-size:cover,180px 80px;z-index:2;pointer-events:none}
+.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen)}
 .lcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
 @media(hover:hover){.lcard:hover .lcard-img img{transform:scale(1.05)}}
 .lcard-badge{position:absolute;top:10px;left:10px;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;background:var(--dark);color:#fff}
@@ -531,7 +416,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
   nav { padding: 0 1rem !important; }
   .nav-mid { display: none !important; }
   .ham { display: flex !important; }
-  #nav-hello { font-size:.75rem; }
+  #nav-hello { display: none !important; }
 }
 /* hero image - always full width, just vary opacity */
 .hero-img { width: 100% !important; }
@@ -774,60 +659,6 @@ input[type=range].price-range::-moz-range-thumb{
 .wa-share{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:#25D366;color:#fff;border-radius:20px;font-size:.65rem;font-weight:500;cursor:pointer;border:none;transition:background .15s;-webkit-tap-highlight-color:transparent;}
 .wa-share:hover{background:#1da851;}
 .wa-share svg{width:11px;height:11px;fill:currentColor;flex-shrink:0;}
-
-@media(max-width:600px){
-  .lcard-body{padding:.9rem 1rem;}
-  .lcard-foot{flex-wrap:wrap;gap:.5rem;}
-  .lcard-price{font-size:1.45rem;}
-  .wa-share{display:none;}
-  .lcard-btn{width:100%;justify-content:center;height:44px;font-size:.72rem;}
-  .lcard-title{font-size:1.15rem;}
-  .lcard-loc{font-size:.72rem;}
-  .lcard-img{height:220px;}
-  .share-btn{width:36px;height:36px;}
-  .lcard-type{font-size:.6rem;}
-  .lcard-chips{gap:.3rem;}
-  .lcard-chip{font-size:.62rem;padding:3px 8px;}
-  .lcard-rating{font-size:.68rem;}
-  .lcard-dist{font-size:.68rem;}
-}
-@media(max-width:400px){
-  .lcard-img{height:190px;}
-  .lcard-price{font-size:1.3rem;}
-  .lcard-body{padding:.75rem .85rem;}
-}
-
-
-@media(max-width:600px){
-  .nav-auth{gap:.4rem;}
-  .btn-signin{padding:.35rem .7rem;font-size:.68rem;}
-  .logo-text{font-size:.95rem;}
-  .logo-ring{width:30px;height:30px;}
-  .logo-ring svg{width:13px;height:13px;}
-}
-
-
-@media(max-width:600px){
-  .btn-dark.btn-sm{
-    min-height:44px;
-    padding:.6rem 1rem;
-    font-size:.72rem;
-    width:100%;
-    justify-content:center;
-  }
-  .lcard-foot > div{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    gap:.4rem;
-  }
-  .wa-share{
-    width:100%;
-    justify-content:center;
-    padding:8px;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -835,7 +666,7 @@ input[type=range].price-range::-moz-range-thumb{
 <!-- NAV -->
 <nav id="navbar">
   <a class="logo" href="#">
-    <div class="logo-ring"><svg viewBox="0 0 24 24"><line x1="5" y1="7" x2="19" y2="7" stroke-linecap="round"/><line x1="12" y1="7" x2="12" y2="21" stroke-linecap="round"/><line x1="5" y1="7" x2="2" y2="12" stroke-linecap="round"/><line x1="19" y1="7" x2="22" y2="12" stroke-linecap="round"/><line x1="2" y1="12" x2="2" y2="21" stroke-linecap="round"/><line x1="22" y1="12" x2="22" y2="21" stroke-linecap="round"/><line x1="2" y1="21" x2="22" y2="21" stroke-linecap="round"/><circle cx="12" cy="4" r="1.2" fill="currentColor" stroke="none"/></svg></div>
+    <div class="logo-ring"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div>
     <span class="logo-text">Nest<b>Finder</b> CUK</span>
   </a>
   <div class="nav-mid">
@@ -1283,10 +1114,10 @@ input[type=range].price-range::-moz-range-thumb{
 <div class="toast" id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-txt"></span></div>
 
 <script>
-
-
-
-
+const SURL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const {createClient}=supabase;
+const sb=createClient(SURL,SKEY);
 const PHOTOS={
   single:['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80','https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80'],
   bedsitter:['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80','https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=600&q=80'],
@@ -1299,33 +1130,38 @@ let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
 
-// Auto-refresh token before it expires
 async function refreshToken(){
-  const rt = localStorage.getItem('sb-refresh');
+  var rt=localStorage.getItem('sb-refresh');
+  if(!rt)return;
   try{
-    const r = await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=refresh_token',{
+    var r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=refresh_token',{
       method:'POST',
       headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Content-Type':'application/json'},
       body:JSON.stringify({refresh_token:rt})
     });
-    const d = await r.json();
+    var d=await r.json();
     if(d.access_token){
-      localStorage.setItem('sb-token', d.access_token);
-      if(d.refresh_token) localStorage.setItem('sb-refresh', d.refresh_token);
+      localStorage.setItem('sb-token',d.access_token);
+      if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);
     }
   }catch(e){}
 }
-// Refresh on load + every 50 minutes
 refreshToken();
-setInterval(refreshToken, 50*60*1000);
+setInterval(refreshToken,50*60*1000);
 
 async function initAuth(){
   const t=localStorage.getItem('sb-token');
+  if(!t)return;
   try{
-    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}});
+    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
+    });
     const u=await ur.json();
+    if(!u.id){localStorage.removeItem('sb-token');return;}
     user=u;
-    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}});
+    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{
+      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
+    });
     const pd=await pr.json();
     const prof=Array.isArray(pd)&&pd.length>0?pd[0]:null;
     const name=prof?.full_name?.split(' ')[0]||'Student';
@@ -1336,25 +1172,30 @@ async function initAuth(){
     document.getElementById('drawer-in').style.display='none';
     document.getElementById('drawer-out').style.display='';
     document.getElementById('drawer-user').textContent='Signed in as '+name;
-    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
-    if(isAdmin){['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});}
+    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='';
+    });
+    if(isAdmin){
+      ['nav-admin','drawer-admin'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.style.display='';
+      });
+    }
     const bi=document.getElementById('bot-in');
     if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
   }catch(e){console.error('initAuth error',e);}
 }
-async function doSignOut(){localStorage.removeItem("sb-token");localStorage.removeItem("sb-refresh");localStorage.removeItem("nf-favs");localStorage.removeItem("nf-listings-cache");localStorage.removeItem("nf-listings-time");user=null;location.reload();}
+async function doSignOut(){
+  localStorage.removeItem('sb-token');
+  localStorage.removeItem('sb-refresh');
+  localStorage.removeItem('nf-favs');
+  localStorage.removeItem('nf-listings-cache');
+  localStorage.removeItem('nf-listings-time');
+  user=null;
+  location.reload();
+}
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDrawer();closeModal();closeGallery();} if(document.getElementById('gallery-ov').classList.contains('open')){if(e.key==='ArrowLeft')galleryNav(-1);if(e.key==='ArrowRight')galleryNav(1);}});
-
-
-function sanitize(s){
-  if(s==null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-function safeUrl(u){
-  try{ const p=new URL(u); return ['https:','http:'].includes(p.protocol)?u:'#'; }catch(e){ return '#'; }
-}
 
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0}return h;}
 function photo(l){
@@ -1364,19 +1205,10 @@ function photo(l){
 }
 
 async function load(){
-  const cached=localStorage.getItem('nf-listings-cache');
-  const cacheTime=localStorage.getItem('nf-listings-time');
-  if(cached&&cacheTime&&(Date.now()-parseInt(cacheTime))<300000){
-    listings=JSON.parse(cached);
-    document.getElementById('stat-n').textContent=listings.length;
-    render(listings);
-  }
   const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
   if(error||!data){emptyState();return;}
   listings=data;
   document.getElementById('stat-n').textContent=data.length;
-  localStorage.setItem('nf-listings-cache',JSON.stringify(data));
-  localStorage.setItem('nf-listings-time',Date.now().toString());
   render(data);
 }
 
@@ -1392,7 +1224,7 @@ function render(list,g){
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
     return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both">
   <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
-    <img src="${ph}" alt="${sanitize(l.title)}" loading="lazy" decoding="async"/>
+    <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
     <div class="lcard-badge ${l.available?'avail':''}">${l.available?'Available':'Taken'}</div>
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
     <div class="share-btn" onclick="shareCard(event,'${l.id}')" role="button" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
@@ -1400,10 +1232,10 @@ function render(list,g){
   </div>
   <div class="lcard-body">
     <div class="lcard-type">${TL[l.type]||l.type}</div>
-    ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${sanitize(l.title)}</div>
+    ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}    <div class="lcard-title">${l.title}</div>
     <div class="lcard-loc">
       <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      ${sanitize(l.location)}
+      ${l.location}
       <span class="lcard-dist"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${distFromCUK(l.location)}</span>
     </div>
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
@@ -1471,7 +1303,7 @@ async function openListing(id){
   if(photoWrap){
     const pool=PHOTOS[l.type]||PHOTOS.default;
     const imgs=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,2)];
-    photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${sanitize(l.title)}"/>`).join('');
+    photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${l.title}"/>`).join('');
     photoWrap.style.display=imgs.length?'flex':'none';
   }
 
@@ -1560,12 +1392,9 @@ async function submitManualPay(){
       sb.from('profiles').select('full_name').eq('id',user.id).single(),
       sb.from('listings').select('title').eq('id',cur.id).single()
     ]);
-    const _nt=localStorage.getItem('sb-token');
-    const _sn=prof?.data?.full_name||prof?.full_name||user?.email||'Student';
-    const _lt=lst?.data?.title||lst?.title||cur?.title||'Listing';
     fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({student_name:_sn,listing_title:_lt,mpesa_ref:ref,amount:250,payment_id:pmnt?.id||''})
-    }).then(r=>r.json()).then(d=>console.log('Notify result:',d)).catch(e=>console.error('Notify error:',e));
+      body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:250,payment_id:pmnt.id})
+    }).catch(()=>{});
   }catch(e){}
 
   // Poll for 5 minutes in case admin confirms quickly
@@ -1604,12 +1433,7 @@ function waShareCard(id,title){
 }
 
 async function showContact(lid){
-  const _t=localStorage.getItem('sb-token');
-  const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/caretaker_contacts?select=caretaker_name,phone&listing_id=eq.'+lid,{
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'')}
-  });
-  const _d=await _r.json();
-  const data=Array.isArray(_d)&&_d.length>0?_d[0]:null;
+  const {data}=await sb.from('caretaker_contacts').select('caretaker_name,phone').eq('listing_id',lid).maybeSingle();
   if(data){
     document.getElementById('cb-name').textContent=data.caretaker_name;
     document.getElementById('cb-phone').textContent=data.phone;
@@ -1830,18 +1654,9 @@ async function loadRatings(){
 /* ══════════════════════════════════════════
    FAVOURITES PAGE
 ══════════════════════════════════════════ */
-async function showFavs(){
+function showFavs(){
   if(!user){toast('Sign in to view your saved listings','err');return;}
-  let favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
-  if(user){
-    try{
-      const _t=localStorage.getItem('sb-token');
-      const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/favourites?select=listing_id&user_id=eq.'+user.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t}});
-      const _d=await _r.json();
-      if(Array.isArray(_d))favIds=_d.map(f=>f.listing_id);
-      localStorage.setItem('nf-favs',JSON.stringify(favIds));
-    }catch(e){}
-  }
+  const favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
   const favListings=listings.filter(l=>favIds.includes(l.id));
   const grid=document.getElementById('favs-grid');
   if(!favListings.length){
@@ -1874,7 +1689,7 @@ function shareCurrentListing(){
 
 function doShare(l){
   const url=window.location.origin+window.location.pathname+'?listing='+l.id;
-  const text=`Check out this listing on NestFinder CUK: ${sanitize(l.title)} — Ksh ${(l.price||0).toLocaleString()}/mo in ${sanitize(l.location)}`;
+  const text=`Check out this listing on NestFinder CUK: ${l.title} — Ksh ${(l.price||0).toLocaleString()}/mo in ${l.location}`;
   if(navigator.share){
     navigator.share({title:l.title,text,url}).catch(()=>{});
   }else{
@@ -1899,8 +1714,7 @@ function doShare(l){
    WHATSAPP
 ══════════════════════════════════════════ */
 function setWhatsApp(phone,name){
-  if(!phone||phone===undefined)return;
-  const clean=String(phone).replace(/\D/g,'');
+  const clean=phone.replace(/\D/g,'');
   const intl=clean.startsWith('0')?'254'+clean.slice(1):clean.startsWith('254')?clean:'254'+clean;
   const msg=encodeURIComponent(`Hello ${name}, I found your listing on NestFinder CUK and I'm interested in viewing the house. Could we arrange a time?`);
   document.getElementById('cb-wa').href=`https://wa.me/${intl}?text=${msg}`;
@@ -1919,10 +1733,7 @@ function pickStar(v){
 }
 
 async function loadReviews(lid){
-  const _t=localStorage.getItem('sb-token');
-  const _h={'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM')};
-  const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{headers:_h});
-  const data=await _r.json().catch(()=>null);
+  const {data}=await sb.from('reviews').select('*,profiles(full_name)').eq('listing_id',lid).order('created_at',{ascending:false});
   const list=document.getElementById('review-list');
   const avgEl=document.getElementById('avg-rating');
   if(!data||!data.length){
@@ -1952,13 +1763,9 @@ async function submitReview(){
   if(!user){toast('Sign in to leave a review','err');return;}
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
-  const _t2=localStorage.getItem('sb-token');
-  const _sr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews',{
-    method:'POST',
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t2,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
-    body:JSON.stringify({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment})
-  });
-  const error=_sr.ok?null:{message:'Failed to submit review ('+_sr.status+')'};
+  const {error}=await sb.from('reviews').upsert({
+    listing_id:cur.id,user_id:user.id,rating:pickedStar,comment
+  },{onConflict:'listing_id,user_id'});
   if(error){toast('Review failed: '+error.message,'err');return;}
   toast('Review submitted — thank you!');
   document.getElementById('review-txt').value='';
@@ -2091,5 +1898,3 @@ async function submitReport(){
 </div>
 </body>
 </html>
-
-

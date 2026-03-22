@@ -3,125 +3,11 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="theme-color" content="#0E0B07"/>
 <meta name="google-site-verification" content="GddCOA185fc_6suKdNQue_xop2OZirH0lIKNN6-rbI0"/>
 <title>NestFinder CUK — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-
-<script>
-function createClient(url,key){
-  var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
-  var _token=null;
-  function getToken(){return _token||localStorage.getItem('sb-token')||key;}
-  var auth={
-    getUser:function(){
-      var t=_token||localStorage.getItem('sb-token');
-      if(!t)return Promise.resolve({data:{user:null}});
-      return fetch(url+'/auth/v1/user',{headers:{'apikey':key,'Authorization':'Bearer '+t}})
-        .then(function(r){return r.json().then(function(d){return{data:{user:r.ok?d:null}};});})
-        .catch(function(){return{data:{user:null}};});
-    },
-    signInWithPassword:function(opts){
-      return fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:h,body:JSON.stringify({email:opts.email,password:opts.password})})
-        .then(function(r){return r.json().then(function(d){
-          if(d.access_token){_token=d.access_token;localStorage.setItem('sb-token',d.access_token);}
-          return r.ok?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
-        });});
-    },
-    signUp:function(opts){
-      var body={email:opts.email,password:opts.password,data:{full_name:(opts.options&&opts.options.data&&opts.options.data.full_name)||''}};
-      return fetch(url+'/auth/v1/signup',{method:'POST',headers:h,body:JSON.stringify(body)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d.user},error:null}:{data:{},error:d};});});
-    },
-    signOut:function(){
-      _token=null;localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-      return Promise.resolve({error:null});
-    },
-    onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};},
-    updateUser:function(attrs){
-      var t=_token||localStorage.getItem('sb-token');
-      return fetch(url+'/auth/v1/user',{method:'PUT',headers:{'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(attrs)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d},error:null}:{data:null,error:d};});});
-    }
-  };
-  var storage={
-    from:function(bucket){
-      return{
-        upload:function(path,file){
-          var t=_token||localStorage.getItem('sb-token');
-          return fetch(url+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+(t||key)},body:file})
-            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
-        },
-        getPublicUrl:function(path){return{data:{publicUrl:url+'/storage/v1/object/public/'+bucket+'/'+path}};}
-      };
-    }
-  };
-  function from(table){
-    var _filters=[];
-    var _select='*';
-    var _order=null;
-    var _single=false;
-    var _maybeSingle=false;
-    var _limit=null;
-    var q={
-      select:function(cols){_select=cols||'*';return q;},
-      eq:function(col,val){_filters.push(col+'=eq.'+encodeURIComponent(val));return q;},
-      neq:function(col,val){_filters.push(col+'=neq.'+encodeURIComponent(val));return q;},
-      order:function(col,opts){_order=col+'.'+(opts&&opts.ascending===false?'desc':'asc');return q;},
-      limit:function(n){_limit=n;return q;},
-      single:function(){_single=true;return q;},
-      maybeSingle:function(){_maybeSingle=true;return q;},
-      insert:function(data){
-        var t=getToken();
-        var ih={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-        return fetch(url+'/rest/v1/'+table,{method:'POST',headers:ih,body:JSON.stringify(data)})
-          .then(function(r){return r.json().then(function(d){return r.ok?{data:Array.isArray(d)?d:[d],error:null}:{data:null,error:d};});});
-      },
-      update:function(data){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var uh={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-            var uu=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(uu,{method:'PATCH',headers:uh,body:JSON.stringify(data)})
-              .then(function(r){return r.json().then(function(d){return{data:d,error:null};}).catch(function(){return{data:null,error:null};});});
-          }
-        };
-      },
-      delete:function(){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var dh={'apikey':key,'Authorization':'Bearer '+t};
-            var du=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(du,{method:'DELETE',headers:dh})
-              .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});});
-          }
-        };
-      },
-      then:function(resolve,reject){
-        var t=getToken();
-        var fh={'apikey':key,'Authorization':'Bearer '+t};
-        var fu=url+'/rest/v1/'+table+'?select='+encodeURIComponent(_select);
-        _filters.forEach(function(f){fu+='&'+f;});
-        if(_order)fu+='&order='+_order;
-        if(_limit)fu+='&limit='+_limit;
-        if(_single)fh['Accept']='application/vnd.pgrst.object+json';
-        return fetch(fu,{headers:fh}).then(function(r){return r.json();}).then(function(d){
-          if(d&&d.code&&d.message){resolve({data:null,error:d});}
-          else if(_single||_maybeSingle){resolve({data:d,error:null});}
-          else{resolve({data:Array.isArray(d)?d:[],error:null});}
-        }).catch(function(e){resolve({data:null,error:e});});
-      }
-    };
-    return q;
-  }
-  return{auth:auth,storage:storage,from:function(t){return from(t);}};
-}
-
-const sb=createClient("https://mtycapgbtvpczvswpjpo.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM");
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ── TOKENS ── */
 :root{
@@ -600,7 +486,7 @@ body{
       <!-- logo -->
       <div class="l-logo">
         <div class="l-logo-ring">
-          <svg viewBox="0 0 24 24"><line x1="5" y1="7" x2="19" y2="7" stroke-linecap="round"/><line x1="12" y1="7" x2="12" y2="21" stroke-linecap="round"/><line x1="5" y1="7" x2="2" y2="12" stroke-linecap="round"/><line x1="19" y1="7" x2="22" y2="12" stroke-linecap="round"/><line x1="2" y1="12" x2="2" y2="21" stroke-linecap="round"/><line x1="22" y1="12" x2="22" y2="21" stroke-linecap="round"/><line x1="2" y1="21" x2="22" y2="21" stroke-linecap="round"/><circle cx="12" cy="4" r="1.2" fill="currentColor" stroke="none"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
         </div>
         <div class="l-logo-text">Nest<b>Finder</b> CUK</div>
       </div>
@@ -869,10 +755,10 @@ body{
 </div>
 
 <script>
-
-
-
-
+const SURL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const {createClient}=supabase;
+const sb=createClient(SURL,SKEY);
 
 // load listing count for left panel
 (async()=>{
@@ -952,15 +838,26 @@ async function doSignIn(){
   const pass=document.getElementById('in-pass').value;
   if(!email||!pass){showMsg('in-msg','Please enter your email and password.');return;}
   setLoading('in-btn','in-arrow',true);
-  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  // Use direct fetch for reliable sign-in
+  const _lr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=password',{
+    method:'POST',
+    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Content-Type':'application/json'},
+    body:JSON.stringify({email,password:pass})
+  });
+  const _ld=await _lr.json();
   setLoading('in-btn','in-arrow',false,'Sign In');
-  if(error){
-    const m=error.message.includes('Invalid')||error.message.includes('credentials')
-      ?'Incorrect email or password. Please try again.'
-      :error.message;
+  if(!_ld.access_token){
+    const m=(_ld.error_description||_ld.msg||'Incorrect email or password. Please try again.');
     showMsg('in-msg',m);return;
   }
-  const {data:p}=await sb.from('profiles').select('full_name,role').eq('id',data.user.id).single();
+  localStorage.setItem('sb-token',_ld.access_token);
+  localStorage.setItem('sb-refresh',_ld.refresh_token||'');
+  // Fetch profile to determine role
+  const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+_ld.user.id,{
+    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_ld.access_token}
+  });
+  const _pd=await _pr.json();
+  const p=Array.isArray(_pd)&&_pd.length>0?_pd[0]:null;
   if(p?.role==='admin'){location.href='admin.html';return;}
   showDone(p?.full_name?.split(' ')[0]||'Student');
 }

@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="google-site-verification" content="GddCOA185fc_6suKdNQue_xop2OZirH0lIKNN6-rbI0"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <meta name="theme-color" content="#16130E"/>
 <title>Admin — NestFinder CUK</title>
 <meta name="description" content="NestFinder CUK admin panel."/>
@@ -15,120 +14,7 @@
 <meta property="og:url" content="https://nest-finder-cuk.vercel.app/admin.html"/>
 <meta property="og:site_name" content="NestFinder CUK"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-<script>
-function createClient(url,key){
-  var h={'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'};
-  var _token=null;
-  function getToken(){return _token||localStorage.getItem('sb-token')||key;}
-  var auth={
-    getUser:function(){
-      var t=_token||localStorage.getItem('sb-token');
-      if(!t)return Promise.resolve({data:{user:null}});
-      return fetch(url+'/auth/v1/user',{headers:{'apikey':key,'Authorization':'Bearer '+t}})
-        .then(function(r){return r.json().then(function(d){return{data:{user:r.ok?d:null}};});})
-        .catch(function(){return{data:{user:null}};});
-    },
-    signInWithPassword:function(opts){
-      return fetch(url+'/auth/v1/token?grant_type=password',{method:'POST',headers:h,body:JSON.stringify({email:opts.email,password:opts.password})})
-        .then(function(r){return r.json().then(function(d){
-          if(d.access_token){_token=d.access_token;localStorage.setItem('sb-token',d.access_token);}
-          return r.ok?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
-        });});
-    },
-    signUp:function(opts){
-      var body={email:opts.email,password:opts.password,data:{full_name:(opts.options&&opts.options.data&&opts.options.data.full_name)||''}};
-      return fetch(url+'/auth/v1/signup',{method:'POST',headers:h,body:JSON.stringify(body)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d.user},error:null}:{data:{},error:d};});});
-    },
-    signOut:function(){
-      _token=null;localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-      return Promise.resolve({error:null});
-    },
-    onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};},
-    updateUser:function(attrs){
-      var t=_token||localStorage.getItem('sb-token');
-      return fetch(url+'/auth/v1/user',{method:'PUT',headers:{'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(attrs)})
-        .then(function(r){return r.json().then(function(d){return r.ok?{data:{user:d},error:null}:{data:null,error:d};});});
-    }
-  };
-  var storage={
-    from:function(bucket){
-      return{
-        upload:function(path,file){
-          var t=_token||localStorage.getItem('sb-token');
-          return fetch(url+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+(t||key)},body:file})
-            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
-        },
-        getPublicUrl:function(path){return{data:{publicUrl:url+'/storage/v1/object/public/'+bucket+'/'+path}};}
-      };
-    }
-  };
-  function from(table){
-    var _filters=[];
-    var _select='*';
-    var _order=null;
-    var _single=false;
-    var _maybeSingle=false;
-    var _limit=null;
-    var q={
-      select:function(cols){_select=cols||'*';return q;},
-      eq:function(col,val){_filters.push(col+'=eq.'+encodeURIComponent(val));return q;},
-      neq:function(col,val){_filters.push(col+'=neq.'+encodeURIComponent(val));return q;},
-      order:function(col,opts){_order=col+'.'+(opts&&opts.ascending===false?'desc':'asc');return q;},
-      limit:function(n){_limit=n;return q;},
-      single:function(){_single=true;return q;},
-      maybeSingle:function(){_maybeSingle=true;return q;},
-      insert:function(data){
-        var t=getToken();
-        var ih={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-        return fetch(url+'/rest/v1/'+table,{method:'POST',headers:ih,body:JSON.stringify(data)})
-          .then(function(r){return r.json().then(function(d){return r.ok?{data:Array.isArray(d)?d:[d],error:null}:{data:null,error:d};});});
-      },
-      update:function(data){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var uh={'apikey':key,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=representation'};
-            var uu=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(uu,{method:'PATCH',headers:uh,body:JSON.stringify(data)})
-              .then(function(r){return r.json().then(function(d){return{data:d,error:null};}).catch(function(){return{data:null,error:null};});});
-          }
-        };
-      },
-      delete:function(){
-        return{
-          eq:function(col,val){
-            var t=getToken();
-            var dh={'apikey':key,'Authorization':'Bearer '+t};
-            var du=url+'/rest/v1/'+table+'?'+col+'=eq.'+encodeURIComponent(val);
-            return fetch(du,{method:'DELETE',headers:dh})
-              .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});});
-          }
-        };
-      },
-      then:function(resolve,reject){
-        var t=getToken();
-        var fh={'apikey':key,'Authorization':'Bearer '+t};
-        var fu=url+'/rest/v1/'+table+'?select='+encodeURIComponent(_select);
-        _filters.forEach(function(f){fu+='&'+f;});
-        if(_order)fu+='&order='+_order;
-        if(_limit)fu+='&limit='+_limit;
-        if(_single)fh['Accept']='application/vnd.pgrst.object+json';
-        return fetch(fu,{headers:fh}).then(function(r){return r.json();}).then(function(d){
-          if(d&&d.code&&d.message){resolve({data:null,error:d});}
-          else if(_single||_maybeSingle){resolve({data:d,error:null});}
-          else{resolve({data:Array.isArray(d)?d:[],error:null});}
-        }).catch(function(e){resolve({data:null,error:e});});
-      }
-    };
-    return q;
-  }
-  return{auth:auth,storage:storage,from:function(t){return from(t);}};
-}
-
-const sb=createClient("https://mtycapgbtvpczvswpjpo.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM");
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;--gold-gl:rgba(184,149,90,.1);
@@ -461,7 +347,7 @@ tr:hover td{background:var(--linen);}
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
     <div class="sb-logo-row">
-      <div class="sb-logo-ring"><svg viewBox="0 0 24 24"><line x1="5" y1="7" x2="19" y2="7" stroke-linecap="round"/><line x1="12" y1="7" x2="12" y2="21" stroke-linecap="round"/><line x1="5" y1="7" x2="2" y2="12" stroke-linecap="round"/><line x1="19" y1="7" x2="22" y2="12" stroke-linecap="round"/><line x1="2" y1="12" x2="2" y2="21" stroke-linecap="round"/><line x1="22" y1="12" x2="22" y2="21" stroke-linecap="round"/><line x1="2" y1="21" x2="22" y2="21" stroke-linecap="round"/><circle cx="12" cy="4" r="1.2" fill="currentColor" stroke="none"/></svg></div>
+      <div class="sb-logo-ring"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div>
       <div class="sb-logo-text">Nest<b>Finder</b> CUK</div>
     </div>
     <div class="sb-badge">Admin Panel</div>
@@ -647,9 +533,9 @@ tr:hover td{background:var(--linen);}
 </div>
 
 <script>
-
-
-
+const SU='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const sb=supabase.createClient(SU,SK);
 let pendingPhotos=[],existingPhotos=[];
 
 // ── REPORTS ──
@@ -681,7 +567,7 @@ async function updateReport(id,status){
 
 async function refreshToken(){
   var rt=localStorage.getItem('sb-refresh');
-  if(!rt) return;
+  if(!rt)return;
   try{
     var r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=refresh_token',{
       method:'POST',
@@ -691,30 +577,28 @@ async function refreshToken(){
     var d=await r.json();
     if(d.access_token){
       localStorage.setItem('sb-token',d.access_token);
-      if(d.refresh_token) localStorage.setItem('sb-refresh',d.refresh_token);
+      if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);
     }
   }catch(e){}
 }
 refreshToken();
-setInterval(refreshToken, 50*60*1000);
+setInterval(refreshToken,50*60*1000);
 
 async function init(){
   let session=null;
-  const token=localStorage.getItem("sb-token");
-  if(!token){window.location.href="login.html";return;}
-  const {data:ud}=await sb.auth.getUser();
-  if(ud&&ud.user){session={user:ud.user};}
+  for(let i=0;i<3;i++){
+    const {data}=await sb.auth.getSession();
+    if(data.session){session=data.session;break;}
+    await new Promise(r=>setTimeout(r,600));
+  }
   if(!session){window.location.href='login.html';return;}
 
   let profile=null;
-  try{
-    const _pt=localStorage.getItem('sb-token');
-    const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=role,full_name&id=eq.'+session.user.id,{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_pt}
-    });
-    const _pd=await _pr.json();
-    if(Array.isArray(_pd)&&_pd.length>0)profile=_pd[0];
-  }catch(e){console.error('Profile fetch error',e);}
+  for(let i=0;i<3;i++){
+    const {data}=await sb.from('profiles').select('role,full_name').eq('id',session.user.id).single();
+    if(data){profile=data;break;}
+    await new Promise(r=>setTimeout(r,500));
+  }
 
   document.getElementById('loading').classList.add('hide');
 
@@ -730,7 +614,7 @@ async function init(){
 
 sb.auth.onAuthStateChange((e)=>{if(e==='SIGNED_OUT')window.location.href='login.html';});
 
-async function doSignOut(){await sb.auth.signOut();window.location.href='login.html';}
+async function doSignOut(){localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');window.location.href='login.html';}
 
 // ── NAVIGATION ──
 const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students',reports:'Reports'};
@@ -951,27 +835,6 @@ function renderPreviews(){
 }
 function showFErr(msg){const e=document.getElementById('fErr');e.textContent=msg;e.className='f-err show';}
 
-
-async function compressImage(file, maxWidth=1200, quality=0.78){
-  return new Promise(resolve=>{
-    const img=new Image();
-    const url=URL.createObjectURL(file);
-    img.onload=()=>{
-      const scale=Math.min(1,maxWidth/img.width);
-      const w=Math.round(img.width*scale);
-      const h=Math.round(img.height*scale);
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      canvas.toBlob(blob=>{
-        URL.revokeObjectURL(url);
-        resolve(new File([blob],file.name,{type:'image/jpeg'}));
-      },'image/jpeg',quality);
-    };
-    img.src=url;
-  });
-}
-
 async function saveListing(){
   const title=document.getElementById('fTitle').value.trim();
   const price=parseInt(document.getElementById('fPrice').value);
@@ -990,7 +853,7 @@ async function saveListing(){
 
   // Upload photos in parallel
   const urls=[...existingPhotos];
-  await Promise.all(pendingPhotos.map(async f=>{ f=await compressImage(f);
+  await Promise.all(pendingPhotos.map(async f=>{
     const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
     const {error}=await sb.storage.from('house-photos').upload(path,f);
     if(error){showFErr('Photo upload failed: '+error.message);return;}
@@ -1026,7 +889,7 @@ async function saveListing(){
   resetSave();
   closeModal('listingOverlay');
   toast(editId?'Listing updated ✓':'Listing added ✓');
-  setTimeout(()=>loadListings(), 500);
+  loadListings();
 }
 
 function resetSave(){
