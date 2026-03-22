@@ -142,6 +142,7 @@ window.sb={
 };
 })();
 </script>
+<script>const sb=window.sb;</script>
 <style>
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;
@@ -257,7 +258,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .lcard{background:#fff;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s;-webkit-tap-highlight-color:transparent}
 @media(hover:hover){.lcard:hover{transform:translateY(-3px);box-shadow:0 16px 48px rgba(22,19,14,.09);border-color:var(--gold-l)}}
 .lcard:active{transform:scale(.99)}
-.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen)}
+.lcard-img{position:relative;height:200px;overflow:hidden;background:var(--linen)}.lcard-img::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(12,10,6,.72) 100%),url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22180%22%20height%3D%2280%22%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2211%22%20font-weight%3D%22500%22%20letter-spacing%3D%223%22%20fill%3D%22rgba%28255%2C255%2C255%2C0.18%29%22%20transform%3D%22rotate%28-30%2090%2040%29%22%3ETRINITY%20PROPERTY%3C/text%3E%3C/svg%3E");background-repeat:no-repeat,repeat;background-size:cover,180px 80px;z-index:2;pointer-events:none}
 .lcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
 @media(hover:hover){.lcard:hover .lcard-img img{transform:scale(1.05)}}
 .lcard-badge{position:absolute;top:10px;left:10px;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;background:var(--dark);color:#fff}
@@ -1435,7 +1436,9 @@ async function openListing(id){
 
   // Already paid? → skip preview and show contact directly
   if(user){
-    const {data}=await sb.from('payments').select('id').eq('user_id',user.id).eq('listing_id',id).eq('status','confirmed').maybeSingle();
+    const _cp=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=id&user_id=eq.'+user.id+'&listing_id=eq.'+id+'&status=eq.confirmed&limit=1',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+    const _cpd=await _cp.json();
+    const data=Array.isArray(_cpd)&&_cpd.length>0?_cpd[0]:null;
     if(data){await showContact(id);sec('succ');openOv();return;}
   }
   // Show preview first
@@ -1468,7 +1471,9 @@ async function submitManualPay(){
   sec('wait');
 
   // Check if this ref was already used
-  const {data:existing}=await sb.from('payments').select('id,status').eq('mpesa_ref',ref).single();
+  const _ce=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=id,status&mpesa_ref=eq.'+encodeURIComponent(ref),{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+  const _ced=await _ce.json();
+  const existing=Array.isArray(_ced)&&_ced.length>0?_ced[0]:null;
   if(existing){
     if(existing.status==='confirmed'){
       await showContact(cur.id);sec('succ');
@@ -1480,11 +1485,15 @@ async function submitManualPay(){
   }
 
   // Save payment record with the M-Pesa ref
-  const {data:pmnt,error}=await sb.from('payments').insert({
-    user_id:user.id,listing_id:cur.id,
-    phone:user.user_metadata?.phone||'',
-    amount:250,status:'pending',mpesa_ref:ref
-  }).select().single();
+  const _pt=localStorage.getItem('sb-token');
+  const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments',{
+    method:'POST',
+    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_pt,'Content-Type':'application/json','Prefer':'return=representation'},
+    body:JSON.stringify({user_id:user.id,listing_id:cur.id,phone:user.phone||'',amount:250,status:'pending',mpesa_ref:ref})
+  });
+  const _pd=await _pr.json();
+  const pmnt=Array.isArray(_pd)&&_pd.length>0?_pd[0]:_pd;
+  const error=_pr.ok?null:{message:JSON.stringify(_pd)};
 
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
 
@@ -1511,7 +1520,9 @@ async function submitManualPay(){
   poll=setInterval(async()=>{
     attempts++;
     if(attempts>60){clearInterval(poll);return;}
-    const {data}=await sb.from('payments').select('status').eq('id',pmnt.id).single();
+    const _pr2=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=status&id=eq.'+pmnt.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+    const _pd2=await _pr2.json();
+    const data=Array.isArray(_pd2)&&_pd2.length>0?_pd2[0]:null;
     if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id);sec('succ');}
   },5000);
 }
