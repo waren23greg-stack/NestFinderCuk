@@ -14,7 +14,118 @@
 <meta property="og:url" content="https://nest-finder-cuk.vercel.app/admin.html"/>
 <meta property="og:site_name" content="NestFinder CUK"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// NestFinder Supabase Client v3 - inline, no CDN
+(function(){
+var _BASE='https://mtycapgbtvpczvswpjpo.supabase.co';
+var _KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+function _h(t){return{'apikey':_KEY,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_KEY),'Content-Type':'application/json'};}
+function _from(table){
+  var _f=[],_s='*',_ord=null,_lim=null;
+  var q={
+    select:function(s){_s=s||'*';return q;},
+    eq:function(c,v){_f.push(c+'=eq.'+encodeURIComponent(v));return q;},
+    neq:function(c,v){_f.push(c+'=neq.'+encodeURIComponent(v));return q;},
+    order:function(c,o){_ord=c+'.'+(o&&o.ascending===false?'desc':'asc');return q;},
+    limit:function(n){_lim=n;return q;},
+    single:function(){return q._run(true,false);},
+    maybeSingle:function(){return q._run(false,true);},
+    then:function(res,rej){return q._run(false,false).then(res,rej);},
+    _run:function(single,maybe){
+      var t=localStorage.getItem('sb-token');
+      var url=_BASE+'/rest/v1/'+table+'?select='+encodeURIComponent(_s);
+      _f.forEach(function(f){url+='&'+f;});
+      if(_ord)url+='&order='+_ord;
+      if(_lim)url+='&limit='+_lim;
+      var h=_h(t);
+      if(single)h['Accept']='application/vnd.pgrst.object+json';
+      return fetch(url,{headers:h}).then(function(r){return r.json();}).then(function(d){
+        if(d&&d.code&&d.message)return{data:null,error:d};
+        if(single||maybe)return{data:d,error:null};
+        return{data:Array.isArray(d)?d:[],error:null};
+      }).catch(function(e){return{data:null,error:e};});
+    },
+    insert:function(data){
+      var t=localStorage.getItem('sb-token');
+      return fetch(_BASE+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':'return=representation'}),body:JSON.stringify(data)})
+        .then(function(r){return r.json();}).then(function(d){return{data:Array.isArray(d)?d:[d],error:null};
+      }).catch(function(e){return{data:null,error:e};});
+    },
+    upsert:function(data,opts){
+      var t=localStorage.getItem('sb-token');
+      var prefer='resolution='+(opts&&opts.onConflict?'merge-duplicates':'ignore-duplicates')+',return=representation';
+      return fetch(_BASE+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':prefer}),body:JSON.stringify(data)})
+        .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
+      }).catch(function(e){return{data:null,error:e};});
+    },
+    update:function(data){
+      return{eq:function(c,v){
+        var t=localStorage.getItem('sb-token');
+        var url=_BASE+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
+        return fetch(url,{method:'PATCH',headers:Object.assign({},_h(t),{'Prefer':'return=representation'}),body:JSON.stringify(data)})
+          .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
+        }).catch(function(e){return{data:null,error:e};});
+      }};
+    },
+    delete:function(){
+      return{eq:function(c,v){
+        var t=localStorage.getItem('sb-token');
+        var url=_BASE+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
+        return fetch(url,{method:'DELETE',headers:_h(t)})
+          .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});})
+          .catch(function(e){return{data:null,error:e};});
+      }};
+    }
+  };
+  return q;
+}
+window.sb={
+  from:function(t){return _from(t);},
+  auth:{
+    getUser:function(){
+      var t=localStorage.getItem('sb-token');
+      if(!t)return Promise.resolve({data:{user:null},error:null});
+      return fetch(_BASE+'/auth/v1/user',{headers:_h(t)})
+        .then(function(r){return r.json();})
+        .then(function(d){return{data:{user:d.id?d:null},error:null};
+      }).catch(function(){return{data:{user:null},error:null};});
+    },
+    signInWithPassword:function(o){
+      return fetch(_BASE+'/auth/v1/token?grant_type=password',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password})})
+        .then(function(r){return r.json();}).then(function(d){
+          if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
+          return d.access_token?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
+        });
+    },
+    signUp:function(o){
+      return fetch(_BASE+'/auth/v1/signup',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password,data:o.options&&o.options.data||{}})})
+        .then(function(r){return r.json();}).then(function(d){return d.id||d.user?{data:{user:d.user||d},error:null}:{data:{},error:d};});
+    },
+    signOut:function(){
+      localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
+      return Promise.resolve({error:null});
+    },
+    resetPasswordForEmail:function(email,opts){
+      return fetch(_BASE+'/auth/v1/recover',{method:'POST',headers:_h(),body:JSON.stringify({email:email,gotrue_meta_security:{}})
+      }).then(function(r){return r.ok?{data:{},error:null}:r.json().then(function(e){return{data:null,error:e};});});
+    },
+    onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};}
+  },
+  storage:{
+    from:function(bucket){
+      return{
+        upload:function(path,file){
+          var t=localStorage.getItem('sb-token');
+          return fetch(_BASE+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':_KEY,'Authorization':'Bearer '+(t||_KEY)},body:file})
+            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
+        },
+        getPublicUrl:function(path){return{data:{publicUrl:_BASE+'/storage/v1/object/public/'+bucket+'/'+path}};}
+      };
+    }
+  }
+};
+})();
+</script>
 <style>
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;--gold-gl:rgba(184,149,90,.1);
@@ -535,7 +646,6 @@ tr:hover td{background:var(--linen);}
 <script>
 const SU='https://mtycapgbtvpczvswpjpo.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-const sb=supabase.createClient(SU,SK);
 let pendingPhotos=[],existingPhotos=[];
 
 // ── REPORTS ──
@@ -584,7 +694,11 @@ setInterval(refreshToken,50*60*1000);
 
 async function init(){
   const t=localStorage.getItem('sb-token');
-  if(!t){window.location.href='login.html';return;}
+  if(!t){
+    document.getElementById('load-txt').innerHTML='<a href="login.html" style="color:var(--gold);font-size:.9rem;letter-spacing:.08em;text-decoration:none;border:1px solid var(--gold);padding:.6rem 1.5rem;">SIGN IN TO CONTINUE</a>';
+    setTimeout(()=>{window.location.href='login.html';},800);
+    return;
+  }
   try{
     const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{
       headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
