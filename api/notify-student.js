@@ -84,7 +84,7 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'NestFinder CUK <noreply@nestfinder.co.ke>',
+        from: 'NestFinder CUK <warengrege@gmail.com>',
         to: [email],
         subject: `🏠 Contact Unlocked — ${caretaker_name} · ${listing_title}`,
         html
