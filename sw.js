@@ -1,3 +1,7 @@
+/* sw.js (root) */
+
+const CACHE_NAME = "nestfinder-cache-v1";
+
 self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (event) => {
@@ -8,14 +12,14 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Only cache successful, basic (same-origin) responses
+        // Only cache successful same-origin responses
         if (!response || response.status !== 200 || response.type !== "basic") {
           return response;
         }
 
         const responseClone = response.clone();
 
-        caches.open("nestfinder-cache-v1").then((cache) => {
+        caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseClone);
         });
 
