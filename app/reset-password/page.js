@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
@@ -10,6 +10,15 @@ const supabase = createClient(
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState("")
   const [message, setMessage] = useState("")
+
+  useEffect(() => {
+    // This will parse the token from the URL fragment and set the session
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setMessage("Please enter your new password below.")
+      }
+    })
+  }, [])
 
   const handleReset = async () => {
     const { error } = await supabase.auth.updateUser({ password: newPassword })
@@ -31,4 +40,3 @@ export default function ResetPassword() {
     </div>
   )
 }
-
