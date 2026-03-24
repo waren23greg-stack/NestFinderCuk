@@ -12,7 +12,7 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("")
 
   useEffect(() => {
-    // Parse token from URL fragment
+    // Parse tokens from URL fragment
     const hashParams = new URLSearchParams(window.location.hash.substring(1))
     const access_token = hashParams.get("access_token")
     const refresh_token = hashParams.get("refresh_token")
@@ -23,7 +23,7 @@ export default function ResetPassword() {
         refresh_token,
       }).then(({ error }) => {
         if (error) setMessage(error.message)
-        else setMessage("Session established, please enter a new password.")
+        else setMessage("Session established. Enter your new password below.")
       })
     }
   }, [])
@@ -31,7 +31,7 @@ export default function ResetPassword() {
   const handleReset = async () => {
     const { error } = await supabase.auth.updateUser({ password: newPassword })
     if (error) setMessage(error.message)
-    else setMessage("Password updated successfully. You can now sign in.")
+    else setMessage("Password updated successfully. Please sign in with your new password.")
   }
 
   return (
