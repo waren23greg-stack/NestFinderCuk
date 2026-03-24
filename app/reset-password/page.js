@@ -18,6 +18,7 @@ export default function ResetPassword() {
     const refresh_token = hashParams.get("refresh_token")
 
     if (access_token && refresh_token) {
+      // Establish session with Supabase
       supabase.auth.setSession({
         access_token,
         refresh_token,
@@ -25,6 +26,8 @@ export default function ResetPassword() {
         if (error) setMessage(error.message)
         else setMessage("Session established. Enter your new password below.")
       })
+    } else {
+      setMessage("Invalid or expired reset link.")
     }
   }, [])
 
