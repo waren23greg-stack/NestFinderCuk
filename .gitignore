@@ -3,3 +3,6 @@ package-lock.json
 .env.local
 .env.local
 .env.local
+.next/
+node_modules/
+.env.local
