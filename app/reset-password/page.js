@@ -12,12 +12,16 @@ export default function ResetPassword() {
   const [message, setMessage] = useState("")
 
   useEffect(() => {
-    // This will parse the token from the URL fragment and set the session
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setMessage("Please enter your new password below.")
+    // This will detect the recovery event when the user arrives via the reset link
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "PASSWORD_RECOVERY") {
+          setMessage("Please enter your new password below.")
+        }
       }
-    })
+    )
+
+    return () => subscription.unsubscribe()
   }, [])
 
   const handleReset = async () => {
