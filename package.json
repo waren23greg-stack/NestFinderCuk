@@ -2,6 +2,7 @@
   "name": "nestfinder-cuk",
   "version": "1.0.0",
   "description": "NestFinder CUK - Student Housing Platform",
+  "main": "electron/main.js",
   "dependencies": {
     "@supabase/supabase-js": "^2.99.3",
     "next": "^16.2.1",
@@ -11,12 +12,42 @@
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_TURBOPACK=1 next dev --webpack",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "electron": "cross-env NODE_ENV=development electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
+    "electron:build": "next build && electron-builder --publish=never",
+    "electron:pack": "next build && electron-builder --dir"
+  },
+  "build": {
+    "appId": "com.nestfinder.cuk",
+    "productName": "NestFinder CUK",
+    "icon": "public/icon.svg",
+    "files": [
+      "out/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   },
   "engines": {
     "node": "24.x"
   },
   "devDependencies": {
-    "cross-env": "^10.1.0"
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^34.5.8",
+    "electron-builder": "^25.1.8",
+    "wait-on": "^8.0.5"
   }
 }
