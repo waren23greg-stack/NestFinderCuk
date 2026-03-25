@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Disallow: /admin.html
+Disallow: /payments.html
+
+Sitemap: https://nest-finder-cuk.vercel.app/sitemap.xml
