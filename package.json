@@ -9,11 +9,14 @@
     "react-dom": "^19.2.4"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NEXT_DISABLE_TURBOPACK=1 next dev --webpack",
     "build": "next build",
     "start": "next start"
   },
   "engines": {
     "node": "24.x"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }
