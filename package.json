@@ -4,20 +4,14 @@
   "description": "NestFinder CUK - Student Housing Platform",
   "dependencies": {
     "@supabase/supabase-js": "^2.99.3",
-<<<<<<< HEAD
     "next": "^16.2.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
-=======
-    "next": "^14.2.35",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
->>>>>>> 95f039eea9dc1c594ce7f5757c31fae8acb03804
   },
   "engines": {
     "node": "24.x"
