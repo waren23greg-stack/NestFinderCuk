@@ -1,0 +1,37 @@
+/* Jost Variable Font */
+@font-face {
+  font-family: 'Jost';
+  src: url('/fonts/jost/Jost-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Jost';
+  src: url('/fonts/jost/Jost-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+/* Default body font */
+body {
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-family: 'Jost', sans-serif;
+  font-weight: 700;
+}
+
+/* Hero section */
+.hero-section {
+  background: url('/images/hero.jpg') no-repeat center center;
+  background-size: cover;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
