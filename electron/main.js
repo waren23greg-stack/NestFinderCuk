@@ -1,8 +1,8 @@
-const { app, BrowserWindow, session, shell } = require('electron')
+const { app, BrowserWindow, session, shell, protocol } = require('electron')
 const path = require('path')
+const fs = require('fs')
 
 const isDev = process.env.NODE_ENV === 'development'
-const DEV_URL = 'http://localhost:3000'
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -21,22 +21,21 @@ function createWindow() {
   })
 
   // ── Content Security Policy ──────────────────────────────────────────
-  // Allows: Supabase API, Unsplash images, Google Fonts, M-Pesa/WhatsApp links
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           [
-            "default-src 'self'",
+            "default-src 'self' file:",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+            // Allow local fonts + Google Fonts as fallback
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' data: https://fonts.gstatic.com",
-            // Allow Unsplash hero/listing images + Supabase storage images
-            "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in",
+            "font-src 'self' file: data: https://fonts.gstatic.com",
+            // Allow local images + Unsplash for listing photos
+            "img-src 'self' file: data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in",
             // Allow Supabase API calls
             "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co",
-            // Allow WhatsApp / M-Pesa links to open in browser
             "frame-src 'none'",
           ].join('; '),
         ],
@@ -44,7 +43,7 @@ function createWindow() {
     })
   })
 
-  // ── Open external links in the system browser, not in Electron ───────
+  // ── Open external links in system browser ────────────────────────────
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https://') || url.startsWith('http://')) {
       shell.openExternal(url)
@@ -52,7 +51,6 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  // Intercept <a> clicks that navigate away (WhatsApp, M-Pesa, etc.)
   win.webContents.on('will-navigate', (event, url) => {
     const isLocal =
       url.startsWith('file://') ||
@@ -64,17 +62,14 @@ function createWindow() {
     }
   })
 
-  // ── Load the app ──────────────────────────────────────────────────────
-  // Your app is plain HTML — load index.html directly, no Next.js server needed
+  // ── Load index.html directly — no Next.js server needed ─────────────
   win.loadFile(path.join(__dirname, '../index.html'))
 
-  // Remove this line once you are done testing:
   if (isDev) win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {
   createWindow()
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
