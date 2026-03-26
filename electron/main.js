@@ -25,20 +25,18 @@ function createWindow() {
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          [
-            "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' data: https://fonts.gstatic.com",
-            // Allow Unsplash hero/listing images + Supabase storage images
-            "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in",
-            // Allow Supabase API calls
-            "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co",
-            // No iframes allowed
-            "frame-src 'none'"
-          ].join('; ')
-        ],
-      },
+          "default-src 'self'; " +
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+          "font-src 'self' data: https://fonts.gstatic.com; " +
+          // Allow Unsplash hero/listing images + Supabase storage images
+          "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in; " +
+          // Allow Supabase API + Safaricom + Resend
+          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.safaricom.co.ke https://sandbox.safaricom.co.ke https://api.resend.com; " +
+          // No iframes allowed
+          "frame-src 'none';"
+        ]
+      }
     })
   })
 
@@ -65,6 +63,11 @@ function createWindow() {
   win.loadFile(path.join(__dirname, '../index.html'))
 
   if (isDev) win.webContents.openDevTools()
+
+  // Optional: handle window close gracefully
+  win.on('closed', () => {
+    console.log('NestFinder window closed')
+  })
 }
 
 app.whenReady().then(() => {
