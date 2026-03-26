@@ -595,7 +595,6 @@ async function doRegister(){
 
   const userId=d.user?.id||d.id;
   if(userId){
-    // upsert profile
     await fetch(_B+'/rest/v1/profiles',{
       method:'POST',
       headers:Object.assign({},_H(d.session?.access_token||_K),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
@@ -622,13 +621,10 @@ async function doReset(){
   if(!email){showMsg('reset-msg','Please enter your email address.');return;}
   setLoading('reset-btn','reset-arrow',true);
 
-  // redirectTo must be this same login.html — the hash detection below handles the rest
-  const redirectTo='https://nest-finder-cuk.vercel.app/login.html';
-
   const r=await fetch(_B+'/auth/v1/recover',{
     method:'POST',
     headers:{apikey:_K,'Content-Type':'application/json'},
-    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:redirectTo})
+    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:'https://nest-finder-cuk.vercel.app/login.html'})
   });
   setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
 
@@ -643,8 +639,8 @@ async function doReset(){
 
 /* ══════════════════════════════════════
    SET NEW PASSWORD
-   Called after user clicks the email link
-   and lands on this page with #access_token
+   Called after user clicks email link,
+   lands here with #access_token=<token_hash>&type=recovery
 ══════════════════════════════════════ */
 async function doNewPass(){
   clearMsg('newpass-msg');
@@ -674,7 +670,6 @@ async function doNewPass(){
     return;
   }
 
-  // Clear recovery tokens — user must sign in fresh with new password
   localStorage.removeItem('sb-token');
   localStorage.removeItem('sb-refresh');
   showMsg('newpass-msg','Password updated successfully! Redirecting to sign in…','ok');
@@ -687,40 +682,51 @@ async function doNewPass(){
 
 /* ══════════════════════════════════════
    DETECT RESET LINK ON PAGE LOAD
-   Supabase appends #access_token=...&type=recovery to the URL
+   ─────────────────────────────────────
+   Supabase now sends token_hash (not a
+   JWT) so we must exchange it via
+   /auth/v1/verify before we can use it.
 ══════════════════════════════════════ */
 (async()=>{
   const hash=new URLSearchParams(window.location.hash.slice(1));
   const type=hash.get('type');
-  const access=hash.get('access_token');
-  const refresh=hash.get('refresh_token');
+  const tokenHash=hash.get('access_token'); // token_hash from email template
 
-  if(type==='recovery'&&access){
-    // Verify the token is actually valid before showing the form
-    const check=await fetch(_B+'/auth/v1/user',{
-      headers:{apikey:_K,Authorization:'Bearer '+access}
+  if(type!=='recovery'||!tokenHash) return;
+
+  // Clean the hash from the URL bar immediately
+  history.replaceState(null,'',window.location.pathname);
+
+  // Hide tabs while processing
+  document.getElementById('tabs').style.display='none';
+
+  // Exchange token_hash → real session via /auth/v1/verify
+  let result;
+  try{
+    const res=await fetch(_B+'/auth/v1/verify',{
+      method:'POST',
+      headers:{apikey:_K,'Content-Type':'application/json'},
+      body:JSON.stringify({type:'recovery',token_hash:tokenHash})
     });
-    const user=await check.json().catch(()=>({}));
-
-    if(!user.id){
-      // Token expired or invalid — send to forgot password with helpful message
-      history.replaceState(null,'',window.location.pathname);
-      showPanel('p-reset');
-      showMsg('reset-msg','Your reset link has expired. Please request a new one.','err');
-      return;
-    }
-
-    // Token valid — store it so doNewPass() can use it
-    localStorage.setItem('sb-token',access);
-    if(refresh)localStorage.setItem('sb-refresh',refresh);
-
-    // Hide tabs, show new password form
-    document.getElementById('tabs').style.display='none';
-    showPanel('p-newpass');
-
-    // Clean the ugly hash from the URL bar
-    history.replaceState(null,'',window.location.pathname);
+    result=await res.json();
+  }catch(e){
+    result={};
   }
+
+  if(!result.access_token){
+    // Token expired, already used, or invalid
+    document.getElementById('tabs').style.display='';
+    showPanel('p-reset');
+    showMsg('reset-msg','Your reset link has expired or already been used. Please request a new one.','err');
+    return;
+  }
+
+  // Store the real JWT so doNewPass() can call /auth/v1/user PUT
+  localStorage.setItem('sb-token',result.access_token);
+  if(result.refresh_token) localStorage.setItem('sb-refresh',result.refresh_token);
+
+  // Show the new password form
+  showPanel('p-newpass');
 })();
 
 /* ══════════════════════════════════════
