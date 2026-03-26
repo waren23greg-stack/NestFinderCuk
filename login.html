@@ -10,367 +10,113 @@
 <style>
 /* ── TOKENS ── */
 :root{
-  --ink:#0E0B07;
-  --ink2:#1C1810;
-  --ink3:#2E2920;
-  --gold:#C09A5A;
-  --gold-l:#D8B97A;
-  --gold-d:#8B6B35;
-  --gold-gl:rgba(192,154,90,.12);
-  --sand:#F7F2EA;
-  --sand2:#EDE6D8;
-  --sand3:#DDD4C0;
-  --muted:#9C8E78;
-  --pale:#FAF8F4;
-  --white:#FFFFFF;
-  --err:#C0392B;
-  --ok:#2D6A4F;
-  --t:.26s;
-  --ease:cubic-bezier(.4,0,.2,1);
+  --ink:#0E0B07;--ink2:#1C1810;--ink3:#2E2920;
+  --gold:#C09A5A;--gold-l:#D8B97A;--gold-d:#8B6B35;--gold-gl:rgba(192,154,90,.12);
+  --sand:#F7F2EA;--sand2:#EDE6D8;--sand3:#DDD4C0;
+  --muted:#9C8E78;--pale:#FAF8F4;--white:#FFFFFF;
+  --err:#C0392B;--ok:#2D6A4F;
+  --t:.26s;--ease:cubic-bezier(.4,0,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;-webkit-text-size-adjust:100%}
 body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--pale);
-  color:var(--ink);
-  min-height:100%;
-  min-height:100dvh;
-  display:flex;
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
+  font-family:'DM Sans',sans-serif;background:var(--pale);color:var(--ink);
+  min-height:100dvh;display:flex;overflow-x:hidden;-webkit-font-smoothing:antialiased;
 }
 
 /* ── SPLIT LAYOUT ── */
 .split{display:flex;width:100%;min-height:100dvh}
 
 /* ── LEFT PANEL ── */
-.left{
-  width:46%;
-  flex-shrink:0;
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  background:var(--ink);
-}
-.left-bg{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(165deg, #1A1408 0%, #0E0B07 40%, #1C160A 100%);
-}
-/* architectural line texture */
+.left{width:46%;flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;background:var(--ink)}
+.left-bg{position:absolute;inset:0;background:linear-gradient(165deg,#1A1408 0%,#0E0B07 40%,#1C160A 100%)}
 .left-lines{
   position:absolute;inset:0;
   background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 79px,
-      rgba(192,154,90,.04) 79px,
-      rgba(192,154,90,.04) 80px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 79px,
-      rgba(192,154,90,.03) 79px,
-      rgba(192,154,90,.03) 80px
-    );
+    repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(192,154,90,.04) 79px,rgba(192,154,90,.04) 80px),
+    repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(192,154,90,.03) 79px,rgba(192,154,90,.03) 80px);
 }
-/* gold noise grain */
 .left-grain{
-  position:absolute;inset:0;
-  opacity:.06;
+  position:absolute;inset:0;opacity:.06;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-/* large decorative house SVG watermark */
-.left-mark{
-  position:absolute;
-  right:-60px;bottom:-60px;
-  width:420px;height:420px;
-  opacity:.04;
-}
+.left-mark{position:absolute;right:-60px;bottom:-60px;width:420px;height:420px;opacity:.04}
 .left-mark svg{width:100%;height:100%}
-
-.left-inner{
-  position:relative;z-index:2;
-  display:flex;flex-direction:column;
-  justify-content:space-between;
-  height:100%;
-  padding:3rem 3.25rem;
-}
-
-/* logo */
+.left-inner{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:3rem 3.25rem}
 .l-logo{display:flex;align-items:center;gap:11px}
-.l-logo-ring{
-  width:38px;height:38px;
-  border:1.5px solid var(--gold);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-}
+.l-logo-ring{width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center}
 .l-logo-ring svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.7}
-.l-logo-text{
-  font-family:'Playfair Display',serif;
-  font-size:1.1rem;color:#fff;letter-spacing:.02em;
-}
+.l-logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff;letter-spacing:.02em}
 .l-logo-text b{color:var(--gold);font-weight:500}
-
-/* editorial block */
 .l-editorial{margin-top:auto;margin-bottom:auto;padding:3rem 0}
-.l-eyebrow{
-  display:inline-flex;align-items:center;gap:10px;
-  font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--gold-l);margin-bottom:1.75rem;
-}
-.l-eyebrow::before{
-  content:'';display:block;width:28px;height:1px;
-  background:linear-gradient(90deg,var(--gold),transparent);
-  flex-shrink:0;
-}
-.l-headline{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2.4rem,3.5vw,3.4rem);
-  font-weight:400;color:#fff;
-  line-height:1.12;
-  margin-bottom:1.6rem;
-}
-.l-headline em{
-  color:var(--gold-l);font-style:italic;
-  display:block;
-}
-.l-sub{
-  font-size:.86rem;color:rgba(255,255,255,.42);
-  line-height:1.8;font-weight:300;
-  max-width:360px;margin-bottom:2.75rem;
-}
-
-/* stats row */
+.l-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-l);margin-bottom:1.75rem}
+.l-eyebrow::before{content:'';display:block;width:28px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);flex-shrink:0}
+.l-headline{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,3.5vw,3.4rem);font-weight:400;color:#fff;line-height:1.12;margin-bottom:1.6rem}
+.l-headline em{color:var(--gold-l);font-style:italic;display:block}
+.l-sub{font-size:.86rem;color:rgba(255,255,255,.42);line-height:1.8;font-weight:300;max-width:360px;margin-bottom:2.75rem}
 .l-stats{display:flex;gap:0;border-top:1px solid rgba(192,154,90,.15)}
-.l-stat{
-  flex:1;padding:1.25rem 0;
-  border-right:1px solid rgba(192,154,90,.12);
-  padding-right:1.5rem;
-}
+.l-stat{flex:1;padding:1.25rem 0;border-right:1px solid rgba(192,154,90,.12);padding-right:1.5rem}
 .l-stat:last-child{border-right:none;padding-right:0;padding-left:1.5rem}
 .l-stat:not(:first-child):not(:last-child){padding-left:1.5rem}
-.l-stat-n{
-  font-family:'Playfair Display',serif;
-  font-size:1.9rem;color:#fff;font-weight:400;line-height:1;
-}
-.l-stat-l{
-  font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;
-  color:rgba(255,255,255,.32);margin-top:4px;
-}
-
-/* vertical gold accent line */
-.l-accent{
-  position:absolute;top:0;right:0;bottom:0;width:1px;
-  background:linear-gradient(180deg,transparent,rgba(192,154,90,.3) 30%,rgba(192,154,90,.5) 60%,transparent);
-}
-
-/* quote */
-.l-quote{
-  border-left:2px solid var(--gold);
-  padding-left:1rem;
-  font-family:'Playfair Display',serif;
-  font-size:.96rem;font-style:italic;
-  color:rgba(255,255,255,.45);
-  line-height:1.65;
-  margin-top:2.5rem;
-}
-.l-quote cite{
-  display:block;margin-top:.5rem;
-  font-family:'DM Sans',sans-serif;
-  font-size:.62rem;font-style:normal;
-  letter-spacing:.12em;text-transform:uppercase;
-  color:rgba(255,255,255,.22);
-}
-
-/* footer */
+.l-stat-n{font-family:'Playfair Display',serif;font-size:1.9rem;color:#fff;font-weight:400;line-height:1}
+.l-stat-l{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-top:4px}
+.l-accent{position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(192,154,90,.3) 30%,rgba(192,154,90,.5) 60%,transparent)}
+.l-quote{border-left:2px solid var(--gold);padding-left:1rem;font-family:'Playfair Display',serif;font-size:.96rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.65;margin-top:2.5rem}
+.l-quote cite{display:block;margin-top:.5rem;font-family:'DM Sans',sans-serif;font-size:.62rem;font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.22)}
 .l-foot{font-size:.62rem;color:rgba(255,255,255,.2);letter-spacing:.04em}
 
 /* ── RIGHT PANEL ── */
-.right{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:3rem 2rem;
-  background:var(--pale);
-  position:relative;
-  overflow:hidden;
-}
-/* faint radial glow */
-.right::before{
-  content:'';
-  position:absolute;
-  top:-100px;right:-100px;
-  width:500px;height:500px;
-  background:radial-gradient(circle,rgba(192,154,90,.07) 0%,transparent 70%);
-  pointer-events:none;
-}
+.right{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 2rem;background:var(--pale);position:relative;overflow:hidden}
+.right::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(192,154,90,.07) 0%,transparent 70%);pointer-events:none}
+.form-wrap{width:100%;max-width:420px;animation:fadeUp .55s var(--ease) both}
 
-.form-wrap{
-  width:100%;max-width:420px;
-  animation:fadeUp .55s var(--ease) both;
-}
-
-/* tab switcher */
-.tabs{
-  display:flex;gap:0;
-  background:var(--sand2);
-  border-radius:3px;
-  padding:3px;
-  margin-bottom:2.5rem;
-  position:relative;
-}
-.tab-btn{
-  flex:1;padding:.62rem;
-  font-family:'DM Sans',sans-serif;font-size:.73rem;font-weight:500;
-  letter-spacing:.06em;text-transform:uppercase;
-  background:transparent;border:none;cursor:pointer;
-  color:var(--muted);transition:color var(--t);
-  position:relative;z-index:1;
-  -webkit-tap-highlight-color:transparent;
-}
+/* ── TABS ── */
+.tabs{display:flex;gap:0;background:var(--sand2);border-radius:3px;padding:3px;margin-bottom:2.5rem;position:relative}
+.tab-btn{flex:1;padding:.62rem;font-family:'DM Sans',sans-serif;font-size:.73rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:color var(--t);position:relative;z-index:1;-webkit-tap-highlight-color:transparent}
 .tab-btn.on{color:var(--ink)}
-.tab-ink{
-  position:absolute;top:3px;bottom:3px;left:3px;
-  width:calc(50% - 3px);
-  background:var(--white);
-  border-radius:2px;
-  transition:transform var(--t) var(--ease);
-  box-shadow:0 1px 4px rgba(14,11,7,.08);
-}
-.tabs.on-reg .tab-ink{transform:translateX(calc(100% + 0px))}
+.tab-ink{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--white);border-radius:2px;transition:transform var(--t) var(--ease);box-shadow:0 1px 4px rgba(14,11,7,.08)}
+.tabs.on-reg .tab-ink{transform:translateX(calc(100%))}
 
-/* form header */
-.form-title{
-  font-family:'Playfair Display',serif;
-  font-size:1.85rem;font-weight:400;
-  color:var(--ink);margin-bottom:.5rem;line-height:1.15;
-}
+/* ── FORM HEADER ── */
+.form-title{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:400;color:var(--ink);margin-bottom:.5rem;line-height:1.15}
 .form-title em{color:var(--gold-d);font-style:italic}
 .form-sub{font-size:.82rem;color:var(--muted);margin-bottom:2rem;line-height:1.6;font-weight:300}
 
-/* fields */
+/* ── FIELDS ── */
 .field{margin-bottom:1.1rem;position:relative}
-.field label{
-  display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--muted);margin-bottom:.42rem;font-weight:500;
-}
+.field label{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.42rem;font-weight:500}
 .field-inner{position:relative}
-.field-ico{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  width:14px;height:14px;
-  stroke:var(--sand3);fill:none;stroke-width:1.8;
-  pointer-events:none;transition:stroke var(--t);
-}
-.field input{
-  width:100%;
-  height:48px;
-  padding:0 13px 0 40px;
-  background:var(--white);
-  border:1px solid var(--sand3);
-  border-radius:3px;
-  font-family:'DM Sans',sans-serif;font-size:.9rem;
-  color:var(--ink);outline:none;
-  transition:border-color var(--t),box-shadow var(--t);
-  -webkit-appearance:none;
-}
-.field input:focus{
-  border-color:var(--gold);
-  box-shadow:0 0 0 3px rgba(192,154,90,.1);
-}
-.field input:focus + .field-ico,
-.field-inner:focus-within .field-ico{stroke:var(--gold)}
+.field-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--sand3);fill:none;stroke-width:1.8;pointer-events:none;transition:stroke var(--t)}
+.field input{width:100%;height:48px;padding:0 13px 0 40px;background:var(--white);border:1px solid var(--sand3);border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color var(--t),box-shadow var(--t);-webkit-appearance:none}
+.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(192,154,90,.1)}
+.field input:focus~.field-ico,.field-inner:focus-within .field-ico{stroke:var(--gold)}
 .field input::placeholder{color:var(--sand3)}
-
-/* password toggle */
-.eye-btn{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  background:none;border:none;cursor:pointer;
-  padding:4px;display:flex;align-items:center;
-  -webkit-tap-highlight-color:transparent;
-}
+.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent}
 .eye-btn svg{width:16px;height:16px;stroke:var(--sand3);fill:none;stroke-width:1.7;transition:stroke var(--t)}
 .eye-btn:hover svg{stroke:var(--muted)}
-
-/* hint */
 .field-hint{font-size:.67rem;color:var(--muted);margin-top:.35rem;font-weight:300;padding-left:1px}
 
-/* submit */
-.submit-btn{
-  width:100%;height:50px;
-  background:var(--ink);
-  color:#fff;
-  border:none;border-radius:3px;
-  font-family:'DM Sans',sans-serif;
-  font-size:.76rem;font-weight:500;
-  letter-spacing:.1em;text-transform:uppercase;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:background var(--t),transform var(--t);
-  -webkit-tap-highlight-color:transparent;
-  margin-top:.25rem;
-  position:relative;overflow:hidden;
-}
-.submit-btn::before{
-  content:'';
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,transparent 0%,rgba(192,154,90,.18) 100%);
-  opacity:0;transition:opacity var(--t);
-}
+/* ── SUBMIT ── */
+.submit-btn{width:100%;height:50px;background:var(--ink);color:#fff;border:none;border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background var(--t),transform var(--t);-webkit-tap-highlight-color:transparent;margin-top:.25rem;position:relative;overflow:hidden}
+.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 0%,rgba(192,154,90,.18) 100%);opacity:0;transition:opacity var(--t)}
 .submit-btn:hover{background:var(--ink3)}
 .submit-btn:hover::before{opacity:1}
 .submit-btn:active{transform:scale(.985)}
+.submit-btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
 .submit-btn svg{flex-shrink:0}
-
-/* loading spinner inside btn */
-.spin-small{
-  width:16px;height:16px;
-  border:1.5px solid rgba(255,255,255,.3);
-  border-top-color:#fff;
-  border-radius:50%;
-  animation:spin .7s linear infinite;
-  flex-shrink:0;
-}
+.spin-small{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* gold divider */
-.or-row{
-  display:flex;align-items:center;gap:.75rem;
-  margin:1.4rem 0;
-  font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--muted);
-}
-.or-row::before,.or-row::after{
-  content:'';flex:1;height:1px;
-  background:linear-gradient(90deg,transparent,var(--sand3));
-}
-.or-row::after{background:linear-gradient(270deg,transparent,var(--sand3))}
-
-/* switch link */
-.switch-row{
-  text-align:center;margin-top:1.5rem;
-  font-size:.79rem;color:var(--muted);
-}
-.switch-row a{
-  color:var(--gold-d);font-weight:500;
-  text-decoration:none;border-bottom:1px solid rgba(192,154,90,.3);
-  transition:border-color var(--t),color var(--t);
-}
+/* ── MISC ── */
+.forgot-row{text-align:right;margin-top:-.4rem;margin-bottom:.9rem}
+.forgot-link{font-size:.76rem;color:var(--gold-d);text-decoration:none;border-bottom:1px solid rgba(139,107,53,.25);transition:all var(--t)}
+.forgot-link:hover{color:var(--gold);border-color:var(--gold)}
+.switch-row{text-align:center;margin-top:1.5rem;font-size:.79rem;color:var(--muted)}
+.switch-row a{color:var(--gold-d);font-weight:500;text-decoration:none;border-bottom:1px solid rgba(192,154,90,.3);transition:border-color var(--t),color var(--t)}
 .switch-row a:hover{color:var(--gold);border-color:var(--gold)}
 
-/* toast */
-.msg{
-  display:none;align-items:flex-start;gap:8px;
-  padding:.8rem 1rem;border-radius:3px;
-  font-size:.78rem;line-height:1.5;
-  margin-bottom:1rem;
-  border-left:3px solid;
-}
+/* ── MSG BANNER ── */
+.msg{display:none;align-items:flex-start;gap:8px;padding:.8rem 1rem;border-radius:3px;font-size:.78rem;line-height:1.5;margin-bottom:1rem;border-left:3px solid}
 .msg.show{display:flex}
 .msg.ok{background:#EFF9F3;border-color:var(--ok);color:#1D5439}
 .msg.err{background:#FCF0EE;border-color:var(--err);color:#7B2221}
@@ -378,69 +124,33 @@ body{
 .msg.ok svg{stroke:var(--ok)}
 .msg.err svg{stroke:var(--err)}
 
-/* panels */
+/* ── PANELS ── */
 .panel{display:none}.panel.on{display:block}
 
-/* success / email confirm screens */
-.special{
-  text-align:center;
-  padding:2rem 0;
-  animation:fadeUp .4s var(--ease) both;
-}
-.special-ico{
-  width:64px;height:64px;
-  border:1.5px solid var(--gold);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  margin:0 auto 1.4rem;
-}
+/* ── SPECIAL SCREENS ── */
+.special{text-align:center;padding:2rem 0;animation:fadeUp .4s var(--ease) both}
+.special-ico{width:64px;height:64px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.4rem}
 .special-ico svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.5}
-.special-t{
-  font-family:'Playfair Display',serif;
-  font-size:1.55rem;font-weight:400;
-  color:var(--ink);margin-bottom:.6rem;
-  line-height:1.2;
-}
+.special-t{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:400;color:var(--ink);margin-bottom:.6rem;line-height:1.2}
 .special-sub{font-size:.82rem;color:var(--muted);line-height:1.7;font-weight:300;max-width:320px;margin:0 auto 2rem}
-.special-email{
-  display:inline-block;
-  font-weight:500;color:var(--ink);
-  background:var(--sand);
-  padding:.25rem .75rem;border-radius:2px;
-  font-size:.86rem;
-}
+.special-email{display:inline-block;font-weight:500;color:var(--ink);background:var(--sand);padding:.25rem .75rem;border-radius:2px;font-size:.86rem}
 
 /* ── ANIMATIONS ── */
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(18px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.stagger > *{animation:fadeUp .45s var(--ease) both}
-.stagger > *:nth-child(1){animation-delay:.05s}
-.stagger > *:nth-child(2){animation-delay:.11s}
-.stagger > *:nth-child(3){animation-delay:.17s}
-.stagger > *:nth-child(4){animation-delay:.23s}
-.stagger > *:nth-child(5){animation-delay:.29s}
-.stagger > *:nth-child(6){animation-delay:.35s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.stagger>*{animation:fadeUp .45s var(--ease) both}
+.stagger>*:nth-child(1){animation-delay:.05s}
+.stagger>*:nth-child(2){animation-delay:.11s}
+.stagger>*:nth-child(3){animation-delay:.17s}
+.stagger>*:nth-child(4){animation-delay:.23s}
+.stagger>*:nth-child(5){animation-delay:.29s}
+.stagger>*:nth-child(6){animation-delay:.35s}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .left{display:none}
-  .right{
-    padding:2.5rem 1.5rem;
-    align-items:flex-start;
-    min-height:100dvh;
-  }
+  .right{padding:2.5rem 1.5rem;align-items:flex-start;min-height:100dvh}
   .form-wrap{max-width:460px;margin:0 auto;padding-top:2rem}
-  /* show mini logo on mobile */
-  .form-wrap::before{
-    content:'NestFinder CUK';
-    display:block;
-    font-family:'Playfair Display',serif;
-    font-size:1.1rem;color:var(--ink);
-    margin-bottom:2.25rem;
-    letter-spacing:.01em;
-  }
+  .form-wrap::before{content:'NestFinder CUK';display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);margin-bottom:2.25rem;letter-spacing:.01em}
 }
 @media(max-width:480px){
   .right{padding:1.5rem 1rem;align-items:flex-start}
@@ -449,163 +159,63 @@ body{
   .field input{height:46px}
   .submit-btn{height:48px}
 }
-
-/* forgot password */
-.forgot-row{text-align:right;margin-top:-.4rem;margin-bottom:.9rem}
-.forgot-link{font-size:.76rem;color:var(--gold-d);text-decoration:none;border-bottom:1px solid rgba(139,107,53,.25);transition:all var(--t)}
-.forgot-link:hover{color:var(--gold);border-color:var(--gold)}
-
 </style>
+
 <script>
+/* ── SUPABASE INLINE CLIENT ── */
 (function(){
 var _B='https://mtycapgbtvpczvswpjpo.supabase.co',_K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-function _h(t){return{'apikey':_K,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_K),'Content-Type':'application/json'};}
-function _q(table){
+function h(t){return{'apikey':_K,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_K),'Content-Type':'application/json'};}
+window.SB_URL=_B;window.SB_KEY=_K;window.SB_H=h;
+function q(table){
   var _f=[],_s='*',_ord=null,_lim=null,_cnt=false;
-  var q={
-    select:function(s,o){_s=s||'*';if(o&&o.count)_cnt=true;return q;},
-    eq:function(c,v){_f.push(c+'=eq.'+encodeURIComponent(v));return q;},
-    neq:function(c,v){_f.push(c+'=neq.'+encodeURIComponent(v));return q;},
-    in:function(c,arr){_f.push(c+'=in.('+arr.map(v=>encodeURIComponent(v)).join(',')+')');return q;},
-    order:function(c,o){_ord=c+'.'+(o&&o.ascending===false?'desc':'asc');return q;},
-    limit:function(n){_lim=n;return q;},
-    single:function(){return q._run(true,false);},
-    maybeSingle:function(){return q._run(false,true);},
-    then:function(res,rej){return q._run(false,false).then(res,rej);},
+  var obj={
+    select:function(s,o){_s=s||'*';if(o&&o.count)_cnt=true;return obj;},
+    eq:function(c,v){_f.push(c+'=eq.'+encodeURIComponent(v));return obj;},
+    order:function(c,o){_ord=c+'.'+(o&&o.ascending===false?'desc':'asc');return obj;},
+    limit:function(n){_lim=n;return obj;},
+    single:function(){return obj._run(true,false);},
+    then:function(res,rej){return obj._run(false,false).then(res,rej);},
     _run:function(single,maybe){
       var t=localStorage.getItem('sb-token');
       var url=_B+'/rest/v1/'+table+'?select='+encodeURIComponent(_s);
       _f.forEach(function(f){url+='&'+f;});
       if(_ord)url+='&order='+_ord;
       if(_lim)url+='&limit='+_lim;
-      var h=_h(t);
-      if(single)h['Accept']='application/vnd.pgrst.object+json';
-      if(_cnt)h['Prefer']='count=exact';
-      return fetch(url,{headers:h}).then(function(r){
+      var hh=h(t);
+      if(single)hh['Accept']='application/vnd.pgrst.object+json';
+      if(_cnt)hh['Prefer']='count=exact';
+      return fetch(url,{headers:hh}).then(function(r){
         var count=r.headers.get('content-range');
         return r.json().then(function(d){
           if(d&&d.code&&d.message)return{data:null,error:d,count:0};
           if(single||maybe)return{data:d,error:null};
           return{data:Array.isArray(d)?d:[],error:null,count:count?parseInt(count.split('/')[1])||0:0};
         });
-      }).catch(function(e){return{data:null,error:e};}); 
-    },
-    insert:function(data){
-      var t=localStorage.getItem('sb-token');
-      var pref='return=representation';
-      return{
-        select:function(){return{single:function(){
-          return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
-            .then(function(r){return r.json();}).then(function(d){
-              var row=Array.isArray(d)?d[0]:d;
-              return{data:row,error:(row&&row.code)?row:null};
-            }).catch(function(e){return{data:null,error:e};});
-        }}},
-        then:function(res){
-          return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
-            .then(function(r){return r.json();}).then(function(d){
-              res({data:Array.isArray(d)?d:[d],error:null});
-            }).catch(function(e){res({data:null,error:e})});
-        }
-      };
-    },
-    upsert:function(data,opts){
-      var t=localStorage.getItem('sb-token');
-      var pref='resolution=merge-duplicates,return=representation';
-      return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
-        .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
       }).catch(function(e){return{data:null,error:e};});
     },
-    update:function(data){
-      return{eq:function(c,v){
-        var t=localStorage.getItem('sb-token');
-        var url=_B+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
-        return fetch(url,{method:'PATCH',headers:Object.assign({},_h(t),{'Prefer':'return=representation'}),body:JSON.stringify(data)})
-          .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
-        }).catch(function(e){return{data:null,error:e};});
-      }};
-    },
-    delete:function(){
-      return{eq:function(c,v){
-        var t=localStorage.getItem('sb-token');
-        var url=_B+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
-        return fetch(url,{method:'DELETE',headers:_h(t)})
-          .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});})
-          .catch(function(e){return{data:null,error:e};});
-      }};
+    upsert:function(data){
+      var t=localStorage.getItem('sb-token');
+      return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},h(t),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(data)})
+        .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};}).catch(function(e){return{data:null,error:e};});
     }
   };
-  return q;
+  return obj;
 }
 window.sb={
-  from:function(t){return _q(t);},
+  from:function(t){return q(t);},
   auth:{
     getUser:function(){
       var t=localStorage.getItem('sb-token');
       if(!t)return Promise.resolve({data:{user:null},error:null});
-      return fetch(_B+'/auth/v1/user',{headers:_h(t)})
-        .then(function(r){return r.json();})
-        .then(function(d){return{data:{user:d.id?d:null},error:null};
-      }).catch(function(){return{data:{user:null},error:null};});
-    },
-    getSession:function(){
-      var t=localStorage.getItem('sb-token');
-      if(!t)return Promise.resolve({data:{session:null},error:null});
-      return fetch(_B+'/auth/v1/user',{headers:_h(t)})
-        .then(function(r){return r.json();})
-        .then(function(d){return{data:{session:d.id?{user:d,access_token:t}:null},error:null};
-      }).catch(function(){return{data:{session:null},error:null};});
-    },
-    setSession:function(o){
-      if(o.access_token){localStorage.setItem('sb-token',o.access_token);if(o.refresh_token)localStorage.setItem('sb-refresh',o.refresh_token);}
-      return Promise.resolve({data:{},error:null});
-    },
-    updateUser:function(attrs){
-      var t=localStorage.getItem('sb-token');
-      return fetch(_B+'/auth/v1/user',{method:'PUT',headers:_h(t),body:JSON.stringify(attrs)})
-        .then(function(r){return r.json();}).then(function(d){return d.id?{data:{user:d},error:null}:{data:{},error:d};
-      }).catch(function(e){return{data:{},error:e};});
-    },
-    signInWithPassword:function(o){
-      return fetch(_B+'/auth/v1/token?grant_type=password',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password})})
-        .then(function(r){return r.json();}).then(function(d){
-          if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
-          return d.access_token?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
-        });
-    },
-    signUp:function(o){
-      return fetch(_B+'/auth/v1/signup',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password,data:o.options&&o.options.data||{}})})
-        .then(function(r){return r.json();}).then(function(d){return d.id||d.user?{data:{user:d.user||d},error:null}:{data:{},error:d};});
-    },
-    signOut:function(){
-      localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-      return Promise.resolve({error:null});
-    },
-    resetPasswordForEmail:function(email,opts){
-      return fetch(_B+'/auth/v1/recover',{method:'POST',headers:_h(),body:JSON.stringify({email:email,gotrue_meta_security:{}})})
-        .then(function(r){return r.ok?{data:{},error:null}:r.json().then(function(e){return{data:null,error:e};});});
-    },
-    onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};},
-  },
-  storage:{
-    from:function(bucket){
-      return{
-        upload:function(path,file){
-          var t=localStorage.getItem('sb-token');
-          return fetch(_B+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K)},body:file})
-            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
-        },
-        getPublicUrl:function(path){return{data:{publicUrl:_B+'/storage/v1/object/public/'+bucket+'/'+path}};}
-      };
+      return fetch(_B+'/auth/v1/user',{headers:h(t)}).then(function(r){return r.json();}).then(function(d){return{data:{user:d.id?d:null},error:null};}).catch(function(){return{data:{user:null},error:null};});
     }
   }
 };
 })();
 </script>
-<script>const sb=window.sb;</script>
 </head>
 <body>
-
 <div class="split">
 
   <!-- ── LEFT PANEL ── -->
@@ -613,8 +223,6 @@ window.sb={
     <div class="left-bg"></div>
     <div class="left-lines"></div>
     <div class="left-grain"></div>
-
-    <!-- watermark house icon -->
     <div class="left-mark">
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 100L100 30L180 100V180H20V100Z" stroke="white" stroke-width="4"/>
@@ -625,50 +233,28 @@ window.sb={
         <path d="M60 140H85M115 140H140" stroke="white" stroke-width="2"/>
       </svg>
     </div>
-
-    <div class="left-accent"></div>
-
+    <div class="l-accent"></div>
     <div class="left-inner">
-      <!-- logo -->
       <div class="l-logo">
         <div class="l-logo-ring">
           <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
         </div>
         <div class="l-logo-text">Nest<b>Finder</b> CUK</div>
       </div>
-
-      <!-- editorial headline -->
       <div class="l-editorial">
         <div class="l-eyebrow">Cooperative University of Kenya</div>
-        <h1 class="l-headline">
-          Your next home<br/>
-          is <em>waiting for you.</em>
-        </h1>
+        <h1 class="l-headline">Your next home<br/>is <em>waiting for you.</em></h1>
         <p class="l-sub">Safe, verified, affordable housing near CUK. Browse real listings, pay Ksh 250 via M-Pesa, and move in with confidence.</p>
-
-        <!-- stats -->
         <div class="l-stats">
-          <div class="l-stat">
-            <div class="l-stat-n" id="ls-listings">—</div>
-            <div class="l-stat-l">Listings</div>
-          </div>
-          <div class="l-stat">
-            <div class="l-stat-n">3</div>
-            <div class="l-stat-l">Room Types</div>
-          </div>
-          <div class="l-stat">
-            <div class="l-stat-n">250</div>
-            <div class="l-stat-l">Ksh Only</div>
-          </div>
+          <div class="l-stat"><div class="l-stat-n" id="ls-listings">—</div><div class="l-stat-l">Listings</div></div>
+          <div class="l-stat"><div class="l-stat-n">3</div><div class="l-stat-l">Room Types</div></div>
+          <div class="l-stat"><div class="l-stat-n">250</div><div class="l-stat-l">Ksh Only</div></div>
         </div>
-
-        <!-- quote -->
         <blockquote class="l-quote">
           "No more walking estate to estate. Real photos, real contacts, real houses."
           <cite>— CUK Student, 2025</cite>
         </blockquote>
       </div>
-
       <div class="l-foot">© 2025 NestFinder CUK · Student Housing Platform</div>
     </div>
   </div>
@@ -677,24 +263,18 @@ window.sb={
   <div class="right">
     <div class="form-wrap">
 
-      <!-- tab bar -->
+      <!-- TAB BAR -->
       <div class="tabs" id="tabs">
         <div class="tab-ink" id="tab-ink"></div>
         <button class="tab-btn on" id="btn-in" onclick="switchTo('in')">Sign In</button>
         <button class="tab-btn" id="btn-reg" onclick="switchTo('reg')">Register</button>
       </div>
 
-      <!-- SIGN IN PANEL -->
+      <!-- ══ SIGN IN ══ -->
       <div class="panel on" id="p-in">
         <div class="stagger">
-          <div>
-            <div class="form-title">Welcome <em>back.</em></div>
-            <p class="form-sub">Sign in to browse listings and unlock caretaker contacts.</p>
-          </div>
-          <div class="msg" id="in-msg">
-            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span id="in-msg-txt"></span>
-          </div>
+          <div><div class="form-title">Welcome <em>back.</em></div><p class="form-sub">Sign in to browse listings and unlock caretaker contacts.</p></div>
+          <div class="msg" id="in-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="in-msg-txt"></span></div>
           <div class="field">
             <label>Email Address</label>
             <div class="field-inner">
@@ -708,13 +288,11 @@ window.sb={
               <input type="password" id="in-pass" placeholder="Your password" autocomplete="current-password"/>
               <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
               <button class="eye-btn" type="button" onclick="toggleEye('in-pass',this)" tabindex="-1" aria-label="Show password">
-                <svg viewBox="0 0 24 24" id="eye-in"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
           </div>
-          <div class="forgot-row">
-            <a href="#" class="forgot-link" onclick="showPanel('p-reset');return false">Forgot password?</a>
-          </div>
+          <div class="forgot-row"><a href="#" class="forgot-link" onclick="showPanel('p-reset');return false">Forgot password?</a></div>
           <div>
             <button class="submit-btn" id="in-btn" onclick="doSignIn()">
               <span id="in-btn-lbl">Sign In</span>
@@ -725,17 +303,11 @@ window.sb={
         </div>
       </div>
 
-      <!-- REGISTER PANEL -->
+      <!-- ══ REGISTER ══ -->
       <div class="panel" id="p-reg">
         <div class="stagger">
-          <div>
-            <div class="form-title">Join <em>NestFinder.</em></div>
-            <p class="form-sub">Create your free student account and start browsing verified listings.</p>
-          </div>
-          <div class="msg" id="reg-msg">
-            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span id="reg-msg-txt"></span>
-          </div>
+          <div><div class="form-title">Join <em>NestFinder.</em></div><p class="form-sub">Create your free student account and start browsing verified listings.</p></div>
+          <div class="msg" id="reg-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="reg-msg-txt"></span></div>
           <div class="field">
             <label>Full Name</label>
             <div class="field-inner">
@@ -757,14 +329,14 @@ window.sb={
               <input type="tel" id="reg-phone" placeholder="07XX XXX XXX" autocomplete="tel" inputmode="tel"/>
               <svg class="field-ico" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>
             </div>
-            <div class="field-hint">Used for M-Pesa STK push payments.</div>
+            <div class="field-hint">Used for M-Pesa payments.</div>
           </div>
           <div class="field">
             <label>Password</label>
             <div class="field-inner">
               <input type="password" id="reg-pass" placeholder="Min. 6 characters" autocomplete="new-password"/>
               <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('reg-pass',this)" tabindex="-1" aria-label="Show password">
+              <button class="eye-btn" type="button" onclick="toggleEye('reg-pass',this)" tabindex="-1">
                 <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -779,18 +351,17 @@ window.sb={
         </div>
       </div>
 
-
-      <!-- FORGOT PASSWORD PANEL -->
+      <!-- ══ FORGOT PASSWORD ══ -->
       <div class="panel" id="p-reset">
         <div class="stagger">
           <div>
+            <button onclick="switchTo('in')" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--muted);margin-bottom:1.25rem;padding:0;-webkit-tap-highlight-color:transparent">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to Sign In
+            </button>
             <div class="form-title">Reset <em>password.</em></div>
             <p class="form-sub">Enter your email and we'll send you a reset link right away.</p>
           </div>
-          <div class="msg" id="reset-msg">
-            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span id="reset-msg-txt"></span>
-          </div>
+          <div class="msg" id="reset-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="reset-msg-txt"></span></div>
           <div class="field">
             <label>Email Address</label>
             <div class="field-inner">
@@ -803,46 +374,34 @@ window.sb={
               <span id="reset-btn-lbl">Send Reset Link</span>
               <svg id="reset-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
-            <div class="switch-row">Remembered it? <a href="#" onclick="switchTo('in');return false">Back to Sign In →</a></div>
           </div>
         </div>
       </div>
 
-      <!-- RESET EMAIL SENT SCREEN -->
+      <!-- ══ RESET EMAIL SENT ══ -->
       <div class="panel" id="p-reset-sent">
         <div class="special">
-          <div class="special-ico">
-            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
+          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
           <div class="special-t">Check your inbox.</div>
           <p class="special-sub">A password reset link has been sent to<br/><span class="special-email" id="reset-sent-email">—</span></p>
-          <p class="special-sub" style="margin-top:-.5rem">Click the link in the email, then set your new password.</p>
+          <p class="special-sub" style="margin-top:-.5rem">Click the link in the email to set your new password.</p>
           <button class="submit-btn" style="max-width:240px;margin:0 auto" onclick="switchTo('in')">
-            Back to Sign In
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Back to Sign In <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- NEW PASSWORD PANEL (after clicking reset link in email) -->
+      <!-- ══ NEW PASSWORD (after clicking email link) ══ -->
       <div class="panel" id="p-newpass">
         <div class="stagger">
-          <div>
-            <div class="form-title">New <em>password.</em></div>
-            <p class="form-sub">Choose a strong new password for your NestFinder account.</p>
-          </div>
-          <div class="msg" id="newpass-msg">
-            <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span id="newpass-msg-txt"></span>
-          </div>
+          <div><div class="form-title">New <em>password.</em></div><p class="form-sub">Choose a strong new password for your NestFinder account.</p></div>
+          <div class="msg" id="newpass-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="newpass-msg-txt"></span></div>
           <div class="field">
             <label>New Password</label>
             <div class="field-inner">
               <input type="password" id="newpass-1" placeholder="Min. 6 characters" autocomplete="new-password"/>
               <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('newpass-1',this)" tabindex="-1">
-                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
+              <button class="eye-btn" type="button" onclick="toggleEye('newpass-1',this)" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
           </div>
           <div class="field">
@@ -850,9 +409,7 @@ window.sb={
             <div class="field-inner">
               <input type="password" id="newpass-2" placeholder="Repeat your new password" autocomplete="new-password"/>
               <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('newpass-2',this)" tabindex="-1">
-                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
+              <button class="eye-btn" type="button" onclick="toggleEye('newpass-2',this)" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
           </div>
           <div>
@@ -864,57 +421,63 @@ window.sb={
         </div>
       </div>
 
-      <!-- EMAIL CONFIRM SCREEN -->
+      <!-- ══ EMAIL CONFIRM ══ -->
       <div class="panel" id="p-email">
         <div class="special">
-          <div class="special-ico">
-            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          </div>
+          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
           <div class="special-t">Check your inbox.</div>
           <p class="special-sub">We sent a confirmation link to<br/><span class="special-email" id="conf-email">—</span></p>
           <p class="special-sub" style="margin-top:-.5rem">Click the link to activate your account, then come back and sign in.</p>
           <button class="submit-btn" style="max-width:240px;margin:0 auto" onclick="switchTo('in')">
-            Back to Sign In
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Back to Sign In <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- SUCCESS SCREEN -->
+      <!-- ══ SUCCESS ══ -->
       <div class="panel" id="p-done">
         <div class="special">
-          <div class="special-ico">
-            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-          </div>
+          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
           <div class="special-t">You're in, <span id="done-name">Student</span>!</div>
           <p class="special-sub">Your account is active. Let's find your perfect home near CUK.</p>
           <a href="index.html" class="submit-btn" style="max-width:240px;margin:0 auto;text-decoration:none">
-            Browse Listings
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Browse Listings <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
       </div>
 
-    </div>
-  </div>
-
-</div>
+    </div><!-- /form-wrap -->
+  </div><!-- /right -->
+</div><!-- /split -->
 
 <script>
-// load listing count for left panel
+const _B = window.SB_URL;
+const _K = window.SB_KEY;
+const _H = window.SB_H;
+
+/* ── load listing count ── */
 (async()=>{
-  const {count}=await sb.from('listings').select('*',{count:'exact',head:true});
-  const el=document.getElementById('ls-listings');
-  if(el)el.textContent=count||0;
+  try{
+    const r=await fetch(_B+'/rest/v1/listings?select=id',{headers:{apikey:_K,Authorization:'Bearer '+_K,'Prefer':'count=exact'}});
+    const count=r.headers.get('content-range');
+    const el=document.getElementById('ls-listings');
+    if(el&&count)el.textContent=count.split('/')[1]||'—';
+  }catch(e){}
 })();
 
-// check already logged in
+/* ── already logged in? ── */
 (async()=>{
-  const {data:{user}}=await sb.auth.getUser();
-  if(user){
-    const {data}=await sb.from('profiles').select('full_name').eq('id',user.id).single();
-    showDone(data?.full_name?.split(' ')[0]||'Student');
-  }
+  const t=localStorage.getItem('sb-token');if(!t)return;
+  try{
+    const r=await fetch(_B+'/auth/v1/user',{headers:_H(t)});
+    const u=await r.json();
+    if(!u.id){localStorage.removeItem('sb-token');return;}
+    const pr=await fetch(_B+'/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{headers:_H(t)});
+    const pd=await pr.json();
+    const p=Array.isArray(pd)&&pd[0]?pd[0]:null;
+    if(p?.role==='admin'){location.href='admin.html';return;}
+    showDone(p?.full_name?.split(' ')[0]||'Student');
+  }catch(e){}
 })();
 
 /* ── TABS ── */
@@ -928,12 +491,14 @@ function switchTo(mode){
 
 function showPanel(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  const el=document.getElementById(id);if(el){el.classList.add('on');}
-  // re-trigger stagger animation
-  el?.querySelectorAll('.stagger > *').forEach((c,i)=>{
-    c.style.animation='none';
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.animation='';}));
-  });
+  const el=document.getElementById(id);
+  if(el){
+    el.classList.add('on');
+    el.querySelectorAll('.stagger > *').forEach(c=>{
+      c.style.animation='none';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.animation='';}));
+    });
+  }
 }
 
 /* ── EYE TOGGLE ── */
@@ -948,11 +513,9 @@ function toggleEye(inputId,btn){
 
 /* ── MSG ── */
 function showMsg(id,text,type='err'){
-  const el=document.getElementById(id);
-  const tx=document.getElementById(id+'-txt');
+  const el=document.getElementById(id),tx=document.getElementById(id+'-txt');
   if(!el||!tx)return;
-  tx.textContent=text;
-  el.className='msg '+type+' show';
+  tx.textContent=text;el.className='msg '+type+' show';
 }
 function clearMsg(id){const el=document.getElementById(id);if(el)el.className='msg';}
 
@@ -961,10 +524,13 @@ function setLoading(btnId,arrowId,loading,label=''){
   const btn=document.getElementById(btnId);
   const lbl=document.getElementById(btnId+'-lbl');
   const arr=document.getElementById(arrowId);
+  if(!btn)return;
   btn.disabled=loading;
   if(loading){
     if(lbl)lbl.textContent='Please wait…';
-    if(arr){arr.style.display='none';btn.insertAdjacentHTML('beforeend','<div class="spin-small" id="sp-'+btnId+'"></div>');}
+    if(arr)arr.style.display='none';
+    if(!document.getElementById('sp-'+btnId))
+      btn.insertAdjacentHTML('beforeend','<div class="spin-small" id="sp-'+btnId+'"></div>');
   }else{
     if(lbl)lbl.textContent=label;
     if(arr)arr.style.display='';
@@ -972,38 +538,41 @@ function setLoading(btnId,arrowId,loading,label=''){
   }
 }
 
-/* ── SIGN IN ── */
+/* ══════════════════════════════════════
+   SIGN IN
+══════════════════════════════════════ */
 async function doSignIn(){
   clearMsg('in-msg');
   const email=document.getElementById('in-email').value.trim();
   const pass=document.getElementById('in-pass').value;
   if(!email||!pass){showMsg('in-msg','Please enter your email and password.');return;}
   setLoading('in-btn','in-arrow',true);
-  // Use direct fetch for reliable sign-in
-  const _lr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=password',{
+
+  const r=await fetch(_B+'/auth/v1/token?grant_type=password',{
     method:'POST',
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Content-Type':'application/json'},
+    headers:{apikey:_K,'Content-Type':'application/json'},
     body:JSON.stringify({email,password:pass})
   });
-  const _ld=await _lr.json();
+  const d=await r.json();
   setLoading('in-btn','in-arrow',false,'Sign In');
-  if(!_ld.access_token){
-    const m=(_ld.error_description||_ld.msg||'Incorrect email or password. Please try again.');
-    showMsg('in-msg',m);return;
+
+  if(!d.access_token){
+    showMsg('in-msg',d.error_description||d.msg||'Incorrect email or password. Please try again.');
+    return;
   }
-  localStorage.setItem('sb-token',_ld.access_token);
-  localStorage.setItem('sb-refresh',_ld.refresh_token||'');
-  // Fetch profile to determine role
-  const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+_ld.user.id,{
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_ld.access_token}
-  });
-  const _pd=await _pr.json();
-  const p=Array.isArray(_pd)&&_pd.length>0?_pd[0]:null;
+  localStorage.setItem('sb-token',d.access_token);
+  localStorage.setItem('sb-refresh',d.refresh_token||'');
+
+  const pr=await fetch(_B+'/rest/v1/profiles?select=full_name,role&id=eq.'+d.user.id,{headers:_H(d.access_token)});
+  const pd=await pr.json();
+  const p=Array.isArray(pd)&&pd[0]?pd[0]:null;
   if(p?.role==='admin'){location.href='admin.html';return;}
   showDone(p?.full_name?.split(' ')[0]||'Student');
 }
 
-/* ── REGISTER ── */
+/* ══════════════════════════════════════
+   REGISTER
+══════════════════════════════════════ */
 async function doRegister(){
   clearMsg('reg-msg');
   const name=document.getElementById('reg-name').value.trim();
@@ -1013,15 +582,30 @@ async function doRegister(){
   if(!name||!email||!pass){showMsg('reg-msg','Please fill in all required fields.');return;}
   if(pass.length<6){showMsg('reg-msg','Password must be at least 6 characters.');return;}
   setLoading('reg-btn','reg-arrow',true);
-  const {data,error}=await sb.auth.signUp({
-    email,password:pass,
-    options:{data:{full_name:name,phone}}
+
+  const r=await fetch(_B+'/auth/v1/signup',{
+    method:'POST',
+    headers:{apikey:_K,'Content-Type':'application/json'},
+    body:JSON.stringify({email,password:pass,data:{full_name:name,phone}})
   });
+  const d=await r.json();
   setLoading('reg-btn','reg-arrow',false,'Create Account');
-  if(error){showMsg('reg-msg',error.message);return;}
-  // upsert profile
-  await sb.from('profiles').upsert({id:data.user.id,full_name:name,phone,role:'student'});
-  if(data.user?.confirmed_at||data.session){
+
+  if(d.error||d.msg){showMsg('reg-msg',d.error_description||d.msg||d.error||'Registration failed.');return;}
+
+  const userId=d.user?.id||d.id;
+  if(userId){
+    // upsert profile
+    await fetch(_B+'/rest/v1/profiles',{
+      method:'POST',
+      headers:Object.assign({},_H(d.session?.access_token||_K),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
+      body:JSON.stringify({id:userId,full_name:name,phone,role:'student'})
+    });
+  }
+
+  if(d.session?.access_token){
+    localStorage.setItem('sb-token',d.session.access_token);
+    localStorage.setItem('sb-refresh',d.session.refresh_token||'');
     showDone(name.split(' ')[0]);
   }else{
     document.getElementById('conf-email').textContent=email;
@@ -1029,30 +613,39 @@ async function doRegister(){
   }
 }
 
-function showDone(name){
-  document.getElementById('done-name').textContent=name||'Student';
-  // hide tabs
-  document.getElementById('tabs').style.display='none';
-  showPanel('p-done');
-}
-
-
-/* ── FORGOT / RESET PASSWORD ── */
+/* ══════════════════════════════════════
+   FORGOT PASSWORD — sends reset email
+══════════════════════════════════════ */
 async function doReset(){
   clearMsg('reset-msg');
   const email=document.getElementById('reset-email').value.trim();
   if(!email){showMsg('reset-msg','Please enter your email address.');return;}
   setLoading('reset-btn','reset-arrow',true);
-  const {error}=await sb.auth.resetPasswordForEmail(email,{
-    redirectTo: 'https://nest-finder-cuk.vercel.app/login.html'
+
+  // redirectTo must be this same login.html — the hash detection below handles the rest
+  const redirectTo='https://nest-finder-cuk.vercel.app/login.html';
+
+  const r=await fetch(_B+'/auth/v1/recover',{
+    method:'POST',
+    headers:{apikey:_K,'Content-Type':'application/json'},
+    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:redirectTo})
   });
   setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
-  if(error){showMsg('reset-msg',error.message);return;}
+
+  if(!r.ok){
+    const d=await r.json().catch(()=>({}));
+    showMsg('reset-msg',d.message||'Could not send reset email. Please try again.');
+    return;
+  }
   document.getElementById('reset-sent-email').textContent=email;
   showPanel('p-reset-sent');
 }
 
-/* ── SET NEW PASSWORD (after clicking email link) ── */
+/* ══════════════════════════════════════
+   SET NEW PASSWORD
+   Called after user clicks the email link
+   and lands on this page with #access_token
+══════════════════════════════════════ */
 async function doNewPass(){
   clearMsg('newpass-msg');
   const p1=document.getElementById('newpass-1').value;
@@ -1060,37 +653,92 @@ async function doNewPass(){
   if(!p1||p1.length<6){showMsg('newpass-msg','Password must be at least 6 characters.');return;}
   if(p1!==p2){showMsg('newpass-msg','Passwords do not match.');return;}
   setLoading('newpass-btn','newpass-arrow',true);
-  const {error}=await sb.auth.updateUser({password:p1});
+
+  const token=localStorage.getItem('sb-token');
+  if(!token){
+    setLoading('newpass-btn','newpass-arrow',false,'Set New Password');
+    showMsg('newpass-msg','Session expired. Please request a new reset link.');
+    return;
+  }
+
+  const r=await fetch(_B+'/auth/v1/user',{
+    method:'PUT',
+    headers:{apikey:_K,Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({password:p1})
+  });
+  const d=await r.json().catch(()=>({}));
   setLoading('newpass-btn','newpass-arrow',false,'Set New Password');
-  if(error){showMsg('newpass-msg',error.message);return;}
-  showMsg('newpass-msg','Password updated! Signing you in…','ok');
-  setTimeout(()=>{location.href='index.html';},1800);
+
+  if(!r.ok||d.error){
+    showMsg('newpass-msg',d.message||d.error||'Update failed. Link may have expired — please request a new one.');
+    return;
+  }
+
+  // Clear recovery tokens — user must sign in fresh with new password
+  localStorage.removeItem('sb-token');
+  localStorage.removeItem('sb-refresh');
+  showMsg('newpass-msg','Password updated successfully! Redirecting to sign in…','ok');
+  setTimeout(()=>{
+    history.replaceState(null,'',window.location.pathname);
+    document.getElementById('tabs').style.display='';
+    switchTo('in');
+  },1800);
 }
 
-/* ── DETECT RESET LINK (Supabase puts #access_token in URL) ── */
+/* ══════════════════════════════════════
+   DETECT RESET LINK ON PAGE LOAD
+   Supabase appends #access_token=...&type=recovery to the URL
+══════════════════════════════════════ */
 (async()=>{
   const hash=new URLSearchParams(window.location.hash.slice(1));
   const type=hash.get('type');
   const access=hash.get('access_token');
   const refresh=hash.get('refresh_token');
+
   if(type==='recovery'&&access){
-    // Set the session so updateUser works
-    await sb.auth.setSession({access_token:access,refresh_token:refresh||''});
+    // Verify the token is actually valid before showing the form
+    const check=await fetch(_B+'/auth/v1/user',{
+      headers:{apikey:_K,Authorization:'Bearer '+access}
+    });
+    const user=await check.json().catch(()=>({}));
+
+    if(!user.id){
+      // Token expired or invalid — send to forgot password with helpful message
+      history.replaceState(null,'',window.location.pathname);
+      showPanel('p-reset');
+      showMsg('reset-msg','Your reset link has expired. Please request a new one.','err');
+      return;
+    }
+
+    // Token valid — store it so doNewPass() can use it
+    localStorage.setItem('sb-token',access);
+    if(refresh)localStorage.setItem('sb-refresh',refresh);
+
+    // Hide tabs, show new password form
     document.getElementById('tabs').style.display='none';
     showPanel('p-newpass');
-    // Clean the URL
+
+    // Clean the ugly hash from the URL bar
     history.replaceState(null,'',window.location.pathname);
   }
 })();
 
+/* ══════════════════════════════════════
+   SHOW DONE SCREEN
+══════════════════════════════════════ */
+function showDone(name){
+  document.getElementById('done-name').textContent=name||'Student';
+  document.getElementById('tabs').style.display='none';
+  showPanel('p-done');
+}
+
 /* ── ENTER KEY ── */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(document.getElementById('p-in').classList.contains('on'))doSignIn();
-    else if(document.getElementById('p-reg').classList.contains('on'))doRegister();
-    else if(document.getElementById('p-reset').classList.contains('on'))doReset();
-    else if(document.getElementById('p-newpass').classList.contains('on'))doNewPass();
-  }
+  if(e.key!=='Enter')return;
+  if(document.getElementById('p-in').classList.contains('on'))doSignIn();
+  else if(document.getElementById('p-reg').classList.contains('on'))doRegister();
+  else if(document.getElementById('p-reset').classList.contains('on'))doReset();
+  else if(document.getElementById('p-newpass').classList.contains('on'))doNewPass();
 });
 </script>
 </body>
