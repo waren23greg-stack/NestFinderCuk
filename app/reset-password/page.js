@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@supabase/supabase-js"
 
+// ✅ Use your Supabase project URL + anon key
 const supabase = createClient(
   "https://mtycapgbtvpczvswpjpo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // your anon key
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // replace with your anon key
 )
 
 export default function ResetPassword() {
@@ -35,18 +36,18 @@ export default function ResetPassword() {
       return
     }
 
-    // ✅ Let Supabase SDK establish the session
-    supabase.auth.setSession({ access_token, refresh_token })
-      .then(({ error }) => {
-        if (error) {
-          setMsgType("err")
-          setMessage("Session error: " + error.message)
-        } else {
-          setMsgType("ok")
-          setMessage("Session confirmed. Enter your new password below.")
-          setReady(true)
-        }
-      })
+    // ✅ Establish Supabase session
+    (async () => {
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token })
+      if (error) {
+        setMsgType("err")
+        setMessage("Session error: " + error.message)
+      } else {
+        setMsgType("ok")
+        setMessage("Session confirmed. Enter your new password below.")
+        setReady(true)
+      }
+    })()
   }, [])
 
   const handleReset = async () => {
