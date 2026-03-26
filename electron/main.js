@@ -1,5 +1,6 @@
-const { app, BrowserWindow, session, shell } = require('electron')
+const { app, BrowserWindow, session, shell, protocol } = require('electron')
 const path = require('path')
+const fs = require('fs')
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -19,30 +20,32 @@ function createWindow() {
     },
   })
 
-  // ── Content Security Policy ───────────────────────────────
+  // ── Content Security Policy ──────────────────────────────────────────
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self'; " +
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-          "font-src 'self' data: https://fonts.gstatic.com; " +
-          // Allow Unsplash hero/listing images + Supabase storage images
-          "img-src 'self' data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in; " +
-          // Allow Supabase API + Safaricom + Resend
-          "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.safaricom.co.ke https://sandbox.safaricom.co.ke https://api.resend.com; " +
-          // No iframes allowed
-          "frame-src 'none';"
-        ]
-      }
+          [
+            "default-src 'self' file:",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+            // Allow local fonts + Google Fonts as fallback
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' file: data: https://fonts.gstatic.com",
+            // Allow local images + Unsplash for listing photos
+            "img-src 'self' file: data: blob: https://images.unsplash.com https://*.supabase.co https://*.supabase.in",
+            // Allow Supabase API calls
+            "connect-src 'self' https://*.supabase.co https://*.supabase.in wss://*.supabase.co",
+            "frame-src 'none'",
+          ].join('; '),
+        ],
+      },
     })
   })
 
-  // ── External links open in system browser ────────────────
+  // ── Open external links in system browser ────────────────────────────
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('https://') || url.startsWith('http://')) {
       shell.openExternal(url)
     }
     return { action: 'deny' }
@@ -59,15 +62,10 @@ function createWindow() {
     }
   })
 
-  // ── Load your static app ─────────────────────────────────
+  // ── Load index.html directly — no Next.js server needed ─────────────
   win.loadFile(path.join(__dirname, '../index.html'))
 
   if (isDev) win.webContents.openDevTools()
-
-  // Optional: handle window close gracefully
-  win.on('closed', () => {
-    console.log('NestFinder window closed')
-  })
 }
 
 app.whenReady().then(() => {
