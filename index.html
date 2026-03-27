@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#16130E"/>
 <meta name="google-site-verification" content="GddCOA185fc_6suKdNQue_xop2OZirH0lIKNN6-rbI0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <title>NestFinder CUK — Student Housing</title>
@@ -15,14 +16,14 @@
 <meta property="og:type" content="website"/>
 <meta property="og:url" content="https://nest-finder-cuk.vercel.app/"/>
 <meta property="og:title" content="NestFinder CUK — Student Housing Near The Cooperative University of Kenya"/>
-<meta property="og:description" content="Safe, verified student housing near CUK. Single rooms Ksh 3,500–5,500. Bedsitters Ksh 6,000–10,000. One bedrooms Ksh 10,000–13,000. Pay Ksh 250 to contact caretaker."/>
-<meta property="og:image" content="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80"/>
+<meta property="og:description" content="Safe, verified student housing near CUK. Single rooms Ksh 3,500–5,500. Bedsitters Ksh 6,000–10,000. One bedrooms Ksh 10,000–13,000. Pay to contact caretaker."/>
+<meta property="og:image" content="https://nest-finder-cuk.vercel.app/public/images/hero.jpg"/>
 <meta property="og:site_name" content="NestFinder CUK"/>
 <meta property="og:locale" content="en_KE"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="NestFinder CUK — Student Housing Near CUK"/>
-<meta name="twitter:description" content="Safe, verified student housing near CUK. Browse free, pay Ksh 250 to unlock caretaker contact."/>
-<meta name="twitter:image" content="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80"/>
+<meta name="twitter:description" content="Safe, verified student housing near CUK. Browse free, pay once to unlock caretaker contact."/>
+<meta name="twitter:image" content="https://nest-finder-cuk.vercel.app/public/images/hero.jpg"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"RealEstateAgent","name":"NestFinder CUK","description":"Safe, verified student housing listings near The Cooperative University of Kenya","url":"https://nest-finder-cuk.vercel.app","telephone":"+254704285315","address":{"@type":"PostalAddress","addressLocality":"Karen","addressRegion":"Nairobi","addressCountry":"KE"},"priceRange":"Ksh 3,500 – Ksh 13,000"}</script>
 <link rel="manifest" href="/manifest.json"/>
 <link rel="apple-touch-icon" href="/icon.svg"/>
@@ -30,9 +31,6 @@
 <meta name="apple-mobile-web-app-title" content="NestFinder"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-/* ═══════════════════════════════════════════
-   DESIGN TOKENS
-═══════════════════════════════════════════ */
 :root{
   --gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;
   --dark:#16130E;--dark2:#231F18;--dark3:#302B22;
@@ -42,6 +40,8 @@
   --ease:cubic-bezier(0.4,0,0.2,1);--t:0.26s;
   --nav-h:64px;--px:3.5rem;--max-w:1180px;
   --sb:env(safe-area-inset-bottom,0px);
+  --green:#1D9E75;--green-d:#0F6E56;--green-l:#E1F5EE;
+  --red:#C0392B;--red-l:#FCF0EE;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -50,9 +50,7 @@ img{display:block;max-width:100%}
 h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.1}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-/* ═══════════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════════ */
+/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Jost',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all var(--t);white-space:nowrap;line-height:1;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--ink);padding:9px 18px;border-radius:2px}
 .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
@@ -66,9 +64,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:998;op
 .btn-sm{padding:8px 16px;font-size:.7rem}
 .btn-full{width:100%;height:50px}
 
-/* ═══════════════════════════════════════════
-   NAV — desktop
-═══════════════════════════════════════════ */
+/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);padding:0 var(--px);display:flex;align-items:center;justify-content:space-between;transition:background var(--t),border-color var(--t);border-bottom:1px solid transparent}
 nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-color:var(--border)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
@@ -84,9 +80,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .ham{display:none;width:42px;height:42px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;background:transparent;border:1px solid var(--border2);border-radius:2px;-webkit-tap-highlight-color:transparent;flex-shrink:0}
 .ham span{width:18px;height:1.5px;background:var(--ink);transition:all var(--t);display:block}
 
-/* ═══════════════════════════════════════════
-   DRAWER
-═══════════════════════════════════════════ */
+/* DRAWER */
 .drawer{position:fixed;inset:0;z-index:150;pointer-events:none}
 .drawer-bg{position:absolute;inset:0;background:rgba(22,19,14,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;transition:opacity var(--t)}
 .drawer-panel{position:absolute;top:0;right:0;bottom:0;width:min(290px,82vw);background:var(--cream);transform:translateX(100%);transition:transform .32s var(--ease);display:flex;flex-direction:column;padding:1.5rem;padding-top:calc(var(--nav-h) + 1.25rem);padding-bottom:calc(1.5rem + var(--sb))}
@@ -94,13 +88,13 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .drawer.open .drawer-bg{opacity:1}
 .drawer.open .drawer-panel{transform:translateX(0)}
 .drawer-links{display:flex;flex-direction:column;gap:0;margin-bottom:1.5rem}
-.drawer-links a{text-decoration:none;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);padding:.9rem 0;border-bottom:1px solid var(--border);transition:color var(--t)}
+.drawer-links a{text-decoration:none;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);padding:.9rem 0;border-bottom:1px solid var(--border);transition:color var(--t);display:flex;align-items:center;gap:.6rem}
+.drawer-links a svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0;opacity:.55}
 .drawer-links a:hover{color:var(--gold)}
+.drawer-links a:hover svg{opacity:1}
 .drawer-user{font-size:.76rem;color:var(--muted);margin-bottom:.75rem;padding:.25rem 0}
 
-/* ═══════════════════════════════════════════
-   HERO
-═══════════════════════════════════════════ */
+/* HERO */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;padding-bottom:8vh;overflow:hidden;padding-top:var(--nav-h)}
 .hero-bg{position:absolute;inset:0;background:linear-gradient(145deg,#1A1409 0%,#2D2218 35%,#16130E 60%,#0E0B07 100%)}
 .hero-img{position:absolute;right:0;top:0;width:56%;height:100%;object-fit:cover;opacity:.32}
@@ -117,9 +111,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .stat-n{font-family:'Cormorant Garamond',serif;font-size:2rem;color:#fff;font-weight:300;line-height:1}
 .stat-l{font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.38);margin-top:4px}
 
-/* ═══════════════════════════════════════════
-   SEARCH
-═══════════════════════════════════════════ */
+/* SEARCH */
 .searchbar{background:var(--linen);padding:1.75rem var(--px);border-bottom:1px solid var(--border)}
 .searchbar-inner{max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .sf{position:relative;flex:1;min-width:160px}
@@ -133,9 +125,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .chip-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
 .chip:active,.chip.on{background:var(--dark);border-color:var(--dark);color:#fff}
 
-/* ═══════════════════════════════════════════
-   PRICE GUIDE
-═══════════════════════════════════════════ */
+/* PRICE GUIDE */
 .pguide{background:var(--linen);border-bottom:1px solid var(--border);padding:4rem var(--px)}
 .pguide-inner{max-width:var(--max-w);margin:0 auto}
 .sec-label{font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
@@ -152,9 +142,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .pcard-range{font-family:'Cormorant Garamond',serif;font-size:1.45rem;color:var(--dark)}
 .pcard-avg{font-size:.73rem;color:var(--muted);margin-top:.2rem}
 
-/* ═══════════════════════════════════════════
-   LISTINGS
-═══════════════════════════════════════════ */
+/* LISTINGS */
 .listings-wrap{padding:4rem var(--px);max-width:var(--max-w);margin:0 auto}
 .sec-header{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:2.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
@@ -180,13 +168,13 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .pills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:.9rem}
 .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:var(--linen);border:1px solid var(--border);font-size:.66rem;color:var(--ink)}
 .pill svg{width:10px;height:10px;stroke:var(--gold);fill:none;stroke-width:1.8}
-.lcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--border);gap:.5rem}
+.lcard-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.85rem;border-top:1px solid var(--border);gap:.5rem;flex-wrap:wrap}
 .lcard-price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--dark);white-space:nowrap}
 .lcard-price span{font-family:'Jost',sans-serif;font-size:.66rem;color:var(--muted);margin-left:2px}
+/* Contact fee badge on card */
+.lcard-fee{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;color:var(--gold);background:rgba(184,149,90,.08);border:1px solid var(--border);padding:2px 8px;border-radius:10px;white-space:nowrap;margin-top:3px}
 
-/* ═══════════════════════════════════════════
-   HOW IT WORKS
-═══════════════════════════════════════════ */
+/* HOW IT WORKS */
 .how{background:var(--dark);padding:5rem var(--px)}
 .how-inner{max-width:var(--max-w);margin:0 auto}
 .how .sec-label{color:var(--gold-l)}
@@ -201,9 +189,7 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .step-t{font-family:'Cormorant Garamond',serif;font-size:.95rem;color:#fff;margin-bottom:.35rem}
 .step-d{font-size:.72rem;color:rgba(255,255,255,.38);line-height:1.65;font-weight:300}
 
-/* ═══════════════════════════════════════════
-   TRUST
-═══════════════════════════════════════════ */
+/* TRUST */
 .trust{background:var(--linen);border-top:1px solid var(--border);padding:4.5rem var(--px)}
 .trust-inner{max-width:var(--max-w);margin:0 auto}
 .tgrid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);margin-top:2.25rem}
@@ -215,18 +201,14 @@ nav.scrolled{background:rgba(253,249,244,.96);backdrop-filter:blur(20px);-webkit
 .titem-t{font-family:'Cormorant Garamond',serif;font-size:.96rem;color:var(--dark);margin-bottom:.3rem}
 .titem-d{font-size:.72rem;color:var(--muted);line-height:1.6;font-weight:300}
 
-/* ═══════════════════════════════════════════
-   FOOTER
-═══════════════════════════════════════════ */
+/* FOOTER */
 footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgba(184,149,90,.12);padding-bottom:calc(2.25rem + var(--sb))}
 .foot-inner{max-width:var(--max-w);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 .foot-logo{font-family:'Cormorant Garamond',serif;font-size:1.05rem;color:#fff}
 .foot-logo b{color:var(--gold);font-weight:500}
 .foot-copy{font-size:.68rem;color:rgba(255,255,255,.28);letter-spacing:.04em}
 
-/* ═══════════════════════════════════════════
-   MODAL
-═══════════════════════════════════════════ */
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(22,19,14,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .3s}
 .overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--cream);width:100%;max-width:480px;max-height:90svh;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(20px);transition:transform .32s var(--ease)}
@@ -245,6 +227,8 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .m-det-l{font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.22rem}
 .m-det-v{font-size:.86rem;color:var(--dark);font-weight:500}
 .divider{height:1px;background:var(--border);margin:1.1rem 0}
+
+/* PAYMENT SECTION */
 .mpesa-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);padding:10px 12px;margin-bottom:1.1rem}
 .mpesa-logo{width:68px;height:34px;flex-shrink:0;background:#00A650;border-radius:3px;display:flex;align-items:center;justify-content:center}
 .mpesa-logo span{font-size:.78rem;font-weight:700;color:#fff;letter-spacing:.04em}
@@ -269,9 +253,14 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .cb-name{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:#fff;margin-bottom:.2rem}
 .cb-phone{font-size:.94rem;color:var(--gold-l);letter-spacing:.08em}
 
-/* ═══════════════════════════════════════════
-   TOAST
-═══════════════════════════════════════════ */
+/* DENIED PAYMENT STATE */
+.denied-box{background:var(--red-l);border:1px solid rgba(192,57,43,.2);padding:1.4rem;text-align:center;margin-top:.5rem;border-radius:2px}
+.denied-box-icon{width:48px;height:48px;border:1.5px solid rgba(192,57,43,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .85rem}
+.denied-box-icon svg{width:20px;height:20px;stroke:var(--red);fill:none;stroke-width:1.5}
+.denied-box-t{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--red);margin-bottom:.4rem}
+.denied-box-d{font-size:.76rem;color:rgba(192,57,43,.75);line-height:1.65;margin-bottom:1rem}
+
+/* TOAST */
 .toast{position:fixed;bottom:calc(1.5rem + var(--sb));left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark);color:#fff;padding:12px 18px;font-size:.78rem;z-index:400;display:flex;align-items:center;gap:9px;max-width:min(320px,90vw);opacity:0;transition:all var(--t);border-left:3px solid var(--gold)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.err{border-left-color:#e57373}
@@ -280,9 +269,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);grid-column:1/-1}
 .empty-state svg{width:38px;height:38px;stroke:var(--border2);fill:none;margin-bottom:.75rem}
 
-/* ═══════════════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════════════ */
+/* BOTTOM NAV */
 .bot-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:90;background:rgba(253,249,244,.97);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--border);padding-bottom:var(--sb)}
 .bot-nav-inner{display:flex}
 .bnb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:.6rem .25rem;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;min-height:52px}
@@ -290,14 +277,10 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .bnb.gold{color:var(--gold)}
 .bnb.gold svg{stroke:var(--gold)}
 
-/* ═══════════════════════════════════════════
-   ANIMATIONS
-═══════════════════════════════════════════ */
+/* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-/* ═══════════════════════════════════════════
-   GALLERY LIGHTBOX
-═══════════════════════════════════════════ */
+/* GALLERY LIGHTBOX */
 .gallery-ov{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;flex-direction:column;user-select:none}
 .gallery-ov.open{opacity:1;pointer-events:all}
 .gallery-bar{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;flex-shrink:0}
@@ -319,36 +302,28 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .gallery-strip{flex-shrink:0;padding:.6rem 1rem;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;background:rgba(0,0,0,.5)}
 .gallery-strip::-webkit-scrollbar{display:none}
 .g-thumb{width:56px;height:44px;object-fit:cover;cursor:pointer;opacity:.45;transition:opacity .18s;border:1.5px solid transparent;border-radius:2px;flex-shrink:0}
-.g-thumb.on{opacity:1;border-color:var(--gold,#B8955A)}
+.g-thumb.on{opacity:1;border-color:var(--gold)}
 .gallery-hint{position:absolute;bottom:5.5rem;left:50%;transform:translateX(-50%);font-size:.62rem;color:rgba(255,255,255,.28);letter-spacing:.08em;pointer-events:none;white-space:nowrap;transition:opacity .4s}
 
-/* ═══════════════════════════════════════════
-   FAVOURITES PAGE
-═══════════════════════════════════════════ */
+/* FAVOURITES PAGE */
 .favs-page{display:none;padding:4rem var(--px);max-width:var(--max-w);margin:0 auto}
 .favs-page.on{display:block}
 .main-listings{display:block}
 .main-listings.hidden{display:none}
 
-/* ═══════════════════════════════════════════
-   SHARE BUTTON
-═══════════════════════════════════════════ */
+/* SHARE */
 .share-btn{position:absolute;bottom:9px;left:9px;background:rgba(253,249,244,.92);border:1px solid var(--border);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--t);z-index:3;-webkit-tap-highlight-color:transparent}
 .share-btn svg{width:13px;height:13px;stroke:var(--muted);fill:none;stroke-width:1.8;transition:stroke var(--t)}
 .share-btn:hover svg,.share-btn:active svg{stroke:var(--gold)}
 
-/* ═══════════════════════════════════════════
-   WHATSAPP + SHARE IN MODAL
-═══════════════════════════════════════════ */
+/* MODAL PREVIEW */
 .cb-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.9rem}
 .btn-wa{background:#25D366;color:#fff;height:46px;border-radius:2px;font-size:.72rem;letter-spacing:.08em}
 .btn-wa:hover{background:#20BA5A}
 .btn-share-modal{background:transparent;border:1px solid var(--border2);color:var(--ink);height:46px;border-radius:2px;font-size:.72rem;letter-spacing:.08em}
 .btn-share-modal:hover{border-color:var(--gold);color:var(--gold)}
 
-/* ═══════════════════════════════════════════
-   REVIEWS
-═══════════════════════════════════════════ */
+/* REVIEWS */
 .reviews-section{margin-top:1.2rem}
 .reviews-title{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
 .review-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem;max-height:200px;overflow-y:auto}
@@ -377,15 +352,12 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .lcard-rating{display:flex;align-items:center;gap:4px;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
 .lcard-rating svg{width:10px;height:10px;fill:var(--gold);stroke:none}
 
-/* ═══════════════════════════════════════════
-   MODAL PREVIEW SECTION
-═══════════════════════════════════════════ */
+/* MODAL PREVIEW SECTION */
 .m-preview{padding:0}
 .m-photo-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 1.75rem 1rem;margin-top:.25rem}
 .m-photo-strip::-webkit-scrollbar{display:none}
 .m-photo-strip img{height:140px;min-width:200px;max-width:240px;object-fit:cover;border-radius:3px;cursor:zoom-in;flex-shrink:0;transition:opacity .2s}
 .m-photo-strip img:hover{opacity:.88}
-.m-photo-single{width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in}
 .m-desc{font-size:.82rem;color:var(--ink);line-height:1.7;padding:0 1.75rem .75rem;font-weight:300}
 .m-amenities{display:flex;gap:8px;flex-wrap:wrap;padding:0 1.75rem .75rem}
 .m-amenity{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--linen);border:1px solid var(--border);font-size:.68rem;color:var(--ink);border-radius:12px}
@@ -399,16 +371,12 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 #preview-sec{display:none}
 #preview-sec.on{display:block}
 
-/* ═══════════════════════════════════════════
-   WHATSAPP ADMIN STRIP
-═══════════════════════════════════════════ */
+/* WHATSAPP ADMIN STRIP */
 .wa-admin-strip{display:flex;align-items:center;gap:7px;padding:.75rem 1rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:2px;font-size:.74rem;color:#166534;margin-bottom:.75rem}
 .wa-admin-strip a{color:#15803d;font-weight:500;border-bottom:1px solid rgba(21,128,61,.3);text-decoration:none}
 .wa-admin-strip a:hover{color:#166534;border-color:#166534}
 
-/* ═══════════════════════════════════════════
-   PWA INSTALL BANNER
-═══════════════════════════════════════════ */
+/* PWA INSTALL */
 #pwa-banner{display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:200;background:var(--dark);color:#fff;padding:.85rem 1.25rem;border-radius:2px;align-items:center;gap:1rem;box-shadow:0 8px 32px rgba(22,19,14,.25);font-size:.78rem;min-width:300px;border:1px solid rgba(184,149,90,.2)}
 #pwa-banner.show{display:flex}
 #pwa-banner-txt{flex:1;line-height:1.4}
@@ -418,12 +386,10 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 #pwa-dismiss{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px;font-size:1rem;line-height:1}
 #pwa-dismiss:hover{color:rgba(255,255,255,.8)}
 
-/* ═══════════════════════════════════════════
-   REPORT
-═══════════════════════════════════════════ */
+/* REPORT */
 .report-btn{background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:inline-flex;align-items:center;gap:4px;padding:.35rem 0;transition:color var(--t);-webkit-tap-highlight-color:transparent}
 .report-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.8}
-.report-btn:hover{color:var(--red,#C0392B)}
+.report-btn:hover{color:var(--red)}
 .report-overlay{display:none;position:fixed;inset:0;background:rgba(22,19,14,.6);backdrop-filter:blur(6px);z-index:300;align-items:center;justify-content:center;padding:1rem}
 .report-overlay.open{display:flex}
 .report-modal{background:var(--cream);width:100%;max-width:460px;border:1px solid var(--border);animation:fadeUp .25s var(--ease) both}
@@ -448,9 +414,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .r-done h4{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--dark);margin-bottom:.4rem}
 .r-done p{font-size:.8rem;color:var(--muted);font-weight:300;line-height:1.7}
 
-/* ═══════════════════════════════════════════
-   PRICE RANGE SLIDER
-═══════════════════════════════════════════ */
+/* PRICE SLIDER */
 .price-slider-wrap{display:flex;align-items:center;gap:10px;padding:0 2px}
 .price-range-label{font-size:.72rem;color:var(--muted);white-space:nowrap;font-weight:300}
 .price-range-label span{color:var(--dark);font-weight:500}
@@ -464,9 +428,7 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
 .wa-share:hover{background:#1da851}
 .wa-share svg{width:11px;height:11px;fill:currentColor;flex-shrink:0}
 
-/* ═══════════════════════════════════════════
-   BREAKPOINTS — DESKTOP LARGE (1600px+)
-═══════════════════════════════════════════ */
+/* BREAKPOINTS */
 @media(min-width:1600px){
   :root{--px:5rem;--max-w:1440px;--nav-h:76px}
   .hero h1{font-size:5.6rem}
@@ -482,10 +444,6 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .sec-title{font-size:2.8rem}
   .hero-eyebrow{font-size:.75rem}
 }
-
-/* ═══════════════════════════════════════════
-   BREAKPOINTS — LAPTOP / TABLET LANDSCAPE
-═══════════════════════════════════════════ */
 @media(min-width:901px) and (max-width:1199px){
   :root{--px:2.5rem}
   .lg{grid-template-columns:repeat(2,1fr)}
@@ -494,10 +452,6 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .titem:nth-child(3),.titem:nth-child(4){border-top:1px solid var(--border)}
   .titem:nth-child(4){border-right:none}
 }
-
-/* ═══════════════════════════════════════════
-   BREAKPOINTS — TABLET PORTRAIT (641–900px)
-═══════════════════════════════════════════ */
 @media(min-width:641px) and (max-width:900px){
   :root{--px:2rem;--nav-h:60px}
   .nav-mid{display:none}
@@ -518,10 +472,6 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .titem:nth-child(4){border-right:none}
   .foot-inner{flex-direction:column;text-align:center}
 }
-
-/* ═══════════════════════════════════════════
-   BREAKPOINTS — LARGE PHONE (481–640px)
-═══════════════════════════════════════════ */
 @media(min-width:481px) and (max-width:640px){
   :root{--px:1.25rem;--nav-h:54px}
   .nav-mid{display:none}
@@ -562,20 +512,14 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .overlay.open .modal{transform:translateY(0)}
   .modal::before{content:'';display:block;width:38px;height:4px;background:var(--border2);border-radius:2px;margin:.75rem auto -.25rem}
 }
-
-/* ═══════════════════════════════════════════
-   BREAKPOINTS — SMALL PHONE (≤480px)
-═══════════════════════════════════════════ */
 @media(max-width:480px){
   :root{--px:1rem;--nav-h:52px}
-  /* NAV — logo + hamburger only */
   nav{padding:0 1rem}
   .nav-mid{display:none}
   #nav-hello,#nav-in,#nav-out,#nav-admin{display:none !important}
   .ham{display:flex}
   .logo-ring{width:30px;height:30px}
   .logo-text{font-size:.96rem}
-  /* HERO — tight, centred, no wasted space */
   .hero{min-height:92svh;align-items:center;padding-top:var(--nav-h);padding-bottom:2vh}
   .hero-content{padding:0 1rem}
   .hero-img{width:100%;opacity:.12}
@@ -586,47 +530,38 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .hero-eyebrow::before{width:14px}
   .hero h1{font-size:clamp(1.85rem,7.5vw,2.2rem);margin-bottom:.85rem}
   .hero-sub{font-size:.8rem;line-height:1.75;margin-bottom:1.4rem;max-width:100%;color:rgba(255,255,255,.55)}
-  /* BUTTONS — stacked, full width */
   .hero-btns{flex-direction:column;gap:8px}
   .hero-btns .btn{width:100%;height:50px;font-size:.76rem}
-  /* STATS — 3 columns side by side, always */
   .hero-rule{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:1.4rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.1);flex-wrap:unset}
   .hero-rule > div{text-align:center;padding:0 .4rem;border-right:1px solid rgba(255,255,255,.07)}
   .hero-rule > div:last-child{border-right:none}
   .stat-n{font-size:1.25rem;line-height:1.1}
   .stat-l{font-size:.5rem;letter-spacing:.06em;margin-top:2px}
-  /* SEARCH */
   .searchbar{padding:1.1rem var(--px)}
   .searchbar-inner{flex-direction:column;gap:8px}
   .sf{min-width:100%;flex:unset}
   .chips{width:100%}
-  /* PRICE */
   .pguide{padding:2.5rem var(--px)}
   .pguide-header{flex-direction:column;align-items:flex-start;gap:.75rem;margin-bottom:1.5rem}
   .pgrid{grid-template-columns:1fr}
   .pcard{border-right:none;border-bottom:1px solid var(--border)}
   .pcard:last-child{border-bottom:none}
-  /* LISTINGS */
   .listings-wrap{padding:2.5rem var(--px)}
   .sec-header{flex-direction:column;align-items:flex-start;gap:.4rem}
   .lg{grid-template-columns:1fr;gap:.9rem}
   .lcard-img{height:180px}
-  /* HOW */
   .how{padding:3rem var(--px)}
   .steps{grid-template-columns:1fr;gap:1.25rem}
   .steps::before{display:none}
   .step{display:flex;align-items:flex-start;gap:1rem;text-align:left}
   .step-ico{flex-shrink:0;margin:0}
-  /* TRUST */
   .trust{padding:2.5rem var(--px)}
   .tgrid{grid-template-columns:1fr}
   .titem{border-right:none;border-bottom:1px solid var(--border)}
   .titem:last-child{border-bottom:none}
-  /* FOOTER + BOTTOM NAV */
   footer{padding:1.75rem var(--px);padding-bottom:calc(60px + var(--sb))}
   .foot-inner{flex-direction:column;text-align:center;gap:.5rem}
   .bot-nav{display:block}
-  /* MODAL BOTTOM SHEET */
   .overlay{align-items:flex-end;padding:0}
   .modal{max-width:100%;max-height:94svh;border-radius:16px 16px 0 0;transform:translateY(100%)}
   .overlay.open .modal{transform:translateY(0)}
@@ -684,13 +619,12 @@ function _q(table){
         }}},
         then:function(res){
           return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
-            .then(function(r){return r.json();}).then(function(d){
-              res({data:Array.isArray(d)?d:[d],error:null});
+            .then(function(r){return r.json();}).then(function(d){res({data:Array.isArray(d)?d:[d],error:null});
             }).catch(function(e){res({data:null,error:e})});
         }
       };
     },
-    upsert:function(data,opts){
+    upsert:function(data){
       var t=localStorage.getItem('sb-token');
       var pref='resolution=merge-duplicates,return=representation';
       return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
@@ -724,18 +658,12 @@ window.sb={
     getUser:function(){
       var t=localStorage.getItem('sb-token');
       if(!t)return Promise.resolve({data:{user:null},error:null});
-      return fetch(_B+'/auth/v1/user',{headers:_h(t)})
-        .then(function(r){return r.json();})
-        .then(function(d){return{data:{user:d.id?d:null},error:null};
-      }).catch(function(){return{data:{user:null},error:null};});
+      return fetch(_B+'/auth/v1/user',{headers:_h(t)}).then(function(r){return r.json();}).then(function(d){return{data:{user:d.id?d:null},error:null};}).catch(function(){return{data:{user:null},error:null};});
     },
     getSession:function(){
       var t=localStorage.getItem('sb-token');
       if(!t)return Promise.resolve({data:{session:null},error:null});
-      return fetch(_B+'/auth/v1/user',{headers:_h(t)})
-        .then(function(r){return r.json();})
-        .then(function(d){return{data:{session:d.id?{user:d,access_token:t}:null},error:null};
-      }).catch(function(){return{data:{session:null},error:null};});
+      return fetch(_B+'/auth/v1/user',{headers:_h(t)}).then(function(r){return r.json();}).then(function(d){return{data:{session:d.id?{user:d,access_token:t}:null},error:null};}).catch(function(){return{data:{session:null},error:null};});
     },
     setSession:function(o){
       if(o.access_token){localStorage.setItem('sb-token',o.access_token);if(o.refresh_token)localStorage.setItem('sb-refresh',o.refresh_token);}
@@ -743,28 +671,20 @@ window.sb={
     },
     updateUser:function(attrs){
       var t=localStorage.getItem('sb-token');
-      return fetch(_B+'/auth/v1/user',{method:'PUT',headers:_h(t),body:JSON.stringify(attrs)})
-        .then(function(r){return r.json();}).then(function(d){return d.id?{data:{user:d},error:null}:{data:{},error:d};
-      }).catch(function(e){return{data:{},error:e};});
+      return fetch(_B+'/auth/v1/user',{method:'PUT',headers:_h(t),body:JSON.stringify(attrs)}).then(function(r){return r.json();}).then(function(d){return d.id?{data:{user:d},error:null}:{data:{},error:d};}).catch(function(e){return{data:{},error:e};});
     },
     signInWithPassword:function(o){
-      return fetch(_B+'/auth/v1/token?grant_type=password',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password})})
-        .then(function(r){return r.json();}).then(function(d){
-          if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
-          return d.access_token?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
-        });
+      return fetch(_B+'/auth/v1/token?grant_type=password',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password})}).then(function(r){return r.json();}).then(function(d){
+        if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
+        return d.access_token?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
+      });
     },
     signUp:function(o){
-      return fetch(_B+'/auth/v1/signup',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password,data:o.options&&o.options.data||{}})})
-        .then(function(r){return r.json();}).then(function(d){return d.id||d.user?{data:{user:d.user||d},error:null}:{data:{},error:d};});
+      return fetch(_B+'/auth/v1/signup',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password,data:o.options&&o.options.data||{}})}).then(function(r){return r.json();}).then(function(d){return d.id||d.user?{data:{user:d.user||d},error:null}:{data:{},error:d};});
     },
-    signOut:function(){
-      localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-      return Promise.resolve({error:null});
-    },
-    resetPasswordForEmail:function(email,opts){
-      return fetch(_B+'/auth/v1/recover',{method:'POST',headers:_h(),body:JSON.stringify({email:email,gotrue_meta_security:{}})})
-        .then(function(r){return r.ok?{data:{},error:null}:r.json().then(function(e){return{data:null,error:e};});});
+    signOut:function(){localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');return Promise.resolve({error:null});},
+    resetPasswordForEmail:function(email){
+      return fetch(_B+'/auth/v1/recover',{method:'POST',headers:_h(),body:JSON.stringify({email:email,gotrue_meta_security:{}})}).then(function(r){return r.ok?{data:{},error:null}:r.json().then(function(e){return{data:null,error:e};});});
     },
     onAuthStateChange:function(){return{data:{subscription:{unsubscribe:function(){}}}};},
   },
@@ -773,8 +693,7 @@ window.sb={
       return{
         upload:function(path,file){
           var t=localStorage.getItem('sb-token');
-          return fetch(_B+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K)},body:file})
-            .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
+          return fetch(_B+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K)},body:file}).then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
         },
         getPublicUrl:function(path){return{data:{publicUrl:_B+'/storage/v1/object/public/'+bucket+'/'+path}};}
       };
@@ -816,13 +735,27 @@ window.sb={
   <div class="drawer-bg" onclick="closeDrawer()"></div>
   <div class="drawer-panel">
     <div class="drawer-links">
-      <a href="#listings" onclick="closeDrawer()">Listings</a>
-      <a href="#" onclick="showFavs();closeDrawer();return false">Favourites</a>
-      <a href="payments.html" id="drawer-payments" style="display:none" onclick="closeDrawer()">My Payments</a>
-      <a href="#how" onclick="closeDrawer()">How It Works</a>
-      <a href="#trust" onclick="closeDrawer()">Safety</a>
-      <a href="admin.html" id="drawer-admin" style="display:none" onclick="closeDrawer()">Admin Panel</a>
-      <a href="https://wa.me/254704285315?text=Hi%2C%20I%20found%20a%20listing%20on%20NestFinder%20CUK%20and%20I%20need%20help%20before%20paying." target="_blank" rel="noopener" id="drawer-wa-admin" onclick="closeDrawer()" style="color:#25D366;">Contact Admin via WhatsApp</a>
+      <a href="#listings" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Listings
+      </a>
+      <a href="#" onclick="showFavs();closeDrawer();return false">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favourites
+      </a>
+      <a href="payments.html" id="drawer-payments" style="display:none" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>My Payments
+      </a>
+      <a href="#how" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>How It Works
+      </a>
+      <a href="#trust" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety
+      </a>
+      <a href="admin.html" id="drawer-admin" style="display:none" onclick="closeDrawer()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Admin Panel
+      </a>
+      <a href="https://wa.me/254704285315?text=Hi%2C%20I%20found%20a%20listing%20on%20NestFinder%20CUK%20and%20I%20need%20help." target="_blank" rel="noopener" id="drawer-wa-admin" onclick="closeDrawer()" style="color:#25D366;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Contact Admin via WhatsApp
+      </a>
     </div>
     <div class="drawer-user" id="drawer-user"></div>
     <a href="login.html" id="drawer-in" class="btn btn-gold" style="width:100%;margin-bottom:.75rem">Sign In</a>
@@ -839,7 +772,7 @@ window.sb={
   <div class="hero-content">
     <div class="hero-eyebrow">The Cooperative University of Kenya</div>
     <h1>Find Your <em>Perfect</em><br/>Student Home</h1>
-    <p class="hero-sub">Browse real photos for free. Pay Ksh 250 once to unlock the caretaker's number, call to arrange a viewing, and move in.</p>
+    <p class="hero-sub">Browse real photos for free. Pay once to unlock the caretaker's number, call to arrange a viewing, and move in.</p>
     <div class="hero-btns">
       <a href="#listings" class="btn btn-gold">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
@@ -850,7 +783,7 @@ window.sb={
     <div class="hero-rule">
       <div><div class="stat-n" id="stat-n">—</div><div class="stat-l">Verified Listings</div></div>
       <div><div class="stat-n">3</div><div class="stat-l">Room Types</div></div>
-      <div><div class="stat-n">Ksh 250</div><div class="stat-l">Contact Fee</div></div>
+      <div><div class="stat-n" id="stat-fee">Ksh 250</div><div class="stat-l">Contact Fee</div></div>
     </div>
   </div>
 </section>
@@ -874,6 +807,7 @@ window.sb={
     <div class="chips">
       <div class="chip" data-f="water" onclick="toggleChip(this)"><div class="chip-dot"></div>Water</div>
       <div class="chip" data-f="wifi" onclick="toggleChip(this)"><div class="chip-dot"></div>WiFi</div>
+      <div class="chip" data-f="avail" onclick="toggleChip(this)"><div class="chip-dot"></div>Available</div>
     </div>
     <div class="price-slider-wrap" style="flex:1;min-width:200px;">
       <div class="price-range-label">Max: <span id="priceLabel">13,000</span></div>
@@ -922,11 +856,12 @@ window.sb={
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         Photos free &nbsp;·&nbsp;
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
-        Pay Ksh 250 to get caretaker contact
+        Pay once to get caretaker contact
       </span>
     </span>
   </div>
   <div class="lg" id="lg">
+    <!-- skeleton -->
     <div class="lcard" style="pointer-events:none">
       <div class="lcard-img"></div>
       <div class="lcard-body">
@@ -938,21 +873,17 @@ window.sb={
   </div>
 </div>
 
-<!-- FAVOURITES PAGE -->
+<!-- FAVOURITES -->
 <div class="favs-page" id="favs-page">
   <div class="sec-header">
-    <div>
-      <p class="sec-label">Saved Listings</p>
-      <h2 class="sec-title">My Favourites</h2>
-    </div>
+    <div><p class="sec-label">Saved Listings</p><h2 class="sec-title">My Favourites</h2></div>
     <button class="btn btn-ghost btn-sm" onclick="hideFavs()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Back to All
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to All
     </button>
   </div>
   <div class="lg" id="favs-grid"></div>
 </div>
-</div><!-- end main-listings -->
+</div>
 
 <!-- HOW IT WORKS -->
 <section id="how" class="how">
@@ -961,9 +892,9 @@ window.sb={
     <h2 class="sec-title">How NestFinder Works</h2>
     <div class="steps">
       <div class="step"><div class="step-ico"><div class="step-n">1</div><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div><div><div class="step-t">Browse</div><p class="step-d">Filter by room type. See up to 6 real photos per listing.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">2</div><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="step-t">Choose</div><p class="step-d">Like what you see? Pay Ksh 250 once to get the caretaker's phone number.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">3</div><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div><div class="step-t">Pay M-Pesa</div><p class="step-d">Enter your Safaricom number. M-Pesa STK push arrives in seconds.</p></div></div>
-      <div class="step"><div class="step-ico"><div class="step-n">4</div><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div><div class="step-t">Get Contact</div><p class="step-d">Caretaker's phone number revealed instantly. Call to book a viewing.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">2</div><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div><div><div class="step-t">Choose</div><p class="step-d">Like what you see? Pay the listed contact fee once to get the caretaker's phone number.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">3</div><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div><div class="step-t">Pay M-Pesa</div><p class="step-d">Send via M-Pesa and enter your confirmation code.</p></div></div>
+      <div class="step"><div class="step-ico"><div class="step-n">4</div><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div><div class="step-t">Get Contact</div><p class="step-d">Caretaker's phone number revealed. Call to book a viewing.</p></div></div>
       <div class="step"><div class="step-ico"><div class="step-n">5</div><svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg></div><div><div class="step-t">Move In</div><p class="step-d">Visit, confirm it suits you, and settle in.</p></div></div>
     </div>
   </div>
@@ -977,7 +908,7 @@ window.sb={
     </div>
     <div class="tgrid">
       <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="titem-t">Verified Only</div><p class="titem-d">Every listing personally inspected by admin before going live.</p></div>
-      <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div class="titem-t">Secure M-Pesa</div><p class="titem-d">Pay Ksh 250 via M-Pesa to unlock a caretaker contact. Photos are always free.</p></div>
+      <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg></div><div class="titem-t">Secure M-Pesa</div><p class="titem-d">Pay via M-Pesa to unlock caretaker contact. Photos are always free.</p></div>
       <div class="titem"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div><div class="titem-t">Real Photos</div><p class="titem-d">Up to 6 actual house photos per listing. No stock images.</p></div>
       <div class="titem" style="border-right:none"><div class="titem-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="titem-t">CUK Students Only</div><p class="titem-d">Built exclusively for Cooperative University of Kenya students.</p></div>
     </div>
@@ -999,6 +930,7 @@ window.sb={
     <a href="login.html" class="bnb gold" id="bot-in"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Sign In</a>
     <a href="payments.html" class="bnb" id="bot-payments" style="display:none"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Payments</a>
     <a href="#" class="bnb" onclick="showFavs();return false"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Saved</a>
+    <a href="admin.html" class="bnb" id="bot-admin" style="display:none"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Admin</a>
   </div>
 </nav>
 
@@ -1008,39 +940,27 @@ window.sb={
     <div class="gallery-bar-title" id="gallery-title"></div>
     <div class="gallery-bar-right">
       <span class="gallery-bar-counter" id="gallery-counter"></span>
-      <button class="g-btn" onclick="resetZoom()" title="Reset zoom" id="g-reset" style="display:none">
-        <svg viewBox="0 0 24 24"><path d="M3.05 11A9 9 0 1112 21M3 3v6h6"/></svg>
-      </button>
-      <button class="g-btn" onclick="closeGallery()">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <button class="g-btn" onclick="resetZoom()" title="Reset zoom" id="g-reset" style="display:none"><svg viewBox="0 0 24 24"><path d="M3.05 11A9 9 0 1112 21M3 3v6h6"/></svg></button>
+      <button class="g-btn" onclick="closeGallery()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
   </div>
   <div class="gallery-stage" id="gallery-stage">
     <div class="gallery-img-wrap" id="gallery-img-wrap">
       <img class="gallery-img" id="gallery-img" src="" alt=""/>
     </div>
-    <button class="gallery-prev g-btn" onclick="galleryNav(-1)" id="g-prev">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    </button>
-    <button class="gallery-next g-btn" onclick="galleryNav(1)" id="g-next">
-      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
+    <button class="gallery-prev g-btn" onclick="galleryNav(-1)" id="g-prev"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <button class="gallery-next g-btn" onclick="galleryNav(1)" id="g-next"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
     <div class="gallery-hint" id="gallery-hint">Pinch or scroll to zoom · Swipe to navigate</div>
   </div>
   <div class="gallery-zoom-bar">
-    <button class="g-btn" onclick="zoomStep(-1)" title="Zoom out">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-    </button>
+    <button class="g-btn" onclick="zoomStep(-1)" title="Zoom out"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
     <span class="zoom-level" id="zoom-level">100%</span>
-    <button class="g-btn" onclick="zoomStep(1)" title="Zoom in">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-    </button>
+    <button class="g-btn" onclick="zoomStep(1)" title="Zoom in"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
   </div>
   <div class="gallery-strip" id="gallery-strip"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MAIN LISTING MODAL -->
 <div class="overlay" id="overlay" onclick="bgClose(event)">
   <div class="modal">
     <div class="m-head">
@@ -1065,10 +985,10 @@ window.sb={
       <div class="m-cta-banner" id="m-cta-banner">
         <div class="m-cta-left">
           <div class="m-cta-title">Interested in this house?</div>
-          <div class="m-cta-sub">Get the caretaker's number and call to arrange a viewing at your convenience.</div>
+          <div class="m-cta-sub">Get the caretaker's number and call to arrange a viewing.</div>
         </div>
         <div>
-          <div class="m-cta-price">Ksh 250<small>One-time fee</small></div>
+          <div class="m-cta-price" id="m-cta-price">Ksh 250<small>One-time fee</small></div>
         </div>
       </div>
       <div style="padding:0 1.75rem 1.5rem">
@@ -1078,7 +998,7 @@ window.sb={
         </button>
         <p style="font-size:.67rem;color:var(--muted);text-align:center;margin-top:.6rem">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;stroke:#2D6A4F"><polyline points="20 6 9 17 4 12"/></svg>
-          You only pay when you want the caretaker's number — browsing is always free
+          Browsing is always free — only pay when you want the caretaker's number
         </p>
       </div>
     </div>
@@ -1103,7 +1023,7 @@ window.sb={
           <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(184,149,90,.04) 24px,rgba(184,149,90,.04) 25px),repeating-linear-gradient(90deg,transparent,transparent 24px,rgba(184,149,90,.04) 24px,rgba(184,149,90,.04) 25px);pointer-events:none"></div>
           <div style="position:relative;z-index:1">
             <div style="font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(184,149,90,.65);margin-bottom:.45rem">One-time Contact Fee</div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:2.6rem;color:#fff;font-weight:300;line-height:1;margin-bottom:.35rem">Ksh 250</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:2.6rem;color:#fff;font-weight:300;line-height:1;margin-bottom:.35rem" id="pay-fee-display">Ksh 250</div>
             <div style="font-size:.72rem;color:rgba(255,255,255,.38);line-height:1.65">Pay once — the caretaker's number is yours forever for this listing.</div>
           </div>
         </div>
@@ -1116,7 +1036,8 @@ window.sb={
             </div>
             <div style="display:flex;gap:.9rem;align-items:flex-start">
               <div style="width:22px;height:22px;background:var(--dark);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:50%">2</div>
-              <div><div style="font-size:.78rem;font-weight:500;color:var(--dark);margin-bottom:.1rem">Send Ksh 250 to this number</div>
+              <div>
+                <div style="font-size:.78rem;font-weight:500;color:var(--dark);margin-bottom:.1rem">Send <span id="pay-step-fee">Ksh 250</span> to this number</div>
                 <div style="font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:var(--dark);letter-spacing:.04em;margin:.2rem 0">0704 285 315</div>
                 <div style="font-size:.7rem;color:var(--muted)">NestFinder CUK Admin</div>
               </div>
@@ -1143,7 +1064,7 @@ window.sb={
         </button>
         <p style="font-size:.67rem;color:var(--muted);text-align:center;margin-top:.65rem;line-height:1.6">
           Admin confirms your payment and the contact unlocks — usually within a few minutes.<br/>
-          Questions? <a href="https://wa.me/254704285315?text=Hi%2C%20I%20just%20paid%20Ksh%20250%20on%20NestFinder%20CUK%20and%20need%20help." target="_blank" style="color:var(--gold)">WhatsApp admin →</a>
+          Questions? <a href="https://wa.me/254704285315?text=Hi%2C%20I%20just%20paid%20on%20NestFinder%20CUK%20and%20need%20help." target="_blank" style="color:var(--gold)">WhatsApp admin →</a>
         </p>
       </div>
       <div id="wait-sec">
@@ -1165,25 +1086,33 @@ window.sb={
         <div class="divider"></div>
         <div class="wa-admin-strip">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          Not ready to pay? <a href="https://wa.me/254704285315?text=Hi%2C%20I%20am%20interested%20in%20a%20listing%20on%20NestFinder%20CUK%20and%20would%20like%20to%20discuss%20before%20paying." target="_blank" rel="noopener">Ask admin on WhatsApp first →</a>
+          Not ready? <a href="https://wa.me/254704285315?text=Hi%2C%20I%20am%20interested%20in%20a%20listing%20on%20NestFinder%20CUK." target="_blank" rel="noopener">Ask admin on WhatsApp first →</a>
         </div>
-        <div class="contact-box">
+        <!-- DENIED STATE -->
+        <div class="denied-box" id="denied-contact-box" style="display:none">
+          <div class="denied-box-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="denied-box-t">Access Revoked</div>
+          <p class="denied-box-d">Your payment for this listing was marked as invalid by admin. Contact admin to resolve this.</p>
+          <a href="https://wa.me/254704285315?text=Hi%2C%20my%20payment%20for%20a%20NestFinder%20CUK%20listing%20was%20denied.%20Please%20help." target="_blank" class="btn btn-gold" style="margin-top:.5rem;width:100%">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Contact Admin on WhatsApp
+          </a>
+        </div>
+        <!-- CONTACT BOX -->
+        <div class="contact-box" id="contact-box-wrap">
           <div class="cb-label">Contact Unlocked — Call to Arrange Viewing</div>
           <div class="cb-name" id="cb-name">—</div>
           <div class="cb-phone" id="cb-phone">—</div>
           <div class="cb-actions">
             <a id="cb-call" href="#" class="btn btn-gold">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 011.72 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>
-              Call Now
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63a19.79 19.79 0 01-3.07-8.67A2 2 0 011.72 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14z"/></svg>Call Now
             </a>
             <a id="cb-wa" href="#" target="_blank" class="btn btn-wa">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-              WhatsApp
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp
             </a>
           </div>
           <button class="btn btn-share-modal btn-full" style="margin-top:8px" onclick="shareCurrentListing()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            Share This Listing
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share This Listing
           </button>
         </div>
         <div class="reviews-section" id="reviews-section">
@@ -1213,10 +1142,13 @@ window.sb={
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toast-txt"></span></div>
 
 <script>
+const _SB_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const _SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+function _SBH(t){return{'apikey':_SB_KEY,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_SB_KEY),'Content-Type':'application/json'};}
+
 const PHOTOS={
   single:['https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=600&q=80','https://images.unsplash.com/photo-1540518614846-7eded433c457?w=600&q=80','https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80'],
   bedsitter:['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&q=80','https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=600&q=80','https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=600&q=80'],
@@ -1224,39 +1156,28 @@ const PHOTOS={
   default:['https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&q=80','https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=600&q=80']
 };
 const TL={single:'Single Room',bedsitter:'Bedsitter','one-bedroom':'One Bedroom'};
-let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false;
+let listings=[],user=null,cur=null,payId=null,poll=null,wOn=false,wfOn=false,availOn=false;
 
 window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',scrollY>60);},{passive:true});
 
 async function refreshToken(){
-  var rt=localStorage.getItem('sb-refresh');
-  if(!rt)return;
+  var rt=localStorage.getItem('sb-refresh');if(!rt)return;
   try{
-    var r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/token?grant_type=refresh_token',{
-      method:'POST',
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Content-Type':'application/json'},
-      body:JSON.stringify({refresh_token:rt})
-    });
+    var r=await fetch(_SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:rt})});
     var d=await r.json();
     if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
   }catch(e){}
 }
-refreshToken();
-setInterval(refreshToken,50*60*1000);
+refreshToken();setInterval(refreshToken,50*60*1000);
 
 async function initAuth(){
-  const t=localStorage.getItem('sb-token');
-  if(!t)return;
+  const t=localStorage.getItem('sb-token');if(!t)return;
   try{
-    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
-    });
+    const ur=await fetch(_SB_URL+'/auth/v1/user',{headers:_SBH(t)});
     const u=await ur.json();
     if(!u.id){localStorage.removeItem('sb-token');return;}
     user=u;
-    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{
-      headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+t}
-    });
+    const pr=await fetch(_SB_URL+'/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{headers:_SBH(t)});
     const pd=await pr.json();
     const prof=Array.isArray(pd)&&pd.length>0?pd[0]:null;
     const name=prof?.full_name?.split(' ')[0]||'Student';
@@ -1267,21 +1188,24 @@ async function initAuth(){
     document.getElementById('drawer-in').style.display='none';
     document.getElementById('drawer-out').style.display='';
     document.getElementById('drawer-user').textContent='Signed in as '+name;
-    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.style.display='';
-    });
-    if(isAdmin){['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});}
+    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+    if(isAdmin){
+      ['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+      const ba=document.getElementById('bot-admin');if(ba)ba.style.display='';
+    }
     const bi=document.getElementById('bot-in');
     if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
   }catch(e){console.error('initAuth error',e);}
 }
+
 async function doSignOut(){
   localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-  localStorage.removeItem('nf-favs');localStorage.removeItem('nf-listings-cache');localStorage.removeItem('nf-listings-time');
-  user=null;location.reload();
+  localStorage.removeItem('nf-favs');user=null;location.reload();
 }
+
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeDrawer();closeModal();closeGallery();}
   if(document.getElementById('gallery-ov').classList.contains('open')){if(e.key==='ArrowLeft')galleryNav(-1);if(e.key==='ArrowRight')galleryNav(1);}
@@ -1299,16 +1223,24 @@ async function load(){
   if(error||!data){emptyState();return;}
   listings=data;
   document.getElementById('stat-n').textContent=data.length;
+  // Update hero contact fee stat with range if fees vary
+  const fees=[...new Set(data.map(l=>l.contact_fee||250))];
+  if(fees.length>1){
+    const mn=Math.min(...fees),mx=Math.max(...fees);
+    document.getElementById('stat-fee').textContent='Ksh '+mn+'–'+mx;
+  }
   render(data);
 }
 
 function render(list,g){
-  g=g||document.getElementById('lg');const c=document.getElementById('res-count');
+  g=g||document.getElementById('lg');
+  const c=document.getElementById('res-count');
   if(!list.length){g.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p>No listings match your search</p></div>`;c.textContent='';return;}
   c.textContent=list.length+' listing'+(list.length!==1?'s':'')+' found';
   const favs=JSON.parse(localStorage.getItem('nf-favs')||'[]');
   g.innerHTML=list.map((l,i)=>{
     const ph=photo(l),cnt=(l.photos||[]).length||1;
+    const fee=l.contact_fee||250;
     const amen=[];
     if(l.water_included)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M12 2C8.69 2 6 4.69 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.31-2.69-6-6-6z"/></svg>Water</div>`);
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
@@ -1331,15 +1263,16 @@ function render(list,g){
     </div>
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
     <div class="lcard-foot">
-      <div class="lcard-price">Ksh ${(l.price||0).toLocaleString()}<span>/ mo</span></div>
+      <div>
+        <div class="lcard-price">Ksh ${(l.price||0).toLocaleString()}<span>/ mo</span></div>
+        <div class="lcard-fee"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>Contact: Ksh ${fee.toLocaleString()}</div>
+      </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
         <button class="wa-share" onclick="event.stopPropagation();waShareCard('${l.id}','${l.title.replace(/'/g,'')}')">
-          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Share
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Share
         </button>
         <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>
-          Get Contact
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>Get Contact
         </button>
       </div>
     </div>
@@ -1348,14 +1281,28 @@ function render(list,g){
 }
 
 function emptyState(){document.getElementById('lg').innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/></svg><p>No listings yet — check back soon</p></div>`;}
+
 function doFilter(){
   const q=document.getElementById('q').value.toLowerCase();
   const t=document.getElementById('tfilter').value;
   const maxP=parseInt(document.getElementById('priceRange')?.value||13000);
-  render(listings.filter(l=>(!q||(l.title+l.location).toLowerCase().includes(q))&&(!t||l.type===t)&&(!wOn||l.water_included)&&(!wfOn||l.wifi_available)&&(l.price<=maxP)));
+  render(listings.filter(l=>
+    (!q||(l.title+l.location).toLowerCase().includes(q))&&
+    (!t||l.type===t)&&
+    (!wOn||l.water_included)&&
+    (!wfOn||l.wifi_available)&&
+    (!availOn||l.available)&&
+    (l.price<=maxP)
+  ));
 }
 function onPriceRange(v){document.getElementById('priceLabel').textContent=parseInt(v).toLocaleString();doFilter();}
-function toggleChip(el){const f=el.dataset.f,on=el.classList.toggle('on');if(f==='water')wOn=on;if(f==='wifi')wfOn=on;doFilter();}
+function toggleChip(el){
+  const f=el.dataset.f,on=el.classList.toggle('on');
+  if(f==='water')wOn=on;
+  if(f==='wifi')wfOn=on;
+  if(f==='avail')availOn=on;
+  doFilter();
+}
 function fav(e,id){
   e.stopPropagation();
   if(!user){toast('Sign in to save favourites','err');return;}
@@ -1365,8 +1312,20 @@ function fav(e,id){
   else{favs.push(id);el.classList.add('on');toast('Saved to favourites');}
   localStorage.setItem('nf-favs',JSON.stringify(favs));
 }
+
 async function openListing(id){
   const l=listings.find(x=>x.id===id);if(!l)return;cur=l;
+  const fee=l.contact_fee||250;
+  const feeStr='Ksh '+fee.toLocaleString();
+
+  // Update all fee displays
+  const ctaPrice=document.getElementById('m-cta-price');
+  if(ctaPrice)ctaPrice.innerHTML=feeStr+'<small>One-time fee</small>';
+  const payFeeDisplay=document.getElementById('pay-fee-display');
+  if(payFeeDisplay)payFeeDisplay.textContent=feeStr;
+  const payStepFee=document.getElementById('pay-step-fee');
+  if(payStepFee)payStepFee.textContent=feeStr;
+
   ['','2'].forEach(sfx=>{
     const t=document.getElementById('m-type'+sfx);const p=document.getElementById('m-price'+sfx);
     const loc=document.getElementById('m-loc'+sfx);const st=document.getElementById('m-status'+sfx);
@@ -1393,14 +1352,27 @@ async function openListing(id){
   const descWrap=document.getElementById('m-desc-wrap');
   if(descWrap&&l.description){descWrap.textContent=l.description;descWrap.style.display='block';}
   else if(descWrap){descWrap.style.display='none';}
+
   if(user){
-    const _cp=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=id&user_id=eq.'+user.id+'&listing_id=eq.'+id+'&status=eq.confirmed&limit=1',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+    // Check for existing confirmed OR denied payment
+    const _cp=await fetch(_SB_URL+'/rest/v1/payments?select=id,status&user_id=eq.'+user.id+'&listing_id=eq.'+id+'&limit=1&order=created_at.desc',{headers:_SBH(localStorage.getItem('sb-token'))});
     const _cpd=await _cp.json();
-    const data=Array.isArray(_cpd)&&_cpd.length>0?_cpd[0]:null;
-    if(data){await showContact(id);sec('succ');openOv();return;}
+    const existingPay=Array.isArray(_cpd)&&_cpd.length>0?_cpd[0]:null;
+    if(existingPay){
+      if(existingPay.status==='confirmed'){await showContact(id,false);sec('succ');openOv();return;}
+      if(existingPay.status==='denied'){showDenied();sec('succ');openOv();return;}
+    }
   }
   sec('preview');openOv();
 }
+
+function showDenied(){
+  const denied=document.getElementById('denied-contact-box');
+  const box=document.getElementById('contact-box-wrap');
+  if(denied)denied.style.display='';
+  if(box)box.style.display='none';
+}
+
 function openOv(){document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';clearInterval(poll);const ri=document.getElementById('mpesa-ref-inp');if(ri)ri.value='';}
 function bgClose(e){if(e.target===e.currentTarget)closeModal();}
@@ -1409,49 +1381,64 @@ function sec(s){
   if(s==='preview'){if(prev)prev.classList.add('on');if(payBody)payBody.style.display='none';}
   else{if(prev)prev.classList.remove('on');if(payBody)payBody.style.display='';}
   ['pay','wait','succ'].forEach(x=>document.getElementById(x+'-sec').className=x===s?x+'-sec on':x+'-sec');
+  // Reset denied/contact box visibility when switching
+  if(s!=='succ'){
+    const denied=document.getElementById('denied-contact-box');
+    const box=document.getElementById('contact-box-wrap');
+    if(denied)denied.style.display='none';
+    if(box)box.style.display='';
+  }
 }
+
 async function submitManualPay(){
   if(!user){toast('Please sign in first','err');closeModal();setTimeout(()=>location.href='login.html',600);return;}
   const ref=document.getElementById('mpesa-ref-inp').value.trim().toUpperCase();
   if(ref.length<6){toast('Enter your M-Pesa confirmation code','err');return;}
   const btn=document.querySelector('#pay-sec .btn-gold');
   btn.disabled=true;btn.textContent='Submitting…';sec('wait');
-  const _ce=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=id,status&mpesa_ref=eq.'+encodeURIComponent(ref),{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+
+  // Check duplicate ref
+  const _ce=await fetch(_SB_URL+'/rest/v1/payments?select=id,status&mpesa_ref=eq.'+encodeURIComponent(ref),{headers:_SBH(localStorage.getItem('sb-token'))});
   const _ced=await _ce.json();
   const existing=Array.isArray(_ced)&&_ced.length>0?_ced[0]:null;
   if(existing){
-    if(existing.status==='confirmed'){await showContact(cur.id);sec('succ');toast('Payment already confirmed — contact unlocked!');btn.disabled=false;return;}
-    toast('This code was already submitted. Contact admin if not yet confirmed.','err');
-    sec('pay');btn.disabled=false;btn.textContent="I've Paid — Submit Code";return;
+    if(existing.status==='confirmed'){await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;return;}
+    if(existing.status==='denied'){showDenied();sec('succ');toast('This payment was marked invalid.','err');btn.disabled=false;return;}
+    toast('Code already submitted — admin will confirm shortly.','err');sec('pay');btn.disabled=false;btn.textContent="I've Paid — Submit Code";return;
   }
+
+  const fee=cur.contact_fee||250;
   const _pt=localStorage.getItem('sb-token');
-  const _pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments',{
+  const _pr=await fetch(_SB_URL+'/rest/v1/payments',{
     method:'POST',
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_pt,'Content-Type':'application/json','Prefer':'return=representation'},
-    body:JSON.stringify({user_id:user.id,listing_id:cur.id,phone:user.phone||'',amount:250,status:'pending',mpesa_ref:ref})
+    headers:Object.assign({},_SBH(_pt),{'Prefer':'return=representation'}),
+    body:JSON.stringify({user_id:user.id,listing_id:cur.id,phone:user.phone||'',amount:fee,status:'pending',mpesa_ref:ref})
   });
   const _pd=await _pr.json();
   const pmnt=Array.isArray(_pd)&&_pd.length>0?_pd[0]:_pd;
-  const error=_pr.ok?null:{message:JSON.stringify(_pd)};
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
-  if(error){sec('pay');toast('Could not submit: '+error.message,'err');return;}
+  if(!_pr.ok){sec('pay');toast('Could not submit: '+(pmnt.message||'Error'),'err');return;}
   payId=pmnt.id;sec('wait');toast('Code submitted! Admin will confirm shortly.');
+
   try{
     const [{data:prof},{data:lst}]=await Promise.all([
-      fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/profiles?select=full_name&id=eq.'+user.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}}).then(r=>r.json()).then(d=>{return{data:Array.isArray(d)?d[0]:d}}),
-      fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listings?select=title&id=eq.'+cur.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}}).then(r=>r.json()).then(d=>{return{data:Array.isArray(d)?d[0]:d}})
+      fetch(_SB_URL+'/rest/v1/profiles?select=full_name&id=eq.'+user.id,{headers:_SBH(_pt)}).then(r=>r.json()).then(d=>{return{data:Array.isArray(d)?d[0]:d}}),
+      fetch(_SB_URL+'/rest/v1/listings?select=title&id=eq.'+cur.id,{headers:_SBH(_pt)}).then(r=>r.json()).then(d=>{return{data:Array.isArray(d)?d[0]:d}})
     ]);
-    fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:250,payment_id:pmnt.id})}).catch(()=>{});
+    fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:fee,payment_id:pmnt.id})}).catch(()=>{});
   }catch(e){}
+
   let attempts=0;
   poll=setInterval(async()=>{
     attempts++;if(attempts>60){clearInterval(poll);return;}
-    const _pr2=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=status&id=eq.'+pmnt.id,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+    const _pr2=await fetch(_SB_URL+'/rest/v1/payments?select=status&id=eq.'+pmnt.id,{headers:_SBH(localStorage.getItem('sb-token'))});
     const _pd2=await _pr2.json();
     const data=Array.isArray(_pd2)&&_pd2.length>0?_pd2[0]:null;
-    if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id);sec('succ');}
+    if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');}
+    if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
   },5000);
 }
+
 function distFromCUK(location){
   const loc=(location||'').toLowerCase();
   const dists={karen:['karen','ngong rd','ngong road'],rongai:['rongai','kiserian'],langata:['langata'],otiende:['otiende'],dagoretti:['dagoretti','kawangware'],kikuyu:['kikuyu'],ngong:['ngong town'],kitengela:['kitengela']};
@@ -1464,21 +1451,28 @@ function waShareCard(id,title){
   const msg=encodeURIComponent('Check out this listing on NestFinder CUK: '+title+' — '+decodeURIComponent(url));
   window.open('https://wa.me/?text='+msg,'_blank');
 }
-async function showContact(lid){
+
+async function showContact(lid,showSuccSec=true){
   const _t=localStorage.getItem('sb-token');
-  const _r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/caretaker_contacts?select=caretaker_name,phone&listing_id=eq.'+lid,{
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM')}
-  });
+  const _r=await fetch(_SB_URL+'/rest/v1/caretaker_contacts?select=caretaker_name,phone&listing_id=eq.'+lid,{headers:_SBH(_t||_SB_KEY)});
   const _d=await _r.json().catch(()=>[]);
   const data=Array.isArray(_d)&&_d.length>0?_d[0]:null;
+
+  // Reset to show contact box (not denied)
+  const deniedBox=document.getElementById('denied-contact-box');
+  const contactBox=document.getElementById('contact-box-wrap');
+  if(deniedBox)deniedBox.style.display='none';
+  if(contactBox)contactBox.style.display='';
+
   if(data){
     document.getElementById('cb-name').textContent=data.caretaker_name;
     document.getElementById('cb-phone').textContent=data.phone;
     document.getElementById('cb-call').href='tel:'+data.phone;
     setWhatsApp(data.phone,data.caretaker_name);
-    sec('succ');toast('Contact unlocked!');
+    if(showSuccSec)sec('succ');
+    toast('Contact unlocked!');
     try{
-      const _rl=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listings?select=title,location&id=eq.'+lid,{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+      const _rl=await fetch(_SB_URL+'/rest/v1/listings?select=title,location&id=eq.'+lid,{headers:_SBH(localStorage.getItem('sb-token'))});
       const _dl=await _rl.json().catch(()=>[]);
       const lst=Array.isArray(_dl)&&_dl.length>0?_dl[0]:null;
       await fetch('/api/notify-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user?.id,listing_title:lst?.title||'Listing',listing_location:lst?.location||'',caretaker_name:data.caretaker_name,caretaker_phone:data.phone})}).catch(()=>{});
@@ -1487,6 +1481,7 @@ async function showContact(lid){
     document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
   }
 }
+
 function toast(msg,type=''){
   const t=document.getElementById('toast');
   t.className='toast'+(type?' '+type:'')+' show';
@@ -1494,7 +1489,7 @@ function toast(msg,type=''){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);
 }
 
-/* ── GALLERY ── */
+/* GALLERY */
 let galPhotos=[],galIdx=0,galScale=1,galX=0,galY=0;
 const MIN_SCALE=1,MAX_SCALE=4;
 function openGallery(id){
@@ -1532,32 +1527,16 @@ function clampPan(){
   const maxX=Math.max(0,(rw-sw)/2),maxY=Math.max(0,(rh-sh)/2);
   galX=Math.max(-maxX,Math.min(maxX,galX));galY=Math.max(-maxY,Math.min(maxY,galY));
 }
-function zoomStep(dir){
-  const steps=[1,1.5,2,3,4];let idx=steps.findIndex(s=>s>=galScale-0.05);
-  idx=Math.max(0,Math.min(steps.length-1,idx+dir));galScale=steps[idx];
-  if(galScale===1){galX=0;galY=0;}clampPan();applyTransform();
-}
+function zoomStep(dir){const steps=[1,1.5,2,3,4];let idx=steps.findIndex(s=>s>=galScale-0.05);idx=Math.max(0,Math.min(steps.length-1,idx+dir));galScale=steps[idx];if(galScale===1){galX=0;galY=0;}clampPan();applyTransform();}
 function resetZoom(){galScale=1;galX=0;galY=0;applyTransform();}
-function closeGallery(){
-  document.getElementById('gallery-ov').classList.remove('open');document.body.style.overflow='';resetZoom();
-  const h=document.getElementById('gallery-hint');if(h)h.style.opacity='1';
-}
-document.getElementById('gallery-stage').addEventListener('wheel',e=>{
-  e.preventDefault();const delta=e.deltaY>0?-0.15:0.15;
-  galScale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,galScale+delta));
-  if(galScale===1){galX=0;galY=0;}clampPan();applyTransform();
-},{passive:false});
+function closeGallery(){document.getElementById('gallery-ov').classList.remove('open');document.body.style.overflow='';resetZoom();const h=document.getElementById('gallery-hint');if(h)h.style.opacity='1';}
+document.getElementById('gallery-stage').addEventListener('wheel',e=>{e.preventDefault();const delta=e.deltaY>0?-0.15:0.15;galScale=Math.max(MIN_SCALE,Math.min(MAX_SCALE,galScale+delta));if(galScale===1){galX=0;galY=0;}clampPan();applyTransform();},{passive:false});
 (()=>{
   let dragging=false,lastX=0,lastY=0;const stage=document.getElementById('gallery-stage');
   stage.addEventListener('mousedown',e=>{if(galScale<=1)return;dragging=true;lastX=e.clientX;lastY=e.clientY;stage.style.cursor='grabbing';});
   window.addEventListener('mousemove',e=>{if(!dragging)return;galX+=e.clientX-lastX;galY+=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;clampPan();applyTransform();});
   window.addEventListener('mouseup',()=>{dragging=false;document.getElementById('gallery-stage').style.cursor='';});
-  stage.addEventListener('dblclick',e=>{
-    if(galScale>1){resetZoom();}else{
-      galScale=2.5;const rect=stage.getBoundingClientRect();
-      galX=(rect.width/2-(e.clientX-rect.left))*0.8;galY=(rect.height/2-(e.clientY-rect.top))*0.8;clampPan();
-    }applyTransform();
-  });
+  stage.addEventListener('dblclick',e=>{if(galScale>1){resetZoom();}else{galScale=2.5;const rect=stage.getBoundingClientRect();galX=(rect.width/2-(e.clientX-rect.left))*0.8;galY=(rect.height/2-(e.clientY-rect.top))*0.8;clampPan();}applyTransform();});
 })();
 (()=>{
   const stage=document.getElementById('gallery-stage');
@@ -1575,17 +1554,17 @@ document.getElementById('gallery-stage').addEventListener('wheel',e=>{
   stage.addEventListener('touchend',e=>{if(moved)return;const dx=e.changedTouches[0].clientX-swipeStartX;if(Math.abs(dx)>50&&galScale<=1){galleryNav(dx<0?1:-1);}},{passive:true});
 })();
 
-/* ── RATINGS ── */
+/* RATINGS */
 let ratings={};
 async function loadRatings(){
-  const _rrat=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews?select=listing_id,rating',{headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+localStorage.getItem('sb-token')}});
+  const _rrat=await fetch(_SB_URL+'/rest/v1/reviews?select=listing_id,rating',{headers:_SBH(localStorage.getItem('sb-token'))});
   const data=await _rrat.json().catch(()=>[]);if(!data)return;
   ratings={};
   data.forEach(r=>{if(!ratings[r.listing_id])ratings[r.listing_id]={sum:0,count:0};ratings[r.listing_id].sum+=r.rating;ratings[r.listing_id].count++;});
   Object.keys(ratings).forEach(id=>{ratings[id].avg=ratings[id].sum/ratings[id].count;});
 }
 
-/* ── FAVOURITES ── */
+/* FAVOURITES */
 function showFavs(){
   if(!user){toast('Sign in to view your saved listings','err');return;}
   const favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
@@ -1598,7 +1577,7 @@ function showFavs(){
 }
 function hideFavs(){document.getElementById('favs-page').classList.remove('on');document.getElementById('main-listings').classList.remove('hidden');}
 
-/* ── SHARE ── */
+/* SHARE */
 function shareCard(e,id){e.stopPropagation();const l=listings.find(x=>x.id===id);if(!l)return;doShare(l);}
 function shareCurrentListing(){if(cur)doShare(cur);}
 function doShare(l){
@@ -1612,7 +1591,7 @@ function doShare(l){
   if(lid){const tryOpen=()=>{if(listings.length){openListing(lid);}else{setTimeout(tryOpen,300);}};setTimeout(tryOpen,500);}
 })();
 
-/* ── WHATSAPP ── */
+/* WHATSAPP */
 function setWhatsApp(phone,name){
   const clean=phone.replace(/\D/g,'');
   const intl=clean.startsWith('0')?'254'+clean.slice(1):clean.startsWith('254')?clean:'254'+clean;
@@ -1620,14 +1599,12 @@ function setWhatsApp(phone,name){
   document.getElementById('cb-wa').href=`https://wa.me/${intl}?text=${msg}`;
 }
 
-/* ── REVIEWS ── */
+/* REVIEWS */
 let pickedStar=0;
 function pickStar(v){pickedStar=v;document.querySelectorAll('.star-pick').forEach((el,i)=>{el.classList.toggle('on',i<v);});}
 async function loadReviews(lid){
   const _t=localStorage.getItem('sb-token');
-  const _rr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+(_t||'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM'),'Accept':'application/json'}
-  });
+  const _rr=await fetch(_SB_URL+'/rest/v1/reviews?select=*,profiles(full_name)&listing_id=eq.'+lid+'&order=created_at.desc',{headers:_SBH(_t||_SB_KEY)});
   const data=await _rr.json().catch(()=>[]);
   const list=document.getElementById('review-list');const avgEl=document.getElementById('avg-rating');
   if(!data||!data.length){list.innerHTML='<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.75rem">No reviews yet — be the first!</div>';avgEl.style.display='none';return;}
@@ -1643,20 +1620,16 @@ async function submitReview(){
   if(!user){toast('Sign in to leave a review','err');return;}
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
-  const _t3=localStorage.getItem('sb-token');
-  const _rs=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/reviews',{
+  const _rs=await fetch(_SB_URL+'/rest/v1/reviews',{
     method:'POST',
-    headers:{'apikey':'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM','Authorization':'Bearer '+_t3,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    headers:Object.assign({},_SBH(localStorage.getItem('sb-token')),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
     body:JSON.stringify({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment})
   });
-  const error=_rs.ok?null:{message:'Review failed ('+_rs.status+')'};
-  if(error){toast('Review failed: '+error.message,'err');return;}
+  if(!_rs.ok){toast('Review failed ('+_rs.status+')','err');return;}
   toast('Review submitted — thank you!');
   document.getElementById('review-txt').value='';pickedStar=0;
   document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
   loadReviews(cur.id);
-  if(!ratings[cur.id])ratings[cur.id]={sum:0,count:0,avg:0};
-  ratings[cur.id].count++;ratings[cur.id].sum+=pickedStar;ratings[cur.id].avg=ratings[cur.id].sum/ratings[cur.id].count;
 }
 
 initAuth();load();loadRatings();
@@ -1664,10 +1637,7 @@ initAuth();load();loadRatings();
 
 <!-- PWA INSTALL BANNER -->
 <div id="pwa-banner">
-  <div id="pwa-banner-txt">
-    <strong>Install NestFinder CUK</strong>
-    Add to your home screen or desktop for quick access
-  </div>
+  <div id="pwa-banner-txt"><strong>Install NestFinder CUK</strong>Add to your home screen for quick access</div>
   <button id="pwa-install-btn" onclick="installPWA()">Install App</button>
   <button id="pwa-dismiss" onclick="dismissPWA()" title="Dismiss">✕</button>
 </div>
@@ -1679,7 +1649,7 @@ window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault();deferredPrompt=e;
   setTimeout(()=>{if(deferredPrompt&&!localStorage.getItem('pwa-dismissed'))document.getElementById('pwa-banner').classList.add('show');},8000);
 });
-function installPWA(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{document.getElementById('pwa-banner').classList.remove('show');deferredPrompt=null;});}
+function installPWA(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{document.getElementById('pwa-banner').classList.remove('show');deferredPrompt=null;});}
 function dismissPWA(){document.getElementById('pwa-banner').classList.remove('show');localStorage.setItem('pwa-dismissed','1');}
 window.addEventListener('appinstalled',()=>{document.getElementById('pwa-banner').classList.remove('show');deferredPrompt=null;});
 
@@ -1723,8 +1693,7 @@ async function submitReport(){
       <label class="r-label">Additional details (optional)</label>
       <textarea class="r-textarea" id="reportDetails" placeholder="Describe what you experienced…"></textarea>
       <button class="r-submit" id="reportSubmitBtn" onclick="submitReport()">
-        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-        Submit Report
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Submit Report
       </button>
     </div>
     <div id="reportDone" class="r-done" style="display:none">
