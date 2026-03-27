@@ -41,6 +41,11 @@ svg{display:block;flex-shrink:0;}
 .denied-sub{font-size:.82rem;color:rgba(255,255,255,.4);max-width:320px;line-height:1.7;font-weight:300;}
 .denied-btn{margin-top:1.5rem;display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:var(--gold);color:#fff;border-radius:2px;text-decoration:none;font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;transition:background var(--t);}
 .denied-btn:hover{background:var(--gold-l);}
+
+/* ── SIDEBAR OVERLAY (mobile) ── */
+.sidebar-overlay{display:none;position:fixed;inset:0;z-index:49;background:rgba(14,11,7,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.sidebar-overlay.show{display:block;}
+
 .sidebar{width:var(--sidebar);flex-shrink:0;background:var(--dark);position:fixed;top:0;left:0;height:100dvh;display:flex;flex-direction:column;border-right:1px solid rgba(184,149,90,.08);z-index:50;}
 .sb-logo{padding:1.75rem 1.5rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);}
 .sb-logo-row{display:flex;align-items:center;gap:10px;}
@@ -89,10 +94,10 @@ svg{display:block;flex-shrink:0;}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
 .sec-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--dark);}
 .sec-sub{font-size:.72rem;color:var(--muted);font-weight:300;margin-top:.2rem;}
-.tbl-wrap{border:1px solid var(--border);background:var(--cream);}
-table{width:100%;border-collapse:collapse;}
+.tbl-wrap{border:1px solid var(--border);background:var(--cream);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:500px;}
 thead tr{background:var(--dark);}
-th{padding:.75rem 1rem;text-align:left;font-size:.58rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);}
+th{padding:.75rem 1rem;text-align:left;font-size:.58rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);white-space:nowrap;}
 td{padding:.9rem 1rem;font-size:.82rem;border-top:1px solid var(--border);vertical-align:middle;}
 tr:hover td{background:var(--linen);}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.62rem;font-weight:500;letter-spacing:.04em;}
@@ -100,16 +105,19 @@ tr:hover td{background:var(--linen);}
 .badge-ok{background:var(--green-l);color:var(--green-d);}.badge-ok::before{background:var(--green);}
 .badge-pending{background:var(--amber-l);color:var(--amber);}.badge-pending::before{background:var(--amber);}
 .badge-failed{background:var(--red-l);color:var(--red);}.badge-failed::before{background:var(--red);}
+.badge-denied{background:#F4E4E4;color:#8B1A1A;}.badge-denied::before{background:#C0392B;}
 .badge-single{background:var(--linen);color:var(--ink);border:1px solid var(--border2);}
 .badge-bedsitter{background:var(--amber-l);color:var(--amber);}
 .badge-one{background:#EBF4FB;color:#1A5276;}
 .badge-admin{background:rgba(184,149,90,.1);color:var(--gold);}
 .badge-student{background:var(--linen);color:var(--muted);border:1px solid var(--border);}
-.act{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:2px;font-size:.65rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all var(--t);border:1px solid;}
+.act{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:2px;font-size:.62rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all var(--t);border:1px solid;white-space:nowrap;}
 .act svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
 .act-edit{background:transparent;border-color:var(--border2);color:var(--ink);}.act-edit:hover{border-color:var(--gold);color:var(--gold);}
 .act-del{background:transparent;border-color:rgba(192,57,43,.2);color:var(--red);}.act-del:hover{background:var(--red-l);}
 .act-confirm{background:var(--green);color:#fff;border-color:var(--green);}.act-confirm:hover{background:var(--green-d);}
+.act-deny{background:transparent;border-color:rgba(192,57,43,.3);color:var(--red);}.act-deny:hover{background:var(--red-l);}
+.act-restore{background:transparent;border-color:rgba(29,158,117,.3);color:var(--green-d);}.act-restore:hover{background:var(--green-l);}
 .thumbs{display:flex;gap:3px;}
 .thumb-sm{width:32px;height:32px;border-radius:1px;overflow:hidden;background:var(--linen);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
 .thumb-sm img{width:100%;height:100%;object-fit:cover;}
@@ -137,6 +145,7 @@ tr:hover td{background:var(--linen);}
 .f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,149,90,.1);}
 .f-group textarea{resize:vertical;min-height:80px;font-size:.84rem;}
 .f-group select{appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8070'/%3E%3C/svg%3E") right 12px center no-repeat;cursor:pointer;}
+.f-hint{font-size:.64rem;color:var(--muted);margin-top:.3rem;font-weight:300;}
 .checks{display:flex;gap:1.5rem;margin-bottom:1.1rem;flex-wrap:wrap;}
 .check-label{display:flex;align-items:center;gap:.5rem;font-size:.78rem;cursor:pointer;color:var(--ink);}
 .check-label input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;}
@@ -169,19 +178,37 @@ tr:hover td{background:var(--linen);}
 .bar{width:100%;background:linear-gradient(180deg,var(--gold-l),var(--gold));border-radius:1px 1px 0 0;transition:height .6s var(--ease);min-height:2px;}
 .bar-day{font-size:.55rem;color:var(--muted);letter-spacing:.04em;}
 .bar-amt{font-size:.58rem;color:var(--gold);font-weight:500;}
-.recent-wrap{border:1px solid var(--border);background:var(--cream);margin-top:1px;}
+.recent-wrap{border:1px solid var(--border);background:var(--cream);margin-top:1px;overflow-x:auto;}
+.actions-cell{display:flex;gap:.35rem;flex-wrap:wrap;align-items:center;}
+
+/* ── MOBILE ── */
 @media(max-width:900px){
   :root{--sidebar:0px;}
-  .sidebar{transform:translateX(-100%);transition:transform .3s var(--ease);}
+  .sidebar{transform:translateX(-100%);transition:transform .3s var(--ease);width:260px;}
   .sidebar.open{transform:translateX(0);}
-  .topbar{padding:0 1.25rem;}
-  .content{padding:1.5rem 1rem;}
-  .stats-grid{grid-template-columns:1fr 1fr;}
+  .topbar{padding:0 1rem;}
+  .topbar-pill{display:none;}
+  .content{padding:1.25rem .875rem;}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:1px;}
+  .stat-card{padding:1rem;}
+  .stat-val{font-size:1.75rem;}
   .form-row{grid-template-columns:1fr;}
   .ham-btn{display:flex!important;}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:.5rem;}
+  table{min-width:420px;}
+  td,th{padding:.65rem .75rem;}
+}
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .stat-card{padding:.875rem;}
+  .stat-val{font-size:1.5rem;}
+  .content{padding:1rem .75rem;}
+  .topbar{height:54px;}
+  .topbar-title{font-size:1.15rem;}
 }
 @media(min-width:901px){.ham-btn{display:none!important;}}
-.ham-btn{display:none;background:none;border:1px solid var(--border2);width:36px;height:36px;align-items:center;justify-content:center;cursor:pointer;}
+.ham-btn{display:none;background:none;border:1px solid var(--border2);width:38px;height:38px;align-items:center;justify-content:center;cursor:pointer;border-radius:2px;transition:border-color var(--t);}
+.ham-btn:hover{border-color:var(--gold);}
 .ham-btn svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.8;}
 </style>
 <script>
@@ -240,8 +267,7 @@ function _q(table){
     },
     upsert:function(data){
       var t=localStorage.getItem('sb-token');
-      var pref='resolution=merge-duplicates,return=representation';
-      return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
+      return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(data)})
         .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
       }).catch(function(e){return{data:null,error:e};});
     },
@@ -305,6 +331,9 @@ window.sb={
   </div>
 </div>
 
+<!-- Mobile sidebar overlay — tap to close -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo">
     <div class="sb-logo-row">
@@ -332,7 +361,9 @@ window.sb={
 <main class="main">
   <div class="topbar">
     <div class="topbar-left">
-      <button class="ham-btn" onclick="toggleSidebar()"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <button class="ham-btn" id="hamBtn" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div class="topbar-title" id="pageTitle">Dashboard</div>
       <div class="topbar-pill">NestFinder CUK</div>
     </div>
@@ -357,12 +388,12 @@ window.sb={
     <!-- LISTINGS -->
     <div class="page" id="page-listings">
       <div class="sec-head"><div><div class="sec-title">House Listings</div><div class="sec-sub" id="listingCount">—</div></div></div>
-      <div class="tbl-wrap"><table><thead><tr><th>Photos</th><th>Listing</th><th>Type</th><th>Price</th><th>Available</th><th>Actions</th></tr></thead><tbody id="listingsBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Photos</th><th>Listing</th><th>Type</th><th>Rent</th><th>Contact Fee</th><th>Available</th><th>Actions</th></tr></thead><tbody id="listingsBody"><tr class="empty-row"><td colspan="7">Loading…</td></tr></tbody></table></div>
     </div>
 
     <!-- PAYMENTS -->
     <div class="page" id="page-payments">
-      <div class="sec-head"><div><div class="sec-title">All Payments</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">All Payments</div><div class="sec-sub">Confirm genuine payments · Deny fake ones to revoke contact access</div></div></div>
       <div class="tbl-wrap"><table><thead><tr><th>Student</th><th>Phone</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="paymentsBody"><tr class="empty-row"><td colspan="8">Loading…</td></tr></tbody></table></div>
     </div>
 
@@ -394,9 +425,18 @@ window.sb={
         <div class="f-group"><label>Type</label><select id="fType"><option value="single">Single Room</option><option value="bedsitter">Bedsitter</option><option value="one-bedroom">One Bedroom</option></select></div>
       </div>
       <div class="form-row">
-        <div class="f-group"><label>Monthly Price (Ksh)</label><input type="number" id="fPrice" placeholder="e.g. 8500"/></div>
-        <div class="f-group"><label>Location</label><input id="fLoc" placeholder="e.g. Karen Road, 10 min walk"/></div>
+        <div class="f-group">
+          <label>Monthly Rent (Ksh)</label>
+          <input type="number" id="fPrice" placeholder="e.g. 8500"/>
+          <div class="f-hint">The monthly rent for this listing.</div>
+        </div>
+        <div class="f-group">
+          <label>Contact Fee (Ksh)</label>
+          <input type="number" id="fContactFee" placeholder="e.g. 250" value="250"/>
+          <div class="f-hint">One-time fee to unlock caretaker contacts.</div>
+        </div>
       </div>
+      <div class="f-group"><label>Location</label><input id="fLoc" placeholder="e.g. Karen Road, 10 min walk"/></div>
       <div class="f-group"><label>Description</label><textarea id="fDesc" placeholder="Describe the house, surroundings, condition…"></textarea></div>
       <div class="checks">
         <label class="check-label"><input type="checkbox" id="fWater"/> Water included</label>
@@ -406,9 +446,6 @@ window.sb={
       <div class="form-row">
         <div class="f-group"><label>Caretaker Name</label><input id="fCtName" placeholder="e.g. Mama Wanjiku"/></div>
         <div class="f-group"><label>Caretaker Phone</label><input id="fCtPhone" placeholder="07XXXXXXXX"/></div>
-      </div>
-      <div class="form-row">
-        <div class="f-group"><label>Contact Fee (Ksh)</label><input type="number" id="fContactFee" placeholder="e.g. 250" value="250"/></div>
       </div>
       <div class="f-group">
         <label>House Photos (max 6)</label>
@@ -436,6 +473,7 @@ window.sb={
 const _B=window.SB_URL,_K=window.SB_KEY,_H=window.SB_H;
 let pendingPhotos=[],existingPhotos=[];
 
+/* ── TOKEN REFRESH ── */
 async function refreshToken(){
   var rt=localStorage.getItem('sb-refresh');if(!rt)return;
   try{
@@ -446,6 +484,7 @@ async function refreshToken(){
 }
 refreshToken();setInterval(refreshToken,50*60*1000);
 
+/* ── AUTH ── */
 async function init(){
   const t=localStorage.getItem('sb-token');
   if(!t){window.location.href='login.html';return;}
@@ -462,9 +501,21 @@ async function init(){
     loadDashboard();
   }catch(e){window.location.href='login.html';}
 }
-
 async function doSignOut(){localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');window.location.href='login.html';}
 
+/* ── SIDEBAR (mobile) ── */
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const o=document.getElementById('sidebarOverlay');
+  const open=s.classList.toggle('open');
+  o.classList.toggle('show',open);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+/* ── NAVIGATION ── */
 const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students',reports:'Reports'};
 const actions={
   listings:`<button class="topbar-btn tbtn-gold" onclick="openModal()"><svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Listing</button>`,
@@ -478,13 +529,14 @@ function goto(name,btn){
   if(btn)btn.classList.add('on');
   document.getElementById('pageTitle').textContent=titles[name]||name;
   document.getElementById('topbarActions').innerHTML=actions[name]||'';
-  document.getElementById('sidebar').classList.remove('open');
+  closeSidebar();
   if(name==='listings')loadListings();
   if(name==='payments')loadPayments();
   if(name==='students')loadStudents();
   if(name==='reports')loadReports();
 }
 
+/* ── TOAST ── */
 let toastTimer;
 function toast(msg,err=false){
   const t=document.getElementById('toast');
@@ -494,7 +546,7 @@ function toast(msg,err=false){
   toastTimer=setTimeout(()=>t.className='toast',3200);
 }
 
-// ── DASHBOARD ──
+/* ── DASHBOARD ── */
 async function loadDashboard(){
   const [l,p,u]=await Promise.all([
     sb.from('listings').select('id,available',{count:'exact'}),
@@ -512,7 +564,14 @@ async function loadDashboard(){
   const {data:rp}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(8);
   const rb=document.getElementById('recentBody');
   if(!rp?.length){rb.innerHTML='<tr class="empty-row"><td colspan="6">No payments yet.</td></tr>';return;}
-  rb.innerHTML=rp.map(p=>`<tr><td>${p.profiles?.full_name||'—'}</td><td style="max-width:160px;font-size:.78rem;">${p.listings?.title||'—'}</td><td>Ksh ${(p.amount||250).toLocaleString()}</td><td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td><td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='pending'?'pending':'failed'}">${p.status}</span></td><td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td></tr>`).join('');
+  rb.innerHTML=rp.map(p=>`<tr>
+    <td>${p.profiles?.full_name||'—'}</td>
+    <td style="max-width:160px;font-size:.78rem;">${p.listings?.title||'—'}</td>
+    <td>Ksh ${(p.amount||250).toLocaleString()}</td>
+    <td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td>
+    <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='denied'?'denied':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
+    <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+  </tr>`).join('');
 }
 function buildChart(confirmed){
   const bars=document.getElementById('chartBars');
@@ -522,22 +581,23 @@ function buildChart(confirmed){
   bars.innerHTML=days.map((d,i)=>`<div class="bar-col"><div class="bar-amt">${totals[i]?'Ksh'+totals[i]:''}</div><div class="bar" style="height:${Math.round((totals[i]/max)*70)+2}px"></div><div class="bar-day">${d.toLocaleDateString('en-KE',{weekday:'short'})}</div></div>`).join('');
 }
 
-// ── LISTINGS ──
+/* ── LISTINGS ── */
 async function loadListings(){
   const {data}=await sb.from('listings').select('*').order('created_at',{ascending:false});
   document.getElementById('listingCount').textContent=(data?.length||0)+' total listings';
   const tb=document.getElementById('listingsBody');
-  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="6">No listings yet. Add your first one.</td></tr>';return;}
+  if(!data?.length){tb.innerHTML='<tr class="empty-row"><td colspan="7">No listings yet. Add your first one.</td></tr>';return;}
   tb.innerHTML=data.map(h=>`<tr>
     <td><div class="thumbs">${(h.photos||[]).slice(0,3).map(u=>`<div class="thumb-sm"><img src="${u}" onerror="this.style.display='none'"/></div>`).join('')}${!(h.photos||[]).length?`<div class="thumb-sm"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`:''}</div></td>
     <td><div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--dark);margin-bottom:.15rem;">${h.title}</div><div style="font-size:.72rem;color:var(--muted);">${h.location}</div></td>
     <td><span class="badge badge-${h.type==='one-bedroom'?'one':h.type}">${h.type.replace('-',' ')}</span></td>
-    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;">Ksh ${h.price.toLocaleString()}</td>
+    <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;">Ksh ${(h.price||0).toLocaleString()}</td>
+    <td><span style="font-family:'Cormorant Garamond',serif;font-size:1rem;">Ksh ${(h.contact_fee||250).toLocaleString()}</span></td>
     <td><label class="avail-toggle" onclick="toggleAvail('${h.id}',${!h.available},this)"><div class="toggle-track${h.available?' on':''}"><div class="toggle-knob"></div></div><span>${h.available?'Available':'Taken'}</span></label></td>
-    <td style="display:flex;gap:.4rem;flex-wrap:wrap;">
+    <td><div class="actions-cell">
       <button class="act act-edit" onclick="editListing('${h.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</button>
       <button class="act act-del" onclick="delListing('${h.id}','${h.title.replace(/'/g,'')}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>Del</button>
-    </td>
+    </div></td>
   </tr>`).join('');
 }
 
@@ -547,7 +607,6 @@ async function toggleAvail(id,newVal,label){
   label.querySelector('span').textContent=newVal?'Available':'Taken';
   toast(newVal?'Marked as available':'Marked as taken');
 }
-
 async function delListing(id,title){
   if(!confirm(`Delete "${title}"? This cannot be undone.`))return;
   const {error}=await sb.from('listings').delete().eq('id',id);
@@ -555,7 +614,7 @@ async function delListing(id,title){
   toast('Listing deleted');loadListings();
 }
 
-// ── PAYMENTS ──
+/* ── PAYMENTS ── */
 async function loadPayments(){
   const {data}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
   const tb=document.getElementById('paymentsBody');
@@ -566,15 +625,37 @@ async function loadPayments(){
     <td style="font-size:.78rem;max-width:140px;">${p.listings?.title||'—'}</td>
     <td>Ksh ${(p.amount||250).toLocaleString()}</td>
     <td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td>
-    <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
+    <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='denied'?'denied':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
     <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
-    <td>${p.status==='pending'?`<button class="act act-confirm" onclick="confirmPay('${p.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Confirm</button>`:'—'}</td>
+    <td><div class="actions-cell">
+      ${p.status==='pending'?`<button class="act act-confirm" onclick="confirmPay('${p.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Confirm</button>`:''}
+      ${p.status==='pending'||p.status==='confirmed'?`<button class="act act-deny" onclick="denyPay('${p.id}','${(p.profiles?.full_name||'').replace(/'/g,'')}','${(p.listings?.title||'').replace(/'/g,'')}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Deny</button>`:''}
+      ${p.status==='denied'?`<button class="act act-restore" onclick="restorePay('${p.id}')"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>Restore</button>`:''}
+      ${p.status==='confirmed'?'<span style="font-size:.7rem;color:var(--green-d);">✓ Access granted</span>':''}
+      ${p.status==='denied'?'<span style="font-size:.7rem;color:var(--red);">✕ Access revoked</span>':''}
+    </div></td>
   </tr>`).join('');
 }
 
 async function confirmPay(id){
   await sb.from('payments').update({status:'confirmed'}).eq('id',id);
-  toast('Payment confirmed ✓');loadPayments();
+  toast('Payment confirmed — contact access granted ✓');
+  loadPayments();
+}
+
+async function denyPay(id,studentName,listingTitle){
+  const reason=studentName?`Mark payment by ${studentName} for "${listingTitle}" as FAKE and revoke their contact access?`:'Mark this payment as fake and revoke contact access?';
+  if(!confirm(reason+'\n\nThis will prevent the student from viewing caretaker contacts.'))return;
+  await sb.from('payments').update({status:'denied'}).eq('id',id);
+  toast('Payment denied — contact access revoked',true);
+  loadPayments();
+}
+
+async function restorePay(id){
+  if(!confirm('Restore this payment and re-grant contact access?'))return;
+  await sb.from('payments').update({status:'confirmed'}).eq('id',id);
+  toast('Payment restored — contact access re-granted ✓');
+  loadPayments();
 }
 
 function exportCSV(){
@@ -587,7 +668,7 @@ function exportCSV(){
   a.download='nestfinder-payments-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
-// ── STUDENTS ──
+/* ── STUDENTS ── */
 async function loadStudents(){
   const {data}=await sb.from('profiles').select('*').order('created_at',{ascending:false});
   const tb=document.getElementById('studentsBody');
@@ -600,14 +681,13 @@ async function loadStudents(){
     <td>${u.role!=='admin'?`<button class="act act-edit" onclick="makeAdmin('${u.id}')">Make Admin</button>`:'<span style="font-size:.72rem;color:var(--muted);">Admin</span>'}</td>
   </tr>`).join('');
 }
-
 async function makeAdmin(id){
   if(!confirm('Grant admin access to this user?'))return;
   await sb.from('profiles').update({role:'admin'}).eq('id',id);
   toast('User is now an admin');loadStudents();
 }
 
-// ── REPORTS ──
+/* ── REPORTS ── */
 async function loadReports(){
   const {data}=await sb.from('reports').select('*,listings(title)').order('created_at',{ascending:false});
   const tb=document.getElementById('reportsBody');
@@ -618,11 +698,11 @@ async function loadReports(){
     <td style="font-size:.78rem;color:var(--muted);max-width:200px;">${r.details||'—'}</td>
     <td><span class="badge ${r.status==='resolved'?'badge-ok':r.status==='reviewed'?'badge-pending':'badge-failed'}">${r.status}</span></td>
     <td style="font-size:.75rem;">${new Date(r.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
-    <td style="display:flex;gap:.35rem;flex-wrap:wrap;">
+    <td><div class="actions-cell">
       ${r.status==='open'?`<button class="act act-edit" onclick="updateReport('${r.id}','reviewed')">Review</button>`:''}
       ${r.status!=='resolved'?`<button class="act act-confirm" onclick="updateReport('${r.id}','resolved')">Resolve</button>`:''}
       ${r.status==='resolved'?'<span style="font-size:.72rem;color:var(--muted);">Done</span>':''}
-    </td>
+    </div></td>
   </tr>`).join('');
 }
 async function updateReport(id,status){
@@ -631,9 +711,10 @@ async function updateReport(id,status){
   loadReports();
 }
 
-// ── LISTING MODAL ──
+/* ── LISTING MODAL ── */
 function openModal(){
   ['fTitle','fPrice','fLoc','fDesc','fCtName','fCtPhone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fContactFee').value='250';
   document.getElementById('fType').value='single';
   document.getElementById('fWater').checked=false;
   document.getElementById('fWifi').checked=false;
@@ -648,27 +729,23 @@ function openModal(){
 }
 
 async function editListing(id){
-  // ── fetch listing ──
   const lr=await fetch(_B+'/rest/v1/listings?select=*&id=eq.'+id,{headers:_H(localStorage.getItem('sb-token'))});
   const ld=await lr.json();
   const h=Array.isArray(ld)?ld[0]:ld;
   if(!h){toast('Could not load listing',true);return;}
-
-  // ── fetch caretaker — use array not .single() to avoid 406 when missing ──
   const cr=await fetch(_B+'/rest/v1/caretaker_contacts?select=*&listing_id=eq.'+id,{headers:_H(localStorage.getItem('sb-token'))});
   const cd=await cr.json();
   const ct=Array.isArray(cd)&&cd.length>0?cd[0]:null;
-
   document.getElementById('editId').value=id;
   document.getElementById('fTitle').value=h.title||'';
   document.getElementById('fType').value=h.type||'single';
   document.getElementById('fPrice').value=h.price||'';
+  document.getElementById('fContactFee').value=h.contact_fee||250;
   document.getElementById('fLoc').value=h.location||'';
   document.getElementById('fDesc').value=h.description||'';
   document.getElementById('fWater').checked=!!h.water_included;
   document.getElementById('fWifi').checked=!!h.wifi_available;
   document.getElementById('fAvail').checked=h.available!==false;
-  document.getElementById('fContactFee').value=h.contact_fee||250;
   document.getElementById('fCtName').value=ct?.caretaker_name||'';
   document.getElementById('fCtPhone').value=ct?.phone||'';
   document.getElementById('modalTitle').textContent='Edit Listing';
@@ -701,6 +778,7 @@ function showFErr(msg){const e=document.getElementById('fErr');e.textContent=msg
 async function saveListing(){
   const title=document.getElementById('fTitle').value.trim();
   const price=parseInt(document.getElementById('fPrice').value);
+  const contactFee=parseInt(document.getElementById('fContactFee').value)||250;
   const location=document.getElementById('fLoc').value.trim();
   const ctName=document.getElementById('fCtName').value.trim();
   const ctPhone=document.getElementById('fCtPhone').value.trim();
@@ -714,7 +792,6 @@ async function saveListing(){
   document.getElementById('saveTxt').textContent='Saving…';
   document.getElementById('fErr').className='f-err';
 
-  // Upload new photos
   const urls=[...existingPhotos];
   for(const f of pendingPhotos){
     const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
@@ -724,9 +801,12 @@ async function saveListing(){
   }
 
   const payload={
-    title,type:document.getElementById('fType').value,price,location,
+    title,
+    type:document.getElementById('fType').value,
+    price,
+    contact_fee:contactFee,
+    location,
     description:document.getElementById('fDesc').value.trim(),
-    contact_fee:parseInt(document.getElementById('fContactFee').value)||250,
     water_included:document.getElementById('fWater').checked,
     wifi_available:document.getElementById('fWifi').checked,
     available:document.getElementById('fAvail').checked,
@@ -737,7 +817,6 @@ async function saveListing(){
   let lid=editId;
 
   if(editId){
-    // UPDATE existing listing
     const r=await fetch(_B+'/rest/v1/listings?id=eq.'+editId,{
       method:'PATCH',
       headers:Object.assign({},_H(localStorage.getItem('sb-token')),{'Prefer':'return=representation'}),
@@ -745,7 +824,6 @@ async function saveListing(){
     });
     if(!r.ok){const d=await r.json();showFErr(d.message||'Update failed.');resetSave();return;}
   } else {
-    // INSERT new listing
     const r=await fetch(_B+'/rest/v1/listings',{
       method:'POST',
       headers:Object.assign({},_H(localStorage.getItem('sb-token')),{'Prefer':'return=representation'}),
@@ -756,21 +834,17 @@ async function saveListing(){
     lid=(Array.isArray(d)?d[0]:d).id;
   }
 
-  // ── CARETAKER UPSERT ──
-  // Check if caretaker exists for this listing (use array fetch, not .single())
+  // Caretaker upsert
   const cr=await fetch(_B+'/rest/v1/caretaker_contacts?select=id&listing_id=eq.'+lid,{headers:_H(localStorage.getItem('sb-token'))});
   const cd=await cr.json();
   const existingContact=Array.isArray(cd)&&cd.length>0?cd[0]:null;
-
   if(existingContact){
-    // PATCH using the contact's own id — not listing_id — to avoid ambiguity
     await fetch(_B+'/rest/v1/caretaker_contacts?id=eq.'+existingContact.id,{
       method:'PATCH',
       headers:Object.assign({},_H(localStorage.getItem('sb-token')),{'Prefer':'return=minimal'}),
       body:JSON.stringify({caretaker_name:ctName,phone:ctPhone})
     });
   } else {
-    // INSERT new caretaker contact
     await fetch(_B+'/rest/v1/caretaker_contacts',{
       method:'POST',
       headers:Object.assign({},_H(localStorage.getItem('sb-token')),{'Prefer':'return=minimal'}),
