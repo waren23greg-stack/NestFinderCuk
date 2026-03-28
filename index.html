@@ -571,6 +571,21 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .fee-row{flex-direction:column;gap:.2rem;align-items:flex-start}
   .fee-note{text-align:left;max-width:100%}
 }
+.promo-box{background:var(--linen);border:1px solid var(--border2);padding:1rem 1.25rem;margin-top:1rem;border-radius:2px}
+.promo-box-label{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
+.promo-code-row{display:flex;align-items:center;gap:8px}
+.promo-code-val{font-family:"Cormorant Garamond",serif;font-size:1.35rem;color:var(--dark);letter-spacing:.12em;flex:1}
+.promo-copy-btn{background:var(--dark);color:#fff;border:none;padding:7px 14px;font-family:"Jost",sans-serif;font-size:.65rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--t);border-radius:2px;flex-shrink:0}
+.promo-copy-btn:hover{background:var(--gold)}
+.promo-sub{font-size:.68rem;color:var(--muted);margin-top:.5rem;line-height:1.55}
+.promo-input-wrap{margin-top:.75rem;display:flex;gap:8px}
+.promo-input{flex:1;height:44px;padding:0 .9rem;background:#fff;border:1px solid var(--border2);font-family:"Jost",sans-serif;font-size:.88rem;color:var(--dark);outline:none;letter-spacing:.08em;text-transform:uppercase;transition:border-color var(--t);border-radius:2px}
+.promo-input:focus{border-color:var(--gold)}
+.promo-apply-btn{height:44px;padding:0 16px;background:var(--gold);color:#fff;border:none;font-family:"Jost",sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background var(--t);border-radius:2px;white-space:nowrap;flex-shrink:0}
+.promo-apply-btn:hover{background:var(--gold-l)}
+.promo-apply-btn:disabled{opacity:.6;cursor:not-allowed}
+.promo-divider{display:flex;align-items:center;gap:.75rem;margin:.9rem 0;font-size:.65rem;color:var(--muted);letter-spacing:.08em}
+.promo-divider::before,.promo-divider::after{content:"";flex:1;height:1px;background:var(--border)}
 </style>
 <script>
 (function(){
@@ -1058,6 +1073,11 @@ window.sb={
           <span style="display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--muted)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Admin verifies within minutes</span>
           <span style="display:flex;align-items:center;gap:4px;font-size:.66rem;color:var(--muted)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2D6A4F" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Contact unlocks instantly</span>
         </div>
+        <div class="promo-divider">or use a promo code</div>
+        <div style="display:flex;gap:8px;margin-bottom:.75rem">
+          <input class="promo-input" id="promo-inp" placeholder="NEST-XXXXXX" maxlength="11" oninput="this.value=this.value.toUpperCase()" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"/>
+          <button class="promo-apply-btn" id="promo-apply-btn" onclick="applyPromo()">Apply</button>
+        </div>
         <button class="btn btn-gold btn-full" onclick="submitManualPay()" style="height:52px;font-size:.78rem;letter-spacing:.12em;border-radius:3px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           I've Paid — Submit Code
@@ -1114,6 +1134,14 @@ window.sb={
           <button class="btn btn-share-modal btn-full" style="margin-top:8px" onclick="shareCurrentListing()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share This Listing
           </button>
+        <div class="promo-box" id="promo-reward-box" style="display:none">
+          <div class="promo-box-label">Your Referral Code</div>
+          <div class="promo-code-row">
+            <div class="promo-code-val" id="promo-reward-code">—</div>
+            <button class="promo-copy-btn" onclick="copyPromoCode()">Copy</button>
+          </div>
+          <p class="promo-sub">Share this code with a friend — they get their caretaker contact <strong>free</strong>. One use only.</p>
+        </div>
         </div>
         <div class="reviews-section" id="reviews-section">
           <div class="divider"></div>
@@ -1359,7 +1387,7 @@ async function openListing(id){
     const _cpd=await _cp.json();
     const existingPay=Array.isArray(_cpd)&&_cpd.length>0?_cpd[0]:null;
     if(existingPay){
-      if(existingPay.status==='confirmed'){await showContact(id,false);sec('succ');openOv();return;}
+      if(existingPay.status==='confirmed'){await showContact(id,false);sec('succ');openOv();fetch(_SB_URL+'/rest/v1/payments?user_id=eq.'+user.id+'&listing_id=eq.'+id+'&status=eq.confirmed&select=id&limit=1',{headers:_SBH(localStorage.getItem('sb-token'))}).then(r=>r.json()).then(d=>{if(Array.isArray(d)&&d[0])generateAndShowPromo(d[0].id);}).catch(()=>{});return;}
       if(existingPay.status==='denied'){showDenied();sec('succ');openOv();return;}
     }
   }
@@ -1434,7 +1462,7 @@ async function submitManualPay(){
     const _pr2=await fetch(_SB_URL+'/rest/v1/payments?select=status&id=eq.'+pmnt.id,{headers:_SBH(localStorage.getItem('sb-token'))});
     const _pd2=await _pr2.json();
     const data=Array.isArray(_pd2)&&_pd2.length>0?_pd2[0]:null;
-    if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');}
+    if(data?.status==="confirmed"){clearInterval(poll);await showContact(cur.id,false);sec("succ");generateAndShowPromo(pmnt.id);}
     if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
   },5000);
 }
@@ -1632,6 +1660,35 @@ async function submitReview(){
   loadReviews(cur.id);
 }
 
+/* ── PROMO CODE: APPLY ── */
+async function applyPromo(){
+  if(!user){toast("Sign in to use a promo code","err");return;}
+  const code=document.getElementById("promo-inp").value.trim().toUpperCase();
+  if(code.length<9){toast("Enter a valid promo code (e.g. NEST-A3X9K2)","err");return;}
+  const btn=document.getElementById("promo-apply-btn");
+  btn.disabled=true;btn.textContent="Checkingu2026";
+  try{
+    const r=await fetch("/api/redeem-promo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,user_id:user.id,listing_id:cur.id})});
+    const d=await r.json();
+    btn.disabled=false;btn.textContent="Apply";
+    if(!r.ok||!d.success){toast(d.error||"Invalid promo code","err");return;}
+    if(d.contact){document.getElementById("cb-name").textContent=d.contact.caretaker_name;document.getElementById("cb-phone").textContent=d.contact.phone;document.getElementById("cb-call").href="tel:"+d.contact.phone;setWhatsApp(d.contact.phone,d.contact.caretaker_name);}
+    sec("succ");toast("Promo code accepted! Contact unlocked free.");
+  }catch(e){btn.disabled=false;btn.textContent="Apply";toast("Network error — please try again","err");}
+}
+/* ── PROMO CODE: GENERATE ── */
+async function generateAndShowPromo(payment_id){
+  if(!payment_id)return;
+  try{
+    const r=await fetch("/api/generate-promo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_id})});
+    const d=await r.json();
+    if(d.code){document.getElementById("promo-reward-code").textContent=d.code;document.getElementById("promo-reward-box").style.display="";}
+  }catch(e){console.warn("Promo generation failed silently:",e);}
+}
+function copyPromoCode(){
+  const code=document.getElementById("promo-reward-code").textContent;
+  navigator.clipboard.writeText(code).then(()=>toast("Promo code copied!"));
+}
 initAuth();load();loadRatings();
 </script>
 
