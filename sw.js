@@ -1,28 +1,26 @@
 /* sw.js (root) */
-
-const CACHE_NAME = "nestfinder-cache-v3";
-
+const CACHE_NAME = "nestfinder-cache-v4";
 self.addEventListener("install", () => self.skipWaiting());
-
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
 });
-
 self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
+  // Only handle same-origin requests
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Only cache successful same-origin responses
         if (!response || response.status !== 200 || response.type !== "basic") {
           return response;
         }
-
         const responseClone = response.clone();
-
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseClone);
         });
-
         return response;
       })
       .catch(() => caches.match(event.request))
