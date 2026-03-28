@@ -1090,6 +1090,20 @@ window.sb={
             </div>
           </div>
         </div>
+        <div id="airbnb-dates" style="display:none;margin-bottom:1.25rem">
+          <div style="font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem">Select Your Dates</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+            <div>
+              <div style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem">Check-in</div>
+              <input type="date" id="checkin-date" style="width:100%;height:44px;padding:0 .75rem;background:#fff;border:1px solid var(--border2);font-family:'Jost',sans-serif;font-size:.85rem;color:var(--dark);outline:none;border-radius:2px;transition:border-color .26s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'" onchange="calcNights()"/>
+            </div>
+            <div>
+              <div style="font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem">Check-out</div>
+              <input type="date" id="checkout-date" style="width:100%;height:44px;padding:0 .75rem;background:#fff;border:1px solid var(--border2);font-family:'Jost',sans-serif;font-size:.85rem;color:var(--dark);outline:none;border-radius:2px;transition:border-color .26s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'" onchange="calcNights()"/>
+            </div>
+          </div>
+          <div id="nights-summary" style="display:none;background:var(--linen);border:1px solid var(--border);padding:.75rem 1rem;border-radius:2px;font-size:.78rem;color:var(--dark);line-height:1.6"></div>
+        </div>
         <div style="font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem">M-Pesa Confirmation Code</div>
         <input id="mpesa-ref-inp" placeholder="e.g. QAB12XYZ5R" maxlength="12"
           style="width:100%;height:48px;padding:0 1rem;background:#fff;border:1px solid var(--border2);font-family:'Jost',sans-serif;font-size:1rem;letter-spacing:.08em;color:var(--dark);outline:none;border-radius:0;text-transform:uppercase;margin-bottom:.75rem;transition:border-color .26s"
@@ -1377,7 +1391,7 @@ function fav(e,id){
 
 async function openListing(id){
   const l=listings.find(x=>x.id===id);if(!l)return;cur=l;
-  const fee=l.contact_fee||250;
+  const fee=l.listing_type==="airbnb"?150:(l.contact_fee||250);
   const feeStr='Ksh '+fee.toLocaleString();
 
   // Update all fee displays
@@ -1409,6 +1423,16 @@ async function openListing(id){
     if(ctaTitle)ctaTitle.textContent="Interested in this house?";
     if(ctaSub)ctaSub.textContent="Get the caretaker's number and call to arrange a viewing.";
     if(ctaBtn)ctaBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg> Get Caretaker Contact`;
+  // Show/hide date picker
+  const airbnbDates=document.getElementById("airbnb-dates");
+  if(airbnbDates)airbnbDates.style.display=l.listing_type==="airbnb"?"":"none";
+  // Reset dates
+  const ci=document.getElementById("checkin-date");const co=document.getElementById("checkout-date");
+  if(ci)ci.value="";if(co)co.value="";
+  const ns=document.getElementById("nights-summary");if(ns)ns.style.display="none";
+  // Set min date to today
+  const today=new Date().toISOString().split("T")[0];
+  if(ci)ci.min=today;if(co)co.min=today;
   }
   const photoWrap=document.getElementById('m-photos');
   if(photoWrap){
@@ -1496,6 +1520,17 @@ function sec(s){
 async function submitManualPay(){
   if(!user){toast('Please sign in first','err');closeModal();setTimeout(()=>location.href='login.html',600);return;}
   const ref=document.getElementById('mpesa-ref-inp').value.trim().toUpperCase();
+  // Airbnb date validation
+  let checkin=null,checkout=null;
+  if(cur.listing_type==="airbnb"){
+    checkin=document.getElementById("checkin-date").value;
+    checkout=document.getElementById("checkout-date").value;
+    if(!checkin||!checkout){toast("Please select check-in and check-out dates","err");return;}
+    const nights=Math.round((new Date(checkout)-new Date(checkin))/(1000*60*60*24));
+    if(nights<1){toast("Check-out must be after check-in","err");return;}
+    const minN=cur.min_nights||1;
+    if(nights<minN){toast("Minimum stay is "+minN+" night"+(minN>1?"s":""),"err");return;}
+  }
   if(ref.length<6){toast('Enter your M-Pesa confirmation code','err');return;}
   const btn=document.querySelector('#pay-sec .btn-gold');
   btn.disabled=true;btn.textContent='Submitting…';sec('wait');
@@ -1515,7 +1550,7 @@ async function submitManualPay(){
   const _pr=await fetch(_SB_URL+'/rest/v1/payments',{
     method:'POST',
     headers:Object.assign({},_SBH(_pt),{'Prefer':'return=representation'}),
-    body:JSON.stringify({user_id:user.id,listing_id:cur.id,phone:user.phone||'',amount:fee,status:'pending',mpesa_ref:ref})
+    body:JSON.stringify({user_id:user.id,listing_id:cur.id,phone:user.phone||"",amount:fee,status:"pending",mpesa_ref:ref,checkin_date:checkin||null,checkout_date:checkout||null})
   });
   const _pd=await _pr.json();
   const pmnt=Array.isArray(_pd)&&_pd.length>0?_pd[0]:_pd;
@@ -1736,6 +1771,20 @@ async function submitReview(){
 }
 
 /* ── PROMO CODE: APPLY ── */
+function calcNights(){
+  const ci=document.getElementById("checkin-date").value;
+  const co=document.getElementById("checkout-date").value;
+  const sum=document.getElementById("nights-summary");
+  if(!ci||!co){sum.style.display="none";return;}
+  const d1=new Date(ci),d2=new Date(co);
+  const nights=Math.round((d2-d1)/(1000*60*60*24));
+  if(nights<1){sum.style.display="none";return;}
+  const minN=cur.min_nights||1;
+  if(nights<minN){sum.innerHTML=`<span style="color:#c0392b">Minimum stay is ${minN} night${minN>1?"s":""}.</span>`;sum.style.display="";return;}
+  const total=nights*(cur.price_per_night||0);
+  sum.innerHTML=`<strong>${nights} night${nights>1?"s":""}</strong> · Ksh ${(cur.price_per_night||0).toLocaleString()} x ${nights} = <strong>Ksh ${total.toLocaleString()}</strong><br><span style="font-size:.7rem;color:var(--muted)">+ Ksh 150 booking fee to unlock host contact</span>`;
+  sum.style.display="";
+}
 async function applyPromo(){
   if(!user){toast("Sign in to use a promo code","err");return;}
   const code=document.getElementById("promo-inp").value.trim().toUpperCase();
