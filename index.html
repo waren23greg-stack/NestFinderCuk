@@ -1478,7 +1478,7 @@ async function openListing(id){
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
         window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
       });
-  },300);
+  },800);
 
   if(user){
     // Check for existing confirmed OR denied payment
