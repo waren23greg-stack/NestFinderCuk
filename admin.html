@@ -424,6 +424,20 @@ window.sb={
         <div class="f-group"><label>Title</label><input id="fTitle" placeholder="e.g. Cosy Bedsitter — Karen Road"/></div>
         <div class="f-group"><label>Type</label><select id="fType"><option value="single">Single Room</option><option value="bedsitter">Bedsitter</option><option value="one-bedroom">One Bedroom</option></select></div>
       </div>
+      <div class="f-group" style="margin-bottom:1.1rem">
+        <label>Listing Category</label>
+        <select id="fListingType" onchange="toggleAirbnbFields()" style="width:100%;padding:.7rem .9rem;background:#fff;border:1px solid var(--border2);font-family:'Jost',sans-serif;font-size:.88rem;color:var(--ink);outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8070'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer">
+          <option value="rental">Student Rental</option>
+          <option value="airbnb">Airbnb / Short Stay</option>
+        </select>
+      </div>
+      <div id="airbnb-fields" style="display:none">
+        <div class="form-row">
+          <div class="f-group"><label>Price Per Night (Ksh)</label><input type="number" id="fPriceNight" placeholder="e.g. 3500"/></div>
+          <div class="f-group"><label>Max Guests</label><input type="number" id="fMaxGuests" placeholder="e.g. 4"/></div>
+        </div>
+        <div class="f-group"><label>Min Nights</label><input type="number" id="fMinNights" placeholder="e.g. 1" value="1"/></div>
+      </div>
       <div class="form-row">
         <div class="f-group">
           <label>Monthly Rent (Ksh)</label>
@@ -746,6 +760,7 @@ async function editListing(id){
   document.getElementById('fWater').checked=!!h.water_included;
   document.getElementById('fWifi').checked=!!h.wifi_available;
   document.getElementById('fAvail').checked=h.available!==false;
+  populateAirbnbFields(h);
   document.getElementById('fCtName').value=ct?.caretaker_name||'';
   document.getElementById('fCtPhone').value=ct?.phone||'';
   document.getElementById('modalTitle').textContent='Edit Listing';
@@ -810,7 +825,11 @@ async function saveListing(){
     water_included:document.getElementById('fWater').checked,
     wifi_available:document.getElementById('fWifi').checked,
     available:document.getElementById('fAvail').checked,
-    photos:urls
+    photos:urls,
+    listing_type:document.getElementById("fListingType").value,
+    price_per_night:document.getElementById("fListingType").value==="airbnb"?parseInt(document.getElementById("fPriceNight").value)||null:null,
+    max_guests:document.getElementById("fListingType").value==="airbnb"?parseInt(document.getElementById("fMaxGuests").value)||null:null,
+    min_nights:document.getElementById("fListingType").value==="airbnb"?parseInt(document.getElementById("fMinNights").value)||1:null
   };
 
   const editId=document.getElementById('editId').value;
@@ -858,6 +877,20 @@ async function saveListing(){
   loadListings();
 }
 
+function toggleAirbnbFields(){
+  const isAirbnb=document.getElementById("fListingType").value==="airbnb";
+  document.getElementById("airbnb-fields").style.display=isAirbnb?"":"none";
+  document.getElementById("fPrice").closest(".form-row").style.display=isAirbnb?"none":"";
+}
+function populateAirbnbFields(l){
+  document.getElementById("fListingType").value=l.listing_type||"rental";
+  toggleAirbnbFields();
+  if(l.listing_type==="airbnb"){
+    document.getElementById("fPriceNight").value=l.price_per_night||"";
+    document.getElementById("fMaxGuests").value=l.max_guests||"";
+    document.getElementById("fMinNights").value=l.min_nights||1;
+  }
+}
 function resetSave(){
   document.getElementById('saveBtn').disabled=false;
   document.getElementById('saveSpin').style.display='none';

@@ -819,6 +819,13 @@ window.sb={
         <option value="one-bedroom">One Bedroom</option>
       </select>
     </div>
+    <div class="sf" style="flex:1;min-width:130px">
+      <select id="ltype-filter" onchange="doFilter()">
+        <option value="">All Listings</option>
+        <option value="rental">Rentals Only</option>
+        <option value="airbnb">Airbnb Only</option>
+      </select>
+    </div>
     <div class="chips">
       <div class="chip" data-f="water" onclick="toggleChip(this)"><div class="chip-dot"></div>Water</div>
       <div class="chip" data-f="wifi" onclick="toggleChip(this)"><div class="chip-dot"></div>WiFi</div>
@@ -1275,7 +1282,7 @@ function render(list,g){
     return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both">
   <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
     <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
-    <div class="lcard-badge ${l.available?'avail':''}">${l.available?'Available':'Taken'}</div>
+    <div class="lcard-badge ${l.available?"avail":""}">${l.available?"Available":"Taken"}</div>${l.listing_type==="airbnb"?"<div class=\"lcard-badge\" style=\"left:auto;right:10px;top:10px;background:var(--gold)\">🌙 Short Stay</div>":""}
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
     <div class="share-btn" onclick="shareCard(event,'${l.id}')" role="button" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
     <div class="lcard-fav ${favs.includes(l.id)?'on':''}" id="fav-${l.id}" onclick="fav(event,'${l.id}')" role="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
@@ -1292,7 +1299,7 @@ function render(list,g){
     ${amen.length?`<div class="pills">${amen.join('')}</div>`:''}
     <div class="lcard-foot">
       <div>
-        <div class="lcard-price">Ksh ${(l.price||0).toLocaleString()}<span>/ mo</span></div>
+        <div class="lcard-price">${l.listing_type==="airbnb"?"Ksh "+(l.price_per_night||0).toLocaleString()+"<span>/ night</span>":"Ksh "+(l.price||0).toLocaleString()+"<span>/ mo</span>"}</div>
         <div class="lcard-fee"><svg viewBox="0 0 24 24" width="9" height="9" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>Contact: Ksh ${fee.toLocaleString()}</div>
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -1313,14 +1320,15 @@ function emptyState(){document.getElementById('lg').innerHTML=`<div class="empty
 function doFilter(){
   const q=document.getElementById('q').value.toLowerCase();
   const t=document.getElementById('tfilter').value;
-  const maxP=parseInt(document.getElementById('priceRange')?.value||13000);
+  const maxP=parseInt(document.getElementById("priceRange")?.value||13000);
+  const ltOn=document.getElementById("ltype-filter")?.value||"";
   render(listings.filter(l=>
     (!q||(l.title+l.location).toLowerCase().includes(q))&&
     (!t||l.type===t)&&
     (!wOn||l.water_included)&&
     (!wfOn||l.wifi_available)&&
     (!availOn||l.available)&&
-    (l.price<=maxP)
+    (l.price<=maxP)&&(!ltOn||l.listing_type===ltOn)
   ));
 }
 function onPriceRange(v){document.getElementById('priceLabel').textContent=parseInt(v).toLocaleString();doFilter();}
