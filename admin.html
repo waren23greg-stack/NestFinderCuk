@@ -792,12 +792,13 @@ function showFErr(msg){const e=document.getElementById('fErr');e.textContent=msg
 
 async function saveListing(){
   const title=document.getElementById('fTitle').value.trim();
-  const price=parseInt(document.getElementById('fPrice').value);
-  const contactFee=parseInt(document.getElementById('fContactFee').value)||250;
+  const isAirbnb=document.getElementById("fListingType").value==="airbnb";
+  const price=isAirbnb?0:parseInt(document.getElementById("fPrice").value);
+  const priceNight=isAirbnb?parseInt(document.getElementById("fPriceNight").value)||0:null;
   const location=document.getElementById('fLoc').value.trim();
   const ctName=document.getElementById('fCtName').value.trim();
   const ctPhone=document.getElementById('fCtPhone').value.trim();
-  if(!title||!price||!location){showFErr('Title, price and location are required.');return;}
+  if(!title||(!isAirbnb&&!price)||(isAirbnb&&!priceNight)||!location){showFErr('Title, price and location are required.');return;}
   if(!ctName||!ctPhone){showFErr('Caretaker name and phone are required.');return;}
 
   const btn=document.getElementById('saveBtn');
