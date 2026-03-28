@@ -317,6 +317,8 @@ window.sb={
 })();
 </script>
 <script>const sb=window.sb;</script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -451,6 +453,15 @@ window.sb={
         </div>
       </div>
       <div class="f-group"><label>Location</label><input id="fLoc" placeholder="e.g. Karen Road, 10 min walk"/></div>
+      <div class="f-group" id="map-picker-wrap">
+        <label>Pin Location on Map <span style="font-weight:400;color:var(--muted);font-size:.65rem">(click to place pin)</span></label>
+        <div id="admin-map" style="height:220px;width:100%;border:1px solid var(--border2);border-radius:2px;margin-top:.3rem;background:var(--linen)"></div>
+        <div style="display:flex;gap:.75rem;margin-top:.4rem">
+          <input type="hidden" id="fLat"/>
+          <input type="hidden" id="fLng"/>
+          <div id="pin-coords" style="font-size:.68rem;color:var(--muted)">No pin placed yet — click the map to set location</div>
+        </div>
+      </div>
       <div class="f-group"><label>Description</label><textarea id="fDesc" placeholder="Describe the house, surroundings, condition…"></textarea></div>
       <div class="checks">
         <label class="check-label"><input type="checkbox" id="fWater"/> Water included</label>
@@ -729,7 +740,8 @@ async function updateReport(id,status){
 
 /* ── LISTING MODAL ── */
 function openModal(){
-  ['fTitle','fPrice','fLoc','fDesc','fCtName','fCtPhone'].forEach(id=>document.getElementById(id).value='');
+  ["fTitle","fPrice","fLoc","fDesc","fCtName","fCtPhone","fLat","fLng"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("pin-coords").textContent="No pin placed yet — click the map to set location";
   document.getElementById('fContactFee').value='250';
   document.getElementById('fType').value='single';
   document.getElementById('fWater').checked=false;
@@ -741,6 +753,7 @@ function openModal(){
   pendingPhotos=[];existingPhotos=[];renderPreviews();
   document.getElementById('fErr').className='f-err';
   document.getElementById('listingOverlay').classList.add('open');
+  setTimeout(()=>initAdminMap(),400);
   document.body.style.overflow='hidden';
 }
 
@@ -759,6 +772,9 @@ async function editListing(id){
   document.getElementById('fContactFee').value=h.contact_fee||250;
   document.getElementById('fLoc').value=h.location||'';
   document.getElementById('fDesc').value=h.description||'';
+  document.getElementById("fLat").value=h.latitude||"";
+  document.getElementById("fLng").value=h.longitude||"";
+  if(h.latitude&&h.longitude)document.getElementById("pin-coords").textContent="📍 "+parseFloat(h.latitude).toFixed(5)+", "+parseFloat(h.longitude).toFixed(5);
   document.getElementById('fWater').checked=!!h.water_included;
   document.getElementById('fWifi').checked=!!h.wifi_available;
   document.getElementById('fAvail').checked=h.available!==false;
@@ -771,6 +787,7 @@ async function editListing(id){
   document.getElementById('fErr').className='f-err';
   document.getElementById('listingOverlay').classList.add('open');
   document.body.style.overflow='hidden';
+  setTimeout(()=>initAdminMap(h.latitude,h.longitude),400);
 }
 
 function handlePhotos(e){
@@ -830,6 +847,8 @@ async function saveListing(){
     wifi_available:document.getElementById('fWifi').checked,
     available:document.getElementById('fAvail').checked,
     photos:urls,
+    latitude:document.getElementById("fLat").value?parseFloat(document.getElementById("fLat").value):null,
+    longitude:document.getElementById("fLng").value?parseFloat(document.getElementById("fLng").value):null,
     listing_type:document.getElementById("fListingType").value,
     price_per_night:document.getElementById("fListingType").value==="airbnb"?parseInt(document.getElementById("fPriceNight").value)||null:null,
     max_guests:document.getElementById("fListingType").value==="airbnb"?parseInt(document.getElementById("fMaxGuests").value)||null:null,
@@ -907,6 +926,37 @@ function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));});
 
 init();
+function initAdminMap(lat,lng){
+  if(window._adminMap){window._adminMap.remove();window._adminMap=null;}
+  const center=[lat||(-1.3167),lng||(36.9333)];
+  const map=L.map("admin-map",{zoomControl:true,scrollWheelZoom:false}).setView(center,15);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+  let marker=null;
+  if(lat&&lng){
+    marker=L.marker([lat,lng],{draggable:true}).addTo(map);
+    marker.on("dragend",function(){
+      const p=marker.getLatLng();
+      document.getElementById("fLat").value=p.lat.toFixed(6);
+      document.getElementById("fLng").value=p.lng.toFixed(6);
+      document.getElementById("pin-coords").textContent="📍 "+p.lat.toFixed(5)+", "+p.lng.toFixed(5);
+    });
+  }
+  map.on("click",function(e){
+    if(marker)map.removeLayer(marker);
+    marker=L.marker(e.latlng,{draggable:true}).addTo(map);
+    document.getElementById("fLat").value=e.latlng.lat.toFixed(6);
+    document.getElementById("fLng").value=e.latlng.lng.toFixed(6);
+    document.getElementById("pin-coords").textContent="📍 "+e.latlng.lat.toFixed(5)+", "+e.latlng.lng.toFixed(5);
+    marker.on("dragend",function(){
+      const p=marker.getLatLng();
+      document.getElementById("fLat").value=p.lat.toFixed(6);
+      document.getElementById("fLng").value=p.lng.toFixed(6);
+      document.getElementById("pin-coords").textContent="📍 "+p.lat.toFixed(5)+", "+p.lng.toFixed(5);
+    });
+  });
+  window._adminMap=map;
+  setTimeout(()=>map.invalidateSize(),300);
+}
 </script>
 </body>
 </html>

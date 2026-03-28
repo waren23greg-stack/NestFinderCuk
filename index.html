@@ -1463,21 +1463,42 @@ async function openListing(id){
   setTimeout(()=>{
     const mapEl=document.getElementById("m-map");if(!mapEl)return;
     if(window._leafletMap){window._leafletMap.remove();window._leafletMap=null;}
-    const query=encodeURIComponent((l.location||"Cooperative University of Kenya")+", Kenya");
-    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+query)
-      .then(r=>r.json())
-      .then(data=>{
-        const lat=data&&data[0]?parseFloat(data[0].lat):-1.3167;
-        const lng=data&&data[0]?parseFloat(data[0].lon):36.9333;
-        const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],15);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-        L.circle([lat,lng],{radius:200,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.18}).addTo(map);
-        window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
-      }).catch(()=>{
-        const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([-1.3167,36.9333],14);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-        window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
-      });
+    if(l.latitude&&l.longitude){
+      const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([l.latitude,l.longitude],16);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+      L.circle([l.latitude,l.longitude],{radius:150,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.22}).addTo(map);
+      window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
+    } else {
+      const query=encodeURIComponent((l.location||"Cooperative University of Kenya")+", Kenya");
+      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+query)
+        .then(r=>r.json()).then(data=>{
+          const lat=data&&data[0]?parseFloat(data[0].lat):-1.3167;
+          const lng=data&&data[0]?parseFloat(data[0].lon):36.9333;
+          const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],15);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+          L.circle([lat,lng],{radius:200,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.18}).addTo(map);
+          window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
+        }).catch(()=>{
+          const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([-1.3167,36.9333],14);
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+          window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   },800);
 
   if(user){
