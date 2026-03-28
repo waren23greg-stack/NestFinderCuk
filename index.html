@@ -571,6 +571,12 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   .fee-row{flex-direction:column;gap:.2rem;align-items:flex-start}
   .fee-note{text-align:left;max-width:100%}
 }
+.lcard.airbnb-card{border-color:var(--gold);box-shadow:0 4px 24px rgba(184,149,90,.13)}
+.lcard.airbnb-card .lcard-body{background:linear-gradient(160deg,#fffdf7 0%,#fff 100%)}
+.lcard.airbnb-card .lcard-type{color:var(--dark);font-weight:600}
+.lcard-airbnb-tag{display:inline-flex;align-items:center;gap:5px;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:3px 8px;border-radius:20px;margin-bottom:.5rem}
+.btn-book{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:linear-gradient(135deg,var(--gold),#c9a96e);color:#fff;border:none;border-radius:3px;font-family:"Jost",sans-serif;font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+.btn-book:hover{opacity:.88}
 .promo-box{background:var(--linen);border:1px solid var(--border2);padding:1rem 1.25rem;margin-top:1rem;border-radius:2px}
 .promo-box-label{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem}
 .promo-code-row{display:flex;align-items:center;gap:8px}
@@ -1293,7 +1299,7 @@ function render(list,g){
     const amen=[];
     if(l.water_included)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M12 2C8.69 2 6 4.69 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.31-2.69-6-6-6z"/></svg>Water</div>`);
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
-    return `<div class="lcard" style="animation:fadeUp .42s ${i*.055}s both">
+    return `<div class="lcard${l.listing_type==="airbnb"?" airbnb-card":""}" style="animation:fadeUp .42s ${i*.055}s both">
   <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
     <img src="${ph}" alt="${l.title}" loading="lazy" decoding="async"/>
     <div class="lcard-badge ${l.available?"avail":""}">${l.available?"Available":"Taken"}</div>${l.listing_type==="airbnb"?"<div class=\"lcard-badge\" style=\"left:auto;right:10px;top:10px;background:var(--gold)\">🌙 Short Stay</div>":""}
@@ -1302,6 +1308,7 @@ function render(list,g){
     <div class="lcard-fav ${favs.includes(l.id)?'on':''}" id="fav-${l.id}" onclick="fav(event,'${l.id}')" role="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
   </div>
   <div class="lcard-body">
+    ${l.listing_type==="airbnb"?`<div class="lcard-airbnb-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Short Stay</div>`:""}
     <div class="lcard-type">${TL[l.type]||l.type}</div>
     ${(ratings[l.id]&&ratings[l.id].count)?`<div class="lcard-rating"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>${ratings[l.id].avg.toFixed(1)} <span style="color:var(--border2)">·</span> ${ratings[l.id].count} review${ratings[l.id].count>1?"s":""}</div>`:""}
     <div class="lcard-title">${l.title}</div>
@@ -1320,9 +1327,14 @@ function render(list,g){
         <button class="wa-share" onclick="event.stopPropagation();waShareCard('${l.id}','${l.title.replace(/'/g,'')}')">
           <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Share
         </button>
-        <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
+        ${l.listing_type==="airbnb"?`<button class="btn-book" onclick="event.stopPropagation();openListing('${l.id}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Book Stay
+        </button>`:`<button class="btn btn-dark btn-sm" onclick="event.stopPropagation();openListing('${l.id}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg>Get Contact
-        </button>
+        </button>`}
+
+
+
       </div>
     </div>
   </div>
