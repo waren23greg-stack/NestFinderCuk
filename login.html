@@ -624,7 +624,7 @@ async function doReset(){
   const r=await fetch(_B+'/auth/v1/recover',{
     method:'POST',
     headers:{apikey:_K,'Content-Type':'application/json'},
-    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:'https://nest-finder-cuk.vercel.app/login.html'})
+    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:'https://nestfindercuk.rocks/login.html'})
   });
   setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
 
