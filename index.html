@@ -718,6 +718,8 @@ window.sb={
 })();
 </script>
 <script>const sb=window.sb;</script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -1000,6 +1002,18 @@ window.sb={
           <div class="m-det"><div class="m-det-l">Monthly Rent</div><div class="m-det-v" id="m-price">—</div></div>
           <div class="m-det"><div class="m-det-l">Location</div><div class="m-det-v" id="m-loc">—</div></div>
           <div class="m-det"><div class="m-det-l">Status</div><div class="m-det-v" id="m-status" style="color:var(--gold)">Available</div></div>
+        </div>
+        <div id="m-airbnb-strip" style="display:none;margin-top:1rem;padding:1rem;background:var(--linen);border:1px solid var(--border);border-radius:2px">
+          <div style="font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem">Short Stay Details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">
+            <div style="text-align:center;padding:.6rem;background:#fff;border:1px solid var(--border);border-radius:2px"><div style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">Per Night</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--dark)" id="m-price-night">—</div></div>
+            <div style="text-align:center;padding:.6rem;background:#fff;border:1px solid var(--border);border-radius:2px"><div style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">Max Guests</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--dark)" id="m-max-guests">—</div></div>
+            <div style="text-align:center;padding:.6rem;background:#fff;border:1px solid var(--border);border-radius:2px"><div style="font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem">Min Nights</div><div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--dark)" id="m-min-nights">—</div></div>
+          </div>
+        </div>
+        <div id="m-map-wrap" style="margin-top:1rem;border-radius:2px;overflow:hidden;border:1px solid var(--border)">
+          <div style="font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:.6rem 1rem;background:var(--linen);border-bottom:1px solid var(--border)">📍 Approximate Location</div>
+          <div id="m-map" style="height:200px;width:100%"></div>
         </div>
         <div id="m-amenities-wrap" class="m-amenities"></div>
         <div id="m-desc-wrap" class="m-desc" style="display:none"></div>
@@ -1366,7 +1380,7 @@ async function openListing(id){
     const t=document.getElementById('m-type'+sfx);const p=document.getElementById('m-price'+sfx);
     const loc=document.getElementById('m-loc'+sfx);const st=document.getElementById('m-status'+sfx);
     if(t)t.textContent=TL[l.type]||l.type;
-    if(p)p.textContent='Ksh '+(l.price||0).toLocaleString()+' / mo';
+    if(p){if(l.listing_type==="airbnb"){p.textContent="Ksh "+(l.price_per_night||0).toLocaleString()+" / night";}else{p.textContent="Ksh "+(l.price||0).toLocaleString()+" / mo";}}
     if(loc)loc.textContent=l.location;
     if(st)st.textContent=l.available?'Available Now':'Currently Taken';
   });
@@ -1388,6 +1402,34 @@ async function openListing(id){
   const descWrap=document.getElementById('m-desc-wrap');
   if(descWrap&&l.description){descWrap.textContent=l.description;descWrap.style.display='block';}
   else if(descWrap){descWrap.style.display='none';}
+  // Airbnb strip
+  const airbnbStrip=document.getElementById("m-airbnb-strip");
+  if(airbnbStrip){airbnbStrip.style.display=l.listing_type==="airbnb"?"":"none";}
+  if(l.listing_type==="airbnb"){
+    const pn=document.getElementById("m-price-night");if(pn)pn.textContent=l.price_per_night?"Ksh "+l.price_per_night.toLocaleString():"—";
+    const mg=document.getElementById("m-max-guests");if(mg)mg.textContent=l.max_guests?l.max_guests+" guests":"—";
+    const mn=document.getElementById("m-min-nights");if(mn)mn.textContent=l.min_nights?l.min_nights+" night"+(l.min_nights>1?"s":""):"1 night";
+  }
+  // Map
+  setTimeout(()=>{
+    const mapEl=document.getElementById("m-map");if(!mapEl)return;
+    if(window._leafletMap){window._leafletMap.remove();window._leafletMap=null;}
+    const query=encodeURIComponent((l.location||"Cooperative University of Kenya")+", Kenya");
+    fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+query)
+      .then(r=>r.json())
+      .then(data=>{
+        const lat=data&&data[0]?parseFloat(data[0].lat):-1.3167;
+        const lng=data&&data[0]?parseFloat(data[0].lon):36.9333;
+        const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+        L.circle([lat,lng],{radius:200,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.18}).addTo(map);
+        window._leafletMap=map;
+      }).catch(()=>{
+        const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([-1.3167,36.9333],14);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
+        window._leafletMap=map;
+      });
+  },300);
 
   if(user){
     // Check for existing confirmed OR denied payment
