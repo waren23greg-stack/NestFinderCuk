@@ -1397,6 +1397,19 @@ async function openListing(id){
     if(st)st.textContent=l.available?'Available Now':'Currently Taken';
   });
   document.getElementById('m-title').textContent=l.title;
+  // Update CTA for Airbnb
+  const ctaTitle=document.getElementById("m-cta-title");
+  const ctaSub=document.getElementById("m-cta-sub");
+  const ctaBtn=document.getElementById("btn-get-contact");
+  if(l.listing_type==="airbnb"){
+    if(ctaTitle)ctaTitle.textContent="Book Your Stay";
+    if(ctaSub)ctaSub.textContent="Pay the contact fee to get the host's number and arrange your booking.";
+    if(ctaBtn)ctaBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> Book Now`;
+  } else {
+    if(ctaTitle)ctaTitle.textContent="Interested in this house?";
+    if(ctaSub)ctaSub.textContent="Get the caretaker's number and call to arrange a viewing.";
+    if(ctaBtn)ctaBtn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg> Get Caretaker Contact`;
+  }
   const photoWrap=document.getElementById('m-photos');
   if(photoWrap){
     const pool=PHOTOS[l.type]||PHOTOS.default;
@@ -1435,11 +1448,11 @@ async function openListing(id){
         const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],15);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
         L.circle([lat,lng],{radius:200,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.18}).addTo(map);
-        window._leafletMap=map;
+        window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
       }).catch(()=>{
         const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([-1.3167,36.9333],14);
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-        window._leafletMap=map;
+        window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
       });
   },300);
 

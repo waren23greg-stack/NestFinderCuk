@@ -623,6 +623,8 @@ async function toggleAvail(id,newVal,label){
 }
 async function delListing(id,title){
   if(!confirm(`Delete "${title}"? This cannot be undone.`))return;
+  // Delete related payments first
+  await sb.from('payments').delete().eq('listing_id',id);
   const {error}=await sb.from('listings').delete().eq('id',id);
   if(error){toast('Delete failed: '+error.message,true);return;}
   toast('Listing deleted');loadListings();
