@@ -1,6 +1,6 @@
 /* sw.js (root) */
 
-const CACHE_NAME = "nestfinder-cache-v1";
+const CACHE_NAME = "nestfinder-cache-v3";
 
 self.addEventListener("install", () => self.skipWaiting());
 
