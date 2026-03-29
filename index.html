@@ -211,9 +211,9 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(22,19,14,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .3s;overflow:hidden}
 .overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--cream);width:100%;max-width:480px;max-height:90svh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;transform:translateY(20px);transition:transform .32s var(--ease)}
+.modal{background:var(--cream);width:100%;max-width:860px;max-height:90svh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;transform:translateY(20px);transition:transform .32s var(--ease)}
 .overlay.open .modal{transform:translateY(0)}
-.m-head{padding:1.5rem 1.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--cream);z-index:1}
+.m-head{padding:1.5rem 1.75rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;position:sticky;top:0;background:var(--cream);z-index:1;flex-shrink:0}
 .m-tag{display:inline-flex;align-items:center;gap:5px;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
 .m-tag svg{width:10px;height:10px;stroke:var(--gold);fill:none;stroke-width:2}
 .m-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--dark)}
@@ -369,6 +369,12 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .m-cta-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--gold-l);white-space:nowrap}
 .m-cta-price small{font-family:'Jost',sans-serif;font-size:.62rem;color:rgba(255,255,255,.35);display:block;text-align:right;margin-top:1px;letter-spacing:.06em;text-transform:uppercase}
 #preview-sec{display:none}
+@media(min-width:640px){
+.modal{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;}
+.m-head{grid-column:1/-1;}
+#preview-sec.on{overflow-y:auto;}
+#m-pay-body{overflow-y:auto;border-left:1px solid var(--border);}
+}
 #preview-sec.on{display:block}
 
 /* WHATSAPP ADMIN STRIP */
