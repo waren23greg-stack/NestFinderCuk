@@ -460,6 +460,8 @@ window.sb={
         <div id="loc-results" style="display:none;border:1px solid var(--border2);background:#fff;max-height:180px;overflow-y:auto;border-radius:2px;margin-bottom:.5rem"></div>
         <input type="hidden" id="fLat"/>
         <input type="hidden" id="fLng"/>
+        <div style="margin-top:.4rem;display:flex;gap:8px;align-items:center"><input id="fLatManual" placeholder="Paste latitude e.g. -1.39240" style="flex:1;padding:.5rem .7rem;background:#fff;border:1px solid var(--border2);font-family:Jost,sans-serif;font-size:.78rem;outline:none" oninput="manualCoords()"><input id="fLngManual" placeholder="Paste longitude e.g. 36.75477" style="flex:1;padding:.5rem .7rem;background:#fff;border:1px solid var(--border2);font-family:Jost,sans-serif;font-size:.78rem;outline:none" oninput="manualCoords()"></div>
+        <a href="https://maps.google.com" target="_blank" style="font-size:.68rem;color:var(--gold);text-decoration:none;display:block;margin:.3rem 0">🗺 Open Google Maps to find coordinates →</a>
         <div id="pin-coords" style="font-size:.68rem;color:var(--muted);padding:.4rem 0">No location set yet</div>
         <div id="loc-map-preview" style="display:none;margin-top:.5rem;border:1px solid var(--border2);border-radius:2px;overflow:hidden"><iframe id="loc-map-iframe" width="100%" height="200" frameborder="0" style="border:0;display:block" allowfullscreen loading="lazy"></iframe></div>
       </div>
@@ -954,6 +956,17 @@ function pickLocation(lat,lng,name){
   document.getElementById("pin-coords").textContent="📍 "+name+" ("+lat+", "+lng+")";
   document.getElementById("loc-results").style.display="none";
   document.getElementById("loc-search-inp").value="";
+  const prev=document.getElementById("loc-map-preview");
+  const iframe=document.getElementById("loc-map-iframe");
+  if(prev&&iframe){iframe.src="https://maps.google.com/maps?q="+lat+","+lng+"&z=17&output=embed";prev.style.display="";}
+}
+function manualCoords(){
+  const lat=document.getElementById("fLatManual").value.trim();
+  const lng=document.getElementById("fLngManual").value.trim();
+  if(!lat||!lng)return;
+  document.getElementById("fLat").value=lat;
+  document.getElementById("fLng").value=lng;
+  document.getElementById("pin-coords").textContent="📍 Manual pin: "+lat+", "+lng;
   const prev=document.getElementById("loc-map-preview");
   const iframe=document.getElementById("loc-map-iframe");
   if(prev&&iframe){iframe.src="https://maps.google.com/maps?q="+lat+","+lng+"&z=17&output=embed";prev.style.display="";}
