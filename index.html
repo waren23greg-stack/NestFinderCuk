@@ -279,6 +279,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 
 /* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* GALLERY LIGHTBOX */
 .gallery-ov{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;flex-direction:column;user-select:none}
@@ -949,6 +950,21 @@ window.sb={
   </div>
 </section>
 
+<!-- MOVERS MARQUEE -->
+<div style="background:var(--dark);overflow:hidden;padding:.7rem 0;border-top:1px solid rgba(184,149,90,.2);border-bottom:1px solid rgba(184,149,90,.2)">
+  <div style="display:flex;animation:marquee 28s linear infinite;white-space:nowrap;width:max-content">
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🚛 NestFinder Movers — Moving made easy for students</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">📦 Lite Move Ksh 500 · Within same estate</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🏠 Mini Bulk Ksh 750 · Within Gataka</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🚚 Bulky Move Ksh 1,000+ · Anywhere · Pay on move day</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(184,149,90,.5);padding-right:4rem">→ Book now at nestfinder.cuk</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🚛 NestFinder Movers — Moving made easy for students</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">📦 Lite Move Ksh 500 · Within same estate</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🏠 Mini Bulk Ksh 750 · Within Gataka</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding-right:4rem">🚚 Bulky Move Ksh 1,000+ · Anywhere · Pay on move day</span>
+    <span style="font-family:Jost,sans-serif;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(184,149,90,.5);padding-right:4rem">→ Book now at nestfinder.cuk</span>
+  </div>
+</div>
 <footer>
   <div class="foot-inner">
     <div class="foot-logo">Nest<b>Finder</b> CUK</div>
