@@ -1408,6 +1408,7 @@ async function openListing(id){
   const payStepFee=document.getElementById('pay-step-fee');
   if(payStepFee)payStepFee.textContent=feeStr;
 
+  setTimeout(()=>{
   ['','2'].forEach(sfx=>{
     const t=document.getElementById('m-type'+sfx);const p=document.getElementById('m-price'+sfx);
     const loc=document.getElementById('m-loc'+sfx);const st=document.getElementById('m-status'+sfx);
@@ -1465,23 +1466,6 @@ async function openListing(id){
     const mg=document.getElementById("m-max-guests");if(mg)mg.textContent=l.max_guests?l.max_guests+" guests":"—";
     const mn=document.getElementById("m-min-nights");if(mn)mn.textContent=l.min_nights?l.min_nights+" night"+(l.min_nights>1?"s":""):"1 night";
   }
-  // Map
-  const mapDiv=document.getElementById("m-map");
-  const dirBtn=document.getElementById("m-directions-btn");
-  if(mapDiv){
-    if(l.latitude&&l.longitude){
-      const q=l.latitude+","+l.longitude;
-      const label=encodeURIComponent(l.title||"Property");
-      mapDiv.innerHTML='<iframe width="100%" height="240" frameborder="0" style="border:0;display:block" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q='+q+'&z=16&output=embed&t=m"></iframe>';
-      if(dirBtn){dirBtn.style.display="";dirBtn.href="https://www.google.com/maps/dir/?api=1&destination="+q;}
-    } else {
-      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:240px;font-size:.72rem;color:var(--muted)">No location pinned for this listing</div>';
-      if(dirBtn)dirBtn.style.display="none";
-    }
-  }
-
-
-
 
 
 
@@ -1494,6 +1478,19 @@ async function openListing(id){
 
 
   },800);
+  // Map
+  const mapDiv=document.getElementById("m-map");
+  const dirBtn=document.getElementById("m-directions-btn");
+  if(mapDiv){
+    if(l.latitude&&l.longitude){
+      const q=l.latitude+","+l.longitude;
+      mapDiv.innerHTML='<iframe width="100%" height="240" frameborder="0" style="border:0;display:block" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q='+q+'&z=16&output=embed&t=m"></iframe>';
+      if(dirBtn){dirBtn.style.display="";dirBtn.href="https://www.google.com/maps/dir/?api=1&destination="+q;}
+    } else {
+      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:240px;font-size:.72rem;color:var(--muted)">No location pinned</div>';
+      if(dirBtn)dirBtn.style.display="none";
+    }
+  }
 
   if(user){
     // Check for existing confirmed OR denied payment
