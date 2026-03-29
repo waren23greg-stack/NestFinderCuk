@@ -1440,11 +1440,10 @@ async function openListing(id){
   // Set min date to today
   const today=new Date().toISOString().split("T")[0];
   if(ci)ci.min=today;if(co)co.min=today;
-  }
+  const imgs=l.photos&&l.photos.length?l.photos:[photo(l),...(PHOTOS[l.type]||PHOTOS.default).slice(1,2)];
   const photoWrap=document.getElementById('m-photos');
   if(photoWrap){
     const pool=PHOTOS[l.type]||PHOTOS.default;
-    const imgs=l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,2)];
     photoWrap.innerHTML=imgs.map(src=>`<img src="${src}" loading="lazy" onclick="openGallery('${l.id}')" alt="${l.title}"/>`).join('');
     photoWrap.style.display=imgs.length?'flex':'none';
   }
