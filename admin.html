@@ -349,6 +349,7 @@ window.sb={
     <div class="sb-divider"></div>
     <button class="sb-item" onclick="goto('payments',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Payments</button>
     <button class="sb-item" onclick="goto('students',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Students</button>
+    <button class="sb-item" onclick="goto('movers',this)"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Movers</button>
     <button class="sb-item" onclick="goto('reports',this)"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Reports</button>
     <div class="sb-divider"></div>
     <a class="sb-item" href="index.html" style="text-decoration:none;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>View Site</a>
@@ -407,6 +408,10 @@ window.sb={
     <div class="page" id="page-reports">
       <div class="sec-head"><div><div class="sec-title">Listing Reports</div><div class="sec-sub">Student-submitted reports</div></div></div>
       <div class="tbl-wrap"><table><thead><tr><th>Listing</th><th>Reason</th><th>Details</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="reportsBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table></div>
+    </div>
+    <div class="page" id="page-movers">
+      <div class="sec-head"><div><div class="sec-title">Trinity Movers — Bookings</div><div class="sec-sub">Manage student moving requests · Confirm or mark as done</div></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Pickup</th><th>Drop-off</th><th>Date</th><th>Tier</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="movers-tbody"><tr class="empty-row"><td colspan="9">Loading...</td></tr></tbody></table></div>
     </div>
   </div>
 </main>
@@ -551,12 +556,50 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
+async function loadMovers(){
+  const tbody=document.getElementById('movers-tbody');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr>';
+  const t=localStorage.getItem('sb-token');
+  const r=await fetch(_B+'/rest/v1/moving_requests?select=*&order=created_at.desc',{headers:_h(t)});
+  const data=await r.json();
+  if(!Array.isArray(data)||!data.length){
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">No bookings yet</td></tr>';
+    return;
+  }
+  tbody.innerHTML=data.map(m=>`
+    <tr>
+      <td><strong>${m.name||'—'}</strong></td>
+      <td><a href="tel:${m.phone}" style="color:var(--gold)">${m.phone||'—'}</a></td>
+      <td>${m.pickup||'—'}<br><small style="color:var(--muted)">${m.pickup_zone||''}</small></td>
+      <td>${m.dropoff||'—'}<br><small style="color:var(--muted)">${m.dropoff_zone||''}</small></td>
+      <td>${m.move_date||'—'}</td>
+      <td>${m.tier||'—'}</td>
+      <td style="color:var(--gold);font-weight:500">Ksh ${m.price||'—'}</td>
+      <td><span style="font-size:.68rem;padding:3px 8px;border-radius:2px;background:${m.status==='confirmed'?'rgba(39,174,96,.15)':m.status==='done'?'rgba(184,149,90,.15)':'rgba(140,126,110,.1)'};color:${m.status==='confirmed'?'#27ae60':m.status==='done'?'var(--gold)':'var(--muted)'}">${m.status||'pending'}</span></td>
+      <td style="display:flex;gap:.4rem;flex-wrap:wrap">
+        <button onclick="updateMover('${m.id}','confirmed')" style="font-size:.65rem;padding:4px 10px;background:rgba(39,174,96,.12);color:#27ae60;border:1px solid rgba(39,174,96,.3);cursor:pointer;font-family:Jost,sans-serif">Confirm</button>
+        <button onclick="updateMover('${m.id}','done')" style="font-size:.65rem;padding:4px 10px;background:rgba(184,149,90,.1);color:var(--gold);border:1px solid rgba(184,149,90,.3);cursor:pointer;font-family:Jost,sans-serif">Done</button>
+        <button onclick="updateMover('${m.id}','cancelled')" style="font-size:.65rem;padding:4px 10px;background:rgba(192,57,43,.08);color:#c0392b;border:1px solid rgba(192,57,43,.2);cursor:pointer;font-family:Jost,sans-serif">Cancel</button>
+      </td>
+    </tr>`).join('');
+}
+async function updateMover(id,status){
+  const t=localStorage.getItem('sb-token');
+  await fetch(_B+'/rest/v1/moving_requests?id=eq.'+id,{
+    method:'PATCH',
+    headers:Object.assign({},_h(t),{'Prefer':'return=minimal'}),
+    body:JSON.stringify({status})
+  });
+  toast(status==='confirmed'?'Booking confirmed':status==='done'?'Marked as done':'Booking cancelled');
+  loadMovers();
+}
 /* ── NAVIGATION ── */
-const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students',reports:'Reports'};
+const titles={dashboard:'Dashboard',listings:'Listings',payments:'Payments',students:'Students',reports:'Reports',movers:'Trinity Movers'};
 const actions={
   listings:`<button class="topbar-btn tbtn-gold" onclick="openModal()"><svg viewBox="0 0 24 24" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Listing</button>`,
   payments:`<button class="topbar-btn tbtn-ghost" onclick="exportCSV()"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export CSV</button>`,
-  dashboard:'',students:'',reports:''
+  dashboard:'',students:'',reports:'',movers:''
 };
 function goto(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
@@ -570,6 +613,7 @@ function goto(name,btn){
   if(name==='payments')loadPayments();
   if(name==='students')loadStudents();
   if(name==='reports')loadReports();
+  if(name==='movers')loadMovers();
 }
 
 /* ── TOAST ── */
