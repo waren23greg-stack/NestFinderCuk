@@ -1522,7 +1522,7 @@ function closeModal(){document.getElementById('overlay').classList.remove('open'
 function bgClose(e){if(e.target===e.currentTarget)closeModal();}
 function sec(s){
   const prev=document.getElementById('preview-sec');const payBody=document.getElementById('m-pay-body');
-  if(s==='preview'){if(prev)prev.classList.add('on');if(payBody)payBody.style.display='none';}
+  if(s==='preview'){if(prev)prev.classList.add('on');if(payBody){const isDesktop=window.innerWidth>=640;payBody.style.display=isDesktop?"":"none";}}
   else{if(prev)prev.classList.remove("on");if(payBody)payBody.style.display="";const ad=document.getElementById("airbnb-dates");if(ad)ad.style.display=(cur&&cur.listing_type==="airbnb")?"":"none";}
   ['pay','wait','succ'].forEach(x=>document.getElementById(x+'-sec').className=x===s?x+'-sec on':x+'-sec');
   // Reset denied/contact box visibility when switching
