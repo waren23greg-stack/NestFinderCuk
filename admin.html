@@ -317,8 +317,6 @@ window.sb={
 })();
 </script>
 <script>const sb=window.sb;</script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -454,15 +452,26 @@ window.sb={
       </div>
       <div class="f-group"><label>Location</label><input id="fLoc" placeholder="e.g. Karen Road, 10 min walk"/></div>
       <div class="f-group" id="map-picker-wrap">
-        <label>Pin Location on Map <span style="font-weight:400;color:var(--muted);font-size:.65rem">(click to place pin)</span></label>
-        <div id="admin-map" style="height:220px;width:100%;border:1px solid var(--border2);border-radius:2px;margin-top:.3rem;background:var(--linen)"></div>
-        <div style="display:flex;gap:.75rem;margin-top:.4rem">
-          <input type="hidden" id="fLat"/>
-          <input type="hidden" id="fLng"/>
-          <div id="pin-coords" style="font-size:.68rem;color:var(--muted)">No pin placed yet — click the map to set location</div>
+        <label>Search & Pin Location <span style="font-weight:400;color:var(--muted);font-size:.65rem">(search to set coordinates)</span></label>
+        <div style="display:flex;gap:8px;margin-bottom:.5rem">
+          <input id="loc-search-inp" placeholder="e.g. Rongai, Olerai, Kajiado..." style="flex:1;padding:.7rem .9rem;background:#fff;border:1px solid var(--border2);font-family:'Jost',sans-serif;font-size:.85rem;color:var(--ink);outline:none;border-radius:0;transition:border-color var(--t)" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'" onkeydown="if(event.key==='Enter')searchLocation()"/>
+          <button onclick="searchLocation()" style="padding:0 1rem;background:var(--dark);color:#fff;border:none;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background var(--t)" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='var(--dark)'">Search</button>
         </div>
+        <div id="loc-results" style="display:none;border:1px solid var(--border2);background:#fff;max-height:180px;overflow-y:auto;border-radius:2px;margin-bottom:.5rem"></div>
+        <input type="hidden" id="fLat"/>
+        <input type="hidden" id="fLng"/>
+        <div id="pin-coords" style="font-size:.68rem;color:var(--muted);padding:.4rem 0">No location set yet</div>
       </div>
-      <div class="f-group"><label>Description</label><textarea id="fDesc" placeholder="Describe the house, surroundings, condition…"></textarea></div>
+
+
+
+
+
+
+
+
+
+
       <div class="checks">
         <label class="check-label"><input type="checkbox" id="fWater"/> Water included</label>
         <label class="check-label"><input type="checkbox" id="fWifi"/> WiFi available</label>
@@ -925,37 +934,32 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));});
 
-init();
+function searchLocation(){
+  const q=document.getElementById("loc-search-inp").value.trim();
+  if(!q){alert("Enter a location to search");return;}
+  const res=document.getElementById("loc-results");
+  res.innerHTML=`<div style="padding:.6rem 1rem;font-size:.75rem;color:var(--muted)">Searching...</div>`;
+  res.style.display="";
+  fetch("https://nominatim.openstreetmap.org/search?format=json&limit=5&q="+encodeURIComponent(q+", Kenya"))
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data.length){res.innerHTML=`<div style="padding:.6rem 1rem;font-size:.75rem;color:var(--muted)">No results found. Try a different name.</div>`;return;}
+      res.innerHTML=data.map((d,i)=>`<div onclick="pickLocation(${parseFloat(d.lat).toFixed(6)},${parseFloat(d.lon).toFixed(6)},'${d.display_name.replace(/'/, "").substring(0,60)}')" style="padding:.6rem 1rem;font-size:.75rem;color:var(--ink);cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background='var(--linen)'" onmouseout="this.style.background=''"><strong>${d.display_name.substring(0,60)}</strong><br><span style="color:var(--muted);font-size:.68rem">${parseFloat(d.lat).toFixed(5)}, ${parseFloat(d.lon).toFixed(5)}</span></div>`).join("");
+    }).catch(()=>{res.innerHTML=`<div style="padding:.6rem 1rem;font-size:.75rem;color:#c0392b">Search failed. Check your connection.</div>`;});
+}
+function pickLocation(lat,lng,name){
+  document.getElementById("fLat").value=lat;
+  document.getElementById("fLng").value=lng;
+  document.getElementById("pin-coords").textContent="📍 "+name+" ("+lat+", "+lng+")";
+  document.getElementById("loc-results").style.display="none";
+  document.getElementById("loc-search-inp").value="";
+}
 function initAdminMap(lat,lng){
-  if(window._adminMap){window._adminMap.remove();window._adminMap=null;}
-  const center=[lat||(-1.3167),lng||(36.9333)];
-  const map=L.map("admin-map",{zoomControl:true,scrollWheelZoom:false}).setView(center,15);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-  let marker=null;
   if(lat&&lng){
-    marker=L.marker([lat,lng],{draggable:true}).addTo(map);
-    marker.on("dragend",function(){
-      const p=marker.getLatLng();
-      document.getElementById("fLat").value=p.lat.toFixed(6);
-      document.getElementById("fLng").value=p.lng.toFixed(6);
-      document.getElementById("pin-coords").textContent="📍 "+p.lat.toFixed(5)+", "+p.lng.toFixed(5);
-    });
+    document.getElementById("fLat").value=lat;
+    document.getElementById("fLng").value=lng;
+    document.getElementById("pin-coords").textContent="📍 Saved: "+parseFloat(lat).toFixed(5)+", "+parseFloat(lng).toFixed(5);
   }
-  map.on("click",function(e){
-    if(marker)map.removeLayer(marker);
-    marker=L.marker(e.latlng,{draggable:true}).addTo(map);
-    document.getElementById("fLat").value=e.latlng.lat.toFixed(6);
-    document.getElementById("fLng").value=e.latlng.lng.toFixed(6);
-    document.getElementById("pin-coords").textContent="📍 "+e.latlng.lat.toFixed(5)+", "+e.latlng.lng.toFixed(5);
-    marker.on("dragend",function(){
-      const p=marker.getLatLng();
-      document.getElementById("fLat").value=p.lat.toFixed(6);
-      document.getElementById("fLng").value=p.lng.toFixed(6);
-      document.getElementById("pin-coords").textContent="📍 "+p.lat.toFixed(5)+", "+p.lng.toFixed(5);
-    });
-  });
-  window._adminMap=map;
-  setTimeout(()=>map.invalidateSize(),300);
 }
 </script>
 </body>
