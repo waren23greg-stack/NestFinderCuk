@@ -1940,5 +1940,21 @@ async function submitReport(){
     </div>
   </div>
 </div>
+<script>
+// Mobile modal scroll fix
+(function(){
+  var overlay=document.getElementById('overlay')||document.querySelector('.overlay');
+  var modal=document.querySelector('.modal');
+  if(!overlay||!modal)return;
+  var startY=0;
+  modal.addEventListener('touchstart',function(e){startY=e.touches[0].clientY;},{ passive:true});
+  modal.addEventListener('touchmove',function(e){
+    var dy=startY-e.touches[0].clientY;
+    modal.scrollTop+=dy;
+    startY=e.touches[0].clientY;
+    e.stopPropagation();
+  },{passive:true});
+})();
+</script>
 </body>
 </html>
