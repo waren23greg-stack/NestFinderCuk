@@ -372,10 +372,10 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 @media(min-width:640px){
 .modal{display:grid;grid-template-columns:45% 55%;grid-template-rows:auto 1fr;height:90svh;}
 .m-head{grid-column:1/-1;}
-#preview-sec.on{overflow-y:auto;height:100%;}
-#m-pay-body{overflow-y:auto;height:100%;border-left:1px solid var(--border);}
+#preview-sec.on{overflow-y:auto;height:100%;min-height:0;}
+#m-pay-body{overflow-y:auto;height:100%;min-height:0;border-left:1px solid var(--border);}
 }
-#preview-sec.on{display:block;overflow-y:auto}
+#preview-sec.on{display:block;overflow-y:auto;min-height:0}
 
 /* WHATSAPP ADMIN STRIP */
 .wa-admin-strip{display:flex;align-items:center;gap:7px;padding:.75rem 1rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:2px;font-size:.74rem;color:#166534;margin-bottom:.75rem}
