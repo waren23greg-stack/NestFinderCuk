@@ -380,7 +380,7 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;font-weight:300;line-height:1.15;margin-bottom:.75rem">Your people need<br><em style="color:var(--gold-l);font-style:italic">to know this.</em></div>
     <p style="font-size:.8rem;color:rgba(255,255,255,.28);margin-bottom:2.5rem;line-height:1.8;font-weight:300">Drop this in your class group, hostel chat,<br>or send to that friend who is always relocating.</p>
     <div style="display:flex;flex-direction:column;align-items:center;gap:1rem">
-      <a id="wa-share-btn" href="#" target="_blank" rel="noopener"
+      <a id="wa-share-btn" href="https://wa.me/?text=*TRINITY%20MOVERS*%20%E2%80%94%20Student%20Moving%20Service%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0A%0AMoving%20out%3F%20We%20handle%20that.%0A%0A*Lite%20Move*%20%E2%80%94%20Ksh%20500%0ABags%20%26%20boxes.%20Same%20estate.%0A%0A*Mini%20Bulk*%20%E2%80%94%20Ksh%20750%E2%80%93900%0AFurniture%20%2B%20boxes.%20Within%20Gataka.%0A%0A*Bulky%20Move*%20%E2%80%94%20Ksh%201%2C000%2B%0AFull%20house.%20Any%20distance.%0A%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0APay%20on%20move%20day.%20Zero%20upfront.%0AAdmin%20confirms%20via%20WhatsApp.%0A%0ABook%20here%3A%0Ahttps%3A%2F%2Fnestfindercuk.rocks%2Fmovers.html" target="_blank" rel="noopener"
         style="display:inline-flex;align-items:center;gap:.85rem;background:#25D366;color:#fff;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:1rem 2.25rem;text-decoration:none;transition:all .25s;border-radius:0;border:1px solid transparent;width:100%;max-width:320px;justify-content:center"
         onmouseover="this.style.background='transparent';this.style.border='1px solid #25D366';this.style.color='#25D366'"
         onmouseout="this.style.background='#25D366';this.style.border='1px solid transparent';this.style.color='#fff'">
@@ -509,48 +509,10 @@ async function submitMove(){
 }
 document.getElementById('mv-date').min=new Date().toISOString().split('T')[0];
 
-// WhatsApp share
-const waMsg = encodeURIComponent(
-"*TRINITY MOVERS* — Student Moving Service
-" +
-"─────────────────────────
-
-" +
-"Moving out? We handle that.
-
-" +
-"*Lite Move* — Ksh 500
-" +
-"Bags & boxes. Same estate.
-
-" +
-"*Mini Bulk* — Ksh 750–900
-" +
-"Furniture + boxes. Within Gataka.
-
-" +
-"*Bulky Move* — Ksh 1,000+
-" +
-"Full house. Any distance.
-
-" +
-"─────────────────────────
-" +
-"Pay on move day. Zero upfront.
-" +
-"Admin confirms via WhatsApp.
-
-" +
-"Book here:
-" +
-"https://waren23greg-stack.github.io/NestFinderCuk/movers.html"
-);
-const waUrl = "https://wa.me/?text=" + waMsg;
-document.getElementById("wa-share").href = waUrl;
-document.getElementById("wa-share-btn").href = waUrl;
+// WhatsApp share links set directly in HTML
 </script>
 <!-- WHATSAPP SHARE FLOAT -->
-<a id="wa-share" href="#" target="_blank" rel="noopener"
+<a id="wa-share" href="https://wa.me/?text=*TRINITY%20MOVERS*%20%E2%80%94%20Student%20Moving%20Service%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0A%0AMoving%20out%3F%20We%20handle%20that.%0A%0A*Lite%20Move*%20%E2%80%94%20Ksh%20500%0ABags%20%26%20boxes.%20Same%20estate.%0A%0A*Mini%20Bulk*%20%E2%80%94%20Ksh%20750%E2%80%93900%0AFurniture%20%2B%20boxes.%20Within%20Gataka.%0A%0A*Bulky%20Move*%20%E2%80%94%20Ksh%201%2C000%2B%0AFull%20house.%20Any%20distance.%0A%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0APay%20on%20move%20day.%20Zero%20upfront.%0AAdmin%20confirms%20via%20WhatsApp.%0A%0ABook%20here%3A%0Ahttps%3A%2F%2Fnestfindercuk.rocks%2Fmovers.html" target="_blank" rel="noopener"
   style="position:fixed;bottom:1.5rem;right:1.5rem;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.35);z-index:998;transition:transform .2s,box-shadow .2s;text-decoration:none"
   onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 6px 28px rgba(37,211,102,.5)'"
   onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(37,211,102,.35)'"
