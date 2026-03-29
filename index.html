@@ -1018,8 +1018,16 @@ window.sb={
           </div>
         </div>
         <div id="m-map-wrap" style="margin-top:1rem;border-radius:2px;overflow:hidden;border:1px solid var(--border)">
-          <div style="font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:.6rem 1rem;background:var(--linen);border-bottom:1px solid var(--border)">📍 Approximate Location</div>
-          <div id="m-map" style="height:200px;width:100%"></div>
+          <div style="font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:.6rem 1rem;background:var(--linen);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span>📍 Location</span>
+            <a id="m-directions-btn" href="#" target="_blank" style="display:none;font-size:.65rem;color:var(--gold);text-decoration:none;font-weight:500;letter-spacing:.06em">Get Directions →</a>
+          </div>
+          <div id="m-map" style="height:240px;width:100%;background:var(--linen);display:flex;align-items:center;justify-content:center">
+            <span style="font-size:.72rem;color:var(--muted)">No location pinned</span>
+          </div>
+        </div>
+
+
         </div>
         <div id="m-amenities-wrap" class="m-amenities"></div>
         <div id="m-desc-wrap" class="m-desc" style="display:none"></div>
@@ -1460,31 +1468,19 @@ async function openListing(id){
     const mn=document.getElementById("m-min-nights");if(mn)mn.textContent=l.min_nights?l.min_nights+" night"+(l.min_nights>1?"s":""):"1 night";
   }
   // Map
-  setTimeout(()=>{
-    const mapEl=document.getElementById("m-map");if(!mapEl)return;
-    if(window._leafletMap){window._leafletMap.remove();window._leafletMap=null;}
+  const mapDiv=document.getElementById("m-map");
+  const dirBtn=document.getElementById("m-directions-btn");
+  if(mapDiv){
     if(l.latitude&&l.longitude){
-      const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([l.latitude,l.longitude],16);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-      L.circle([l.latitude,l.longitude],{radius:150,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.22}).addTo(map);
-      window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
+      const q=l.latitude+","+l.longitude;
+      const label=encodeURIComponent(l.title||"Property");
+      mapDiv.innerHTML='<iframe width="100%" height="240" frameborder="0" style="border:0;display:block" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q='+q+'&z=16&output=embed&t=m"></iframe>';
+      if(dirBtn){dirBtn.style.display="";dirBtn.href="https://www.google.com/maps/dir/?api=1&destination="+q;}
     } else {
-      const query=encodeURIComponent((l.location||"Cooperative University of Kenya")+", Kenya");
-      fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&q="+query)
-        .then(r=>r.json()).then(data=>{
-          const lat=data&&data[0]?parseFloat(data[0].lat):-1.3167;
-          const lng=data&&data[0]?parseFloat(data[0].lon):36.9333;
-          const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],15);
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-          L.circle([lat,lng],{radius:200,color:"var(--gold)",fillColor:"var(--gold)",fillOpacity:0.18}).addTo(map);
-          window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
-        }).catch(()=>{
-          const map=L.map("m-map",{zoomControl:true,scrollWheelZoom:false}).setView([-1.3167,36.9333],14);
-          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap",maxZoom:19}).addTo(map);
-          window._leafletMap=map;setTimeout(()=>map.invalidateSize(),100);
-        });
+      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:240px;font-size:.72rem;color:var(--muted)">No location pinned for this listing</div>';
+      if(dirBtn)dirBtn.style.display="none";
     }
-
+  }
 
 
 
