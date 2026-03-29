@@ -537,9 +537,9 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
         </svg>
       </div>
       <div style="display:flex;gap:.75rem;justify-content:center;margin-top:1rem;flex-wrap:wrap">
-      <button onclick="printFlyer()" style="background:var(--gold);color:var(--dark);border:none;font-family:Jost,sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.75rem 1.5rem;cursor:pointer;display:flex;align-items:center;gap:.5rem">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        Print / Save PDF
+      <button onclick="downloadFlyerImage()" style="background:var(--gold);color:var(--dark);border:none;font-family:Jost,sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.75rem 1.5rem;cursor:pointer;display:flex;align-items:center;gap:.5rem">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Flyer
       </button>
       <p style="font-size:.65rem;color:rgba(255,255,255,.25);margin:0;line-height:1.6;align-self:center">Or screenshot and share in chats</p>
     </div>
@@ -687,20 +687,33 @@ function downloadFlyer(){
   const fw=document.getElementById('flyer-wrap');
   if(fw){fw.style.display=fw.style.display==='none'?'block':'none';}
 }
-function printFlyer(){
+function downloadFlyerImage(){
   const src=document.getElementById('flyer');
-  const target=document.getElementById('print-flyer-target');
-  const page=document.getElementById('print-flyer-page');
-  if(!src||!target||!page)return;
-  const clone=src.cloneNode(true);
-  clone.style.cssText='width:100%;max-width:100%;display:block';
-  target.innerHTML='';
-  target.appendChild(clone);
-  page.style.cssText='display:block;position:fixed;inset:0;background:#1a0a00;z-index:9999;padding:1rem;box-sizing:border-box';
-  setTimeout(()=>{
-    window.print();
-    setTimeout(()=>{page.style.display='none';},800);
-  },300);
+  if(!src){alert('Please tap "Save Flyer" first to reveal it.');return;}
+  const svgEl=src.querySelector('svg');
+  if(!svgEl)return;
+  const svgData=new XMLSerializer().serializeToString(svgEl);
+  const canvas=document.createElement('canvas');
+  canvas.width=760;canvas.height=1120;
+  const ctx=canvas.getContext('2d');
+  const img=new Image();
+  const blob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  img.onload=function(){
+    ctx.fillStyle='#1a0a00';
+    ctx.fillRect(0,0,760,1120);
+    ctx.drawImage(img,0,0,760,1120);
+    URL.revokeObjectURL(url);
+    const link=document.createElement('a');
+    link.download='trinity-movers-flyer.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+  };
+  img.onerror=function(){
+    URL.revokeObjectURL(url);
+    alert('Download failed. Please screenshot the flyer instead.');
+  };
+  img.src=url;
 }
 
 // WhatsApp share links set directly in HTML
