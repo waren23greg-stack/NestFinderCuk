@@ -509,6 +509,8 @@ async function submitMove(){
     document.getElementById('mv-success').style.display='block';
     btn.style.display='none';
     toast('Booking submitted successfully.');
+    const waMsg=encodeURIComponent('*NEW TRINITY MOVERS BOOKING*\n\nName: '+name+'\nPhone: '+phone+'\nPickup: '+pickup+' ('+pz+' zone)'+'\nDrop-off: '+dropoff+' ('+dz+' zone)'+'\nDate: '+date+'\nTier: '+tierLabel+'\nPrice: Ksh '+price+(notes?'\nNotes: '+notes:'')+'\n\nReply to confirm.');
+    window.open('https://wa.me/254704285315?text='+waMsg,'_blank');
   }catch(e){
     toast('Submission failed. Please try again.','err');
     btn.disabled=false;btn.textContent='Request My Move';
