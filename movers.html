@@ -105,6 +105,7 @@ nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(22,1
 .marquee-item{font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(184,149,90,.55);padding-right:2.5rem}
 .marquee-sep{color:rgba(184,149,90,.25);padding-right:2.5rem}
 @keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes scrollpulse{0%,100%{opacity:.4}50%{opacity:1}}
 footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba(184,149,90,.1)}
 .foot-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
 .foot-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;color:#fff}
@@ -126,7 +127,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
 </style>
 </head>
 <body>
-
 <nav>
   <a href="index.html" class="nav-logo">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
@@ -137,7 +137,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <a href="movers.html" class="active">Movers</a>
   </div>
 </nav>
-
 <div class="hero">
   <svg class="hero-lines" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
     <line x1="0" y1="200" x2="1200" y2="200" stroke="white" stroke-width="0.5"/>
@@ -162,7 +161,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <div class="scroll-line"></div>
   </div>
 </div>
-
 <div class="brand-strip">
   <div class="brand-item">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -181,8 +179,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     All 3 Gataka Zones
   </div>
 </div>
-
-<!-- ZONES -->
 <div class="zones-section">
   <div class="section-label">Coverage Area</div>
   <div class="section-title">We cover all of Gataka</div>
@@ -213,8 +209,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     </div>
   </div>
 </div>
-
-<!-- TIERS -->
 <div class="section">
   <div class="section-label">Our Services</div>
   <div class="section-title">Choose your tier</div>
@@ -223,7 +217,7 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <div class="tier-card" id="tier-lite" onclick="selectTier('lite')">
       <div class="tier-number">01</div>
       <div class="tier-icon-wrap">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M21 10H3"/><path d="M21 6H3"/><path d="M21 14H3"/><path d="M21 18H3"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="1.5"><path d="M21 10H3M21 6H3M21 14H3M21 18H3"/></svg>
       </div>
       <div class="tier-name">Lite Move</div>
       <div class="tier-price">Ksh 500</div>
@@ -256,8 +250,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     </div>
   </div>
 </div>
-
-<!-- HOW IT WORKS -->
 <div class="how-section">
   <div style="max-width:960px;margin:0 auto">
     <div class="section-label" style="color:rgba(184,149,90,.55)">The Process</div>
@@ -270,8 +262,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     </div>
   </div>
 </div>
-
-<!-- BOOKING FORM -->
 <div class="form-wrap" id="book">
   <div style="margin-bottom:2.5rem">
     <div class="section-label">Booking</div>
@@ -376,10 +366,9 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" style="margin-bottom:1rem"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
     <h3>Booking Received</h3>
     <p>Thank you. Admin will confirm your move via WhatsApp shortly.<br><br>
-    Questions? <a href="https://wa.me/254704285315" target="_blank">WhatsApp Admin →</a></p>
+    Questions? <a href="https://wa.me/254704285315" target="_blank">WhatsApp Admin</a></p>
   </div>
 </div>
-
 <div class="marquee-wrap">
   <div class="marquee-inner">
     <span class="marquee-item">Trinity Movers</span><span class="marquee-sep">·</span>
@@ -396,7 +385,6 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     <span class="marquee-item">Pay on move day</span><span class="marquee-sep">·</span>
   </div>
 </div>
-
 <footer>
   <div class="foot-inner">
     <div>
@@ -409,15 +397,12 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
     </div>
   </div>
 </footer>
-
 <div class="toast" id="toast"></div>
-
 <script>
 const _SB_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
 const _SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
 let activeTier='';
 const ZONES={upper:'Upper Zone',mid:'Mid Zone',lower:'Lower Zone',outside:'Outside Gataka'};
-
 function selectTier(tier){
   activeTier=tier;
   document.querySelectorAll('.tier-card').forEach(c=>c.classList.remove('selected'));
@@ -429,15 +414,12 @@ function selectTier(tier){
   calcPrice();
   document.getElementById('book').scrollIntoView({behavior:'smooth'});
 }
-
 function syncTierFromSelect(){
   const v=document.getElementById('mv-tier').value;
   if(v)selectTier(v);
 }
-
 function getZone(id){const v=document.getElementById(id).value;return v?v.split('|')[1]:null;}
 function getLandmark(id){const v=document.getElementById(id).value;return v?v.split('|')[0]:'';}
-
 function calcPrice(){
   if(activeTier!=='mini'){document.getElementById('price-calc').style.display='none';return;}
   const pz=getZone('mv-pickup'),dz=getZone('mv-dropoff');
@@ -455,13 +437,11 @@ function calcPrice(){
     document.getElementById('price-calc-note').textContent='Cross-zone move ('+ZONES[pz]+' → '+ZONES[dz]+').';
   }
 }
-
 function toast(msg,type){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.borderLeftColor=type==='err'?'#c0392b':'var(--gold)';
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 }
-
 async function submitMove(){
   const name=document.getElementById('mv-name').value.trim();
   const phone=document.getElementById('mv-phone').value.trim();
