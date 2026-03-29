@@ -209,7 +209,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .foot-copy{font-size:.68rem;color:rgba(255,255,255,.28);letter-spacing:.04em}
 
 /* MODAL */
-.overlay{position:fixed;inset:0;background:rgba(22,19,14,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .3s;overflow:hidden}
+.overlay{position:fixed;inset:0;background:rgba(22,19,14,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .3s;overflow:hidden;touch-action:pan-y}
 .overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--cream);width:100%;max-width:860px;max-height:90svh;transform:translateY(20px);transition:transform .32s var(--ease)}
 .overlay.open .modal{transform:translateY(0)}
