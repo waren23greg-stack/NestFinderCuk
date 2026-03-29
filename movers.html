@@ -139,9 +139,10 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
 .hero.ready .hero-scroll{opacity:1}
 
 @media print {
-  body > *:not(#print-flyer-page) { display: none !important; }
-  #print-flyer-page { display: flex !important; }
-  @page { margin: 0; size: A5 portrait; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body > * { display: none !important; }
+  #print-flyer-page { display: block !important; position: static !important; }
+  @page { margin: 0; size: A5 portrait; background: #1a0a00; }
 }
 #print-flyer-page {
   display: none;
@@ -691,12 +692,15 @@ function printFlyer(){
   const target=document.getElementById('print-flyer-target');
   const page=document.getElementById('print-flyer-page');
   if(!src||!target||!page)return;
-  target.innerHTML=src.innerHTML;
-  page.style.display='flex';
+  const clone=src.cloneNode(true);
+  clone.style.cssText='width:100%;max-width:100%;display:block';
+  target.innerHTML='';
+  target.appendChild(clone);
+  page.style.cssText='display:block;position:fixed;inset:0;background:#1a0a00;z-index:9999;padding:1rem;box-sizing:border-box';
   setTimeout(()=>{
     window.print();
-    setTimeout(()=>{page.style.display='none';},500);
-  },200);
+    setTimeout(()=>{page.style.display='none';},800);
+  },300);
 }
 
 // WhatsApp share links set directly in HTML
