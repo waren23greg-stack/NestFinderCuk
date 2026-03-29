@@ -749,7 +749,7 @@ async function updateReport(id,status){
 
 /* ── LISTING MODAL ── */
 function openModal(){
-  ["fTitle","fPrice","fLoc","fDesc","fCtName","fCtPhone","fLat","fLng"].forEach(id=>document.getElementById(id).value="");
+  ["fTitle","fPrice","fLoc","fDesc","fCtName","fCtPhone","fLat","fLng"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("pin-coords").textContent="No pin placed yet — click the map to set location";
   document.getElementById('fContactFee').value='250';
   document.getElementById('fType').value='single';
@@ -781,8 +781,8 @@ async function editListing(id){
   document.getElementById('fContactFee').value=h.contact_fee||250;
   document.getElementById('fLoc').value=h.location||'';
   document.getElementById('fDesc').value=h.description||'';
-  document.getElementById("fLat").value=h.latitude||"";
-  document.getElementById("fLng").value=h.longitude||"";
+  const _la=document.getElementById("fLat");if(_la)_la.value=h.latitude||"";
+  const _ln=document.getElementById("fLng");if(_ln)_ln.value=h.longitude||"";
   if(h.latitude&&h.longitude)document.getElementById("pin-coords").textContent="📍 "+parseFloat(h.latitude).toFixed(5)+", "+parseFloat(h.longitude).toFixed(5);
   document.getElementById('fWater').checked=!!h.water_included;
   document.getElementById('fWifi').checked=!!h.wifi_available;
