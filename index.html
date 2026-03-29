@@ -1457,7 +1457,7 @@ async function openListing(id){
     if(t)t.textContent=TL[l.type]||l.type;
     if(p){if(l.listing_type==="airbnb"){p.textContent="Ksh "+(l.price_per_night||0).toLocaleString()+" / night";}else{p.textContent="Ksh "+(l.price||0).toLocaleString()+" / mo";}}
     if(loc)loc.textContent=l.location;
-    if(st)st.textContent=l.available?'Available Now':'Currently Taken';
+    if(st){st.textContent=l.available?'Available Now':'Currently Taken';st.style.color=l.available?'var(--gold)':'var(--muted)';}
   });
   document.getElementById('m-title').textContent=l.title;
   // Update CTA for Airbnb
