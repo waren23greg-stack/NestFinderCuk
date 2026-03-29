@@ -1526,14 +1526,14 @@ async function openListing(id){
   if(mapDiv){
     if(l.latitude&&l.longitude){
       const q=l.latitude+","+l.longitude;
-      const staticUrl='https://maps.googleapis.com/maps/api/staticmap?center='+q+'&zoom=16&size=640x240&scale=2&markers=color:0xB8955A|'+q+'&key=AIzaSyD-placeholder';
-      const mapsLink='https://www.google.com/maps/search/?api=1&query='+q;
-      mapDiv.innerHTML='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:block;position:relative;height:220px;background:var(--linen);overflow:hidden;text-decoration:none"><iframe width="100%" height="220" frameborder="0" style="border:0;display:block;pointer-events:none" src="https://maps.google.com/maps?q='+q+'&z=16&output=embed&t=m"></iframe><div style="position:absolute;inset:0;z-index:10;display:flex;align-items:flex-end;justify-content:center;padding-bottom:1rem;background:linear-gradient(to top,rgba(22,19,14,.5) 0%,transparent 60%)"><span style="background:var(--dark);color:var(--gold);font-family:Jost,sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1.25rem;border:1px solid rgba(184,149,90,.4)">Tap to Open in Maps</span></div></a>';
-      if(dirBtn){dirBtn.style.display="";dirBtn.href="https://www.google.com/maps/dir/?api=1&destination="+q;}
+      const mapsLink="https://www.google.com/maps/search/?api=1&query="+q;
+      mapDiv.innerHTML='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;background:var(--linen);text-decoration:none;border:1px solid var(--border);gap:.75rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-family:Jost,sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(184,149,90,.35);padding:.45rem 1.25rem">Open in Google Maps</span><span style="font-size:.62rem;color:var(--muted)">'+l.location+'</span></a>';
+      if(dirBtn){dirBtn.style.display="";dirBtn.href=mapsLink;}
     } else {
-      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:240px;font-size:.72rem;color:var(--muted)">No location pinned</div>';
+      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:120px;font-size:.72rem;color:var(--muted)">No location pinned</div>';
       if(dirBtn)dirBtn.style.display="none";
     }
+  }
   }
 
   if(user){
