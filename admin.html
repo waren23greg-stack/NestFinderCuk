@@ -932,6 +932,7 @@ function resetSave(){
 
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
+init();
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));});
 
 function searchLocation(){
