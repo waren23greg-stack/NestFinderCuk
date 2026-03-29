@@ -19,7 +19,7 @@ self.addEventListener("fetch", (event) => {
         }
         const responseClone = response.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseClone);
+          if(event.request.method==="GET")cache.put(event.request, responseClone);
         });
         return response;
       })
