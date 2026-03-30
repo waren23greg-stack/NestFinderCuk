@@ -126,3 +126,4 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: err.message });
   }
 };
+// NOTE: referral earnings insert is missing — add after Step 4 succeeds
