@@ -301,6 +301,7 @@ footer{background:var(--dark);padding:2.5rem var(--px);border-top:1px solid rgba
   <div class="f-row">
     <div class="f-group"><label>Your Name</label><input id="mv-name" type="text" placeholder="e.g. John Kamau"/></div>
     <div class="f-group"><label>Phone Number</label><input id="mv-phone" type="tel" placeholder="e.g. 0712 345 678"/></div>
+    <div class="f-group"><label>Email Address</label><input id="mv-email" type="email" placeholder="e.g. john@students.chuka.ac.ke"/></div>
   </div>
   <div class="f-row">
     <div class="f-group">
@@ -630,12 +631,13 @@ function toast(msg,type){
 async function submitMove(){
   const name=document.getElementById('mv-name').value.trim();
   const phone=document.getElementById('mv-phone').value.trim();
+  const email=document.getElementById('mv-email').value.trim();
   const pickupRaw=document.getElementById('mv-pickup').value;
   const dropoffRaw=document.getElementById('mv-dropoff').value;
   const date=document.getElementById('mv-date').value;
   const tier=document.getElementById('mv-tier').value;
   const notes=document.getElementById('mv-notes').value.trim();
-  if(!name||!phone||!pickupRaw||!dropoffRaw||!date||!tier){toast('Please fill in all required fields','err');return;}
+  if(!name||!phone||!email||!pickupRaw||!dropoffRaw||!date||!tier){toast('Please fill in all required fields','err');return;}
   const pickup=getLandmark('mv-pickup'),dropoff=getLandmark('mv-dropoff');
   const pz=getZone('mv-pickup'),dz=getZone('mv-dropoff');
   let price='500';
@@ -654,6 +656,11 @@ async function submitMove(){
     document.getElementById('mv-success').style.display='block';
     btn.style.display='none';
     toast('Booking submitted successfully.');
+    fetch('/api/notify-mover',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,email,phone,pickup,dropoff,pickup_zone:pz,dropoff_zone:dz,move_date:date,tier:tierLabel,price,notes})
+    }).catch(()=>{});
     const waMsg=encodeURIComponent('*NEW TRINITY MOVERS BOOKING*\n\nName: '+name+'\nPhone: '+phone+'\nPickup: '+pickup+' ('+pz+' zone)'+'\nDrop-off: '+dropoff+' ('+dz+' zone)'+'\nDate: '+date+'\nTier: '+tierLabel+'\nPrice: Ksh '+price+(notes?'\nNotes: '+notes:'')+'\n\nReply to confirm.');
     const waBtn=document.getElementById('admin-wa-btn');
     if(waBtn){waBtn.href='https://wa.me/254704285315?text='+waMsg;waBtn.style.display='flex';}
