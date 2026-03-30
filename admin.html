@@ -378,9 +378,10 @@ window.sb={
         <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg></div><div class="stat-label">Total Listings</div><div class="stat-val" id="s-listings">—</div><div class="stat-sub">on platform</div></div>
         <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="stat-label">Available</div><div class="stat-val" id="s-avail">—</div><div class="stat-sub">ready to view</div></div>
         <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-label">Students</div><div class="stat-val" id="s-students">—</div><div class="stat-sub">registered</div></div>
-        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="stat-label">Revenue</div><div class="stat-val" id="s-revenue">—</div><div class="stat-sub">confirmed payments</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="stat-label">Total Revenue</div><div class="stat-val" id="s-revenue">—</div><div class="stat-sub">listings + movers</div></div>
+        <div class="stat-card"><div class="stat-ico"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="stat-label">Mover Bookings</div><div class="stat-val" id="s-movers">—</div><div class="stat-sub">confirmed moves</div></div>
       </div>
-      <div class="sec-head"><div><div class="sec-title">Revenue — last 7 days</div><div class="sec-sub">Confirmed payments only</div></div></div>
+      <div class="sec-head"><div><div class="sec-title">Revenue — last 7 days</div><div class="sec-sub">Listings (gold) + Movers (green) confirmed revenue</div></div></div>
       <div class="chart-wrap"><div class="chart-label">Daily confirmed payments (Ksh)</div><div class="bars" id="chartBars"></div></div>
       <div class="sec-head" style="margin-top:2rem;"><div><div class="sec-title">Recent payments</div></div></div>
       <div class="recent-wrap"><table><thead><tr><th>Student</th><th>Listing</th><th>Amount</th><th>M-Pesa Ref</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentBody"><tr class="empty-row"><td colspan="6">Loading…</td></tr></tbody></table></div>
@@ -628,19 +629,25 @@ function toast(msg,err=false){
 
 /* ── DASHBOARD ── */
 async function loadDashboard(){
-  const [l,p,u]=await Promise.all([
+  const t=localStorage.getItem('sb-token');
+  const [l,p,u,mv]=await Promise.all([
     sb.from('listings').select('id,available',{count:'exact'}),
     sb.from('payments').select('id,status,amount,created_at',{count:'exact'}),
-    sb.from('profiles').select('id',{count:'exact'}).eq('role','student')
+    sb.from('profiles').select('id',{count:'exact'}).eq('role','student'),
+    fetch(_B+'/rest/v1/moving_requests?select=id,status,price,created_at',{headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K)}}).then(r=>r.json()).catch(()=>[])
   ]);
   const avail=(l.data||[]).filter(x=>x.available).length;
   const confirmed=(p.data||[]).filter(x=>x.status==='confirmed');
-  const rev=confirmed.reduce((s,x)=>s+(x.amount||250),0);
+  const listingsRev=confirmed.reduce((s,x)=>s+(x.amount||250),0);
+  const moverConfirmed=Array.isArray(mv)?mv.filter(x=>x.status==='confirmed'||x.status==='done'):[];
+  const moversRev=moverConfirmed.reduce((s,x)=>s+(parseInt(x.price)||0),0);
+  const totalRev=listingsRev+moversRev;
   document.getElementById('s-listings').textContent=l.count??0;
   document.getElementById('s-avail').textContent=avail;
   document.getElementById('s-students').textContent=u.count??0;
-  document.getElementById('s-revenue').textContent='Ksh '+(rev).toLocaleString();
-  buildChart(confirmed);
+  document.getElementById('s-revenue').textContent='Ksh '+totalRev.toLocaleString();
+  if(document.getElementById('s-movers'))document.getElementById('s-movers').textContent=moverConfirmed.length;
+  buildChart(confirmed,moverConfirmed);
   const {data:rp}=await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(8);
   const rb=document.getElementById('recentBody');
   if(!rp?.length){rb.innerHTML='<tr class="empty-row"><td colspan="6">No payments yet.</td></tr>';return;}
@@ -653,12 +660,24 @@ async function loadDashboard(){
     <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
   </tr>`).join('');
 }
-function buildChart(confirmed){
+function buildChart(confirmed,moverConfirmed){
   const bars=document.getElementById('chartBars');
   const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d);}
-  const totals=days.map(d=>{const ds=d.toDateString();return confirmed.filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(p.amount||250),0);});
-  const max=Math.max(...totals,250);
-  bars.innerHTML=days.map((d,i)=>`<div class="bar-col"><div class="bar-amt">${totals[i]?'Ksh'+totals[i]:''}</div><div class="bar" style="height:${Math.round((totals[i]/max)*70)+2}px"></div><div class="bar-day">${d.toLocaleDateString('en-KE',{weekday:'short'})}</div></div>`).join('');
+  const totals=days.map(d=>{
+    const ds=d.toDateString();
+    const lRev=confirmed.filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(p.amount||250),0);
+    const mRev=(moverConfirmed||[]).filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(parseInt(p.price)||0),0);
+    return {total:lRev+mRev,listings:lRev,movers:mRev};
+  });
+  const max=Math.max(...totals.map(t=>t.total),250);
+  bars.innerHTML=days.map((d,i)=>`<div class="bar-col">
+    <div class="bar-amt">${totals[i].total?'Ksh'+totals[i].total.toLocaleString():''}</div>
+    <div style="display:flex;flex-direction:column;justify-content:flex-end;height:72px;gap:1px">
+      ${totals[i].movers?`<div style="width:100%;background:rgba(37,211,102,.5);height:${Math.round((totals[i].movers/max)*70)+1}px" title="Movers: Ksh${totals[i].movers}"></div>`:''}
+      ${totals[i].listings?`<div class="bar" style="height:${Math.round((totals[i].listings/max)*70)+1}px" title="Listings: Ksh${totals[i].listings}"></div>`:'<div class="bar" style="height:2px"></div>'}
+    </div>
+    <div class="bar-day">${d.toLocaleDateString('en-KE',{weekday:'short'})}</div>
+  </div>`).join('');
 }
 
 /* ── LISTINGS ── */
