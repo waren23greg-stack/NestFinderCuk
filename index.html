@@ -912,6 +912,7 @@ window.sb={
       </select>
     </div>
     <div class="chips">
+      <div class="chip" data-f="short_stay" onclick="toggleChip(this)" style="border-color:rgba(184,149,90,.4);color:#B8955A;font-weight:500"><div class="chip-dot" style="background:#B8955A"></div>Short Stay</div>
       <div class="chip" data-f="water" onclick="toggleChip(this)"><div class="chip-dot"></div>Water</div>
       <div class="chip" data-f="wifi" onclick="toggleChip(this)"><div class="chip-dot"></div>WiFi</div>
       <div class="chip" data-f="avail" onclick="toggleChip(this)"><div class="chip-dot"></div>Available</div>
@@ -1009,6 +1010,24 @@ window.sb={
 
 <!-- TRUST -->
 <section id="trust" class="trust">
+  <div style="background:#16130E;padding:1.25rem 2rem;display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;border-bottom:1px solid rgba(184,149,90,.15)">
+    <div style="text-align:center">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#D4B483;font-weight:300" id="stat-students">—</div>
+      <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#8A8070;margin-top:.2rem">Students Housed</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#D4B483;font-weight:300" id="stat-listings">—</div>
+      <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#8A8070;margin-top:.2rem">Active Listings</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#D4B483;font-weight:300">4.8★</div>
+      <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#8A8070;margin-top:.2rem">Avg Rating</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#D4B483;font-weight:300">24hr</div>
+      <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#8A8070;margin-top:.2rem">Listing Review</div>
+    </div>
+  </div>
   <div class="trust-inner">
     <div class="sec-header" style="border-color:var(--border)">
       <div><p class="sec-label">Why NestFinder</p><h2 class="sec-title">Built for Your Safety</h2></div>
@@ -1265,7 +1284,11 @@ window.sb={
             <div class="promo-code-val" id="promo-reward-code">—</div>
             <button class="promo-copy-btn" onclick="copyPromoCode()">Copy</button>
           </div>
-          <p class="promo-sub">Share this code with a friend — they get their caretaker contact <strong>free</strong>. One use only.</p>
+          <p class="promo-sub">Share this code with a friend — they get <strong style="color:#B8955A">Ksh 50 off</strong> their first contact fee. You help them find housing faster.</p>
+          <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+            <button onclick="(()=>{const c=document.getElementById('promo-reward-code').textContent;const msg='Use my NestFinder CUK code '+c+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks';if(navigator.share){navigator.share({title:'NestFinder CUK',text:msg})}else{navigator.clipboard.writeText(msg);toast('Share link copied!')}})()" style="background:#16130E;color:#D4B483;border:none;font-family:Jost,sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:.4rem"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share Code</button>
+            <a href="https://wa.me/?text=" id="promo-wa-share" target="_blank" style="background:transparent;color:#25D366;border:1px solid #25D366;font-family:Jost,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:.4rem"><svg width="11" height="11" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.878-1.438A9.945 9.945 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>WhatsApp</a>
+          </div>
         </div>
         </div>
         <div class="reviews-section" id="reviews-section">
@@ -1905,6 +1928,24 @@ function copyPromoCode(){
   navigator.clipboard.writeText(code).then(()=>toast("Promo code copied!"));
 }
 initAuth();load();loadRatings();
+// Live trust stats
+(async()=>{
+  try{
+    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+    const [pr,lr]=await Promise.all([
+      fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/payments?select=id&status=eq.approved',{headers:{'apikey':K,'Authorization':'Bearer '+K,'Prefer':'count=exact'}}),
+      fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listings?select=id',{headers:{'apikey':K,'Authorization':'Bearer '+K,'Prefer':'count=exact'}})
+    ]);
+    const pc=pr.headers.get('content-range');
+    const lc=lr.headers.get('content-range');
+    const students=pc?pc.split('/')[1]:null;
+    const listings=lc?lc.split('/')[1]:null;
+    const se=document.getElementById('stat-students');
+    const le=document.getElementById('stat-listings');
+    if(se&&students)se.textContent=parseInt(students).toLocaleString()+'+';
+    if(le&&listings)le.textContent=parseInt(listings).toLocaleString();
+  }catch(e){}
+})();
 </script>
 
 <!-- PWA INSTALL BANNER -->
