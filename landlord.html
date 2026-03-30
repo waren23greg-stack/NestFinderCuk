@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#16130E"/>
+<title>List Your Property — NestFinder CUK</title>
+<meta name="description" content="List your rental property on NestFinder CUK. Reach hundreds of verified students near The Cooperative University of Kenya. Free to list."/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#B8955A;--gold-l:#D4B483;--gold-xl:#F0E4CC;--dark:#16130E;--dark2:#231F18;--ink:#4A4438;--muted:#8A8070;--linen:#F8F4EE;--cream:#FDF9F4;--border:rgba(184,149,90,0.18);--border2:rgba(184,149,90,0.38);--green:#1D9E75;--red:#C0392B;--ease:cubic-bezier(0.4,0,0.2,1);--t:0.26s;--px:clamp(1.25rem,5vw,4rem)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.1}
+nav{position:sticky;top:0;z-index:100;background:rgba(253,249,244,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;padding:0 var(--px);justify-content:space-between}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--dark);text-decoration:none}
+.nav-logo b{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color var(--t)}
+.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.hero{background:var(--dark);padding:5rem var(--px) 4rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(184,149,90,.12) 0%,transparent 70%)}
+.hero-inner{position:relative;max-width:680px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;border:1px solid rgba(184,149,90,.3);padding:.35rem 1rem;font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-l);margin-bottom:2rem}
+.hero-badge span{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+.hero h1{font-size:clamp(2.2rem,6vw,3.8rem);color:#fff;font-weight:300;line-height:1.1;margin-bottom:1rem}
+.hero h1 em{color:var(--gold-l);font-style:italic}
+.hero-sub{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.8;font-weight:300;max-width:480px;margin:0 auto 2.5rem}
+.hero-stats{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
+.hero-stat-val{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--gold-l);font-weight:300;line-height:1}
+.hero-stat-label{font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:.25rem}
+.why{padding:5rem var(--px);background:var(--cream)}
+.why-inner{max-width:1100px;margin:0 auto}
+.sec-label{font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--dark);font-weight:300;margin-bottom:3rem}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5px;background:var(--border)}
+.why-card{background:var(--cream);padding:2rem;transition:background var(--t)}
+.why-card:hover{background:#fff}
+.why-ico{width:44px;height:44px;background:rgba(184,149,90,.08);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.why-ico svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.why-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--dark);margin-bottom:.5rem}
+.why-desc{font-size:.78rem;color:var(--muted);line-height:1.75;font-weight:300}
+.how{padding:5rem var(--px);background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.how-inner{max-width:860px;margin:0 auto}
+.how-step{display:grid;grid-template-columns:60px 1fr;gap:1.5rem;padding:2rem 0;border-bottom:1px solid var(--border);align-items:start}
+.how-step:last-child{border-bottom:none}
+.how-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--gold-xl);font-weight:300;line-height:1}
+.how-content h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--dark);font-weight:400;margin-bottom:.4rem}
+.how-content p{font-size:.8rem;color:var(--muted);line-height:1.75;font-weight:300}
+.form-section{padding:5rem var(--px);background:var(--linen)}
+.form-wrap{max-width:760px;margin:0 auto}
+.form-card{background:#fff;border:1px solid var(--border)}
+.form-block{padding:2rem 2.5rem;border-bottom:1px solid var(--border)}
+.form-block:last-child{border-bottom:none}
+.form-block-title{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.form-block-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-row.single{grid-template-columns:1fr}
+.f-group{display:flex;flex-direction:column;gap:.4rem}
+.f-group label{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.f-group input,.f-group select,.f-group textarea{width:100%;padding:.65rem .85rem;background:var(--linen);border:1px solid var(--border);font-family:'Jost',sans-serif;font-size:.88rem;color:var(--dark);outline:none;transition:border-color var(--t);-webkit-appearance:none;border-radius:0}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--gold-l);background:#fff}
+.f-group textarea{resize:vertical;min-height:90px;line-height:1.6}
+.f-group select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A8070' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.5rem;cursor:pointer}
+.f-hint{font-size:.65rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+.amenities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.5rem;margin-top:.5rem}
+.amen-check{display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;border:1px solid var(--border);cursor:pointer;transition:all var(--t);user-select:none;font-size:.78rem;color:var(--ink)}
+.amen-check:hover{border-color:var(--gold);background:rgba(184,149,90,.04)}
+.amen-check input{display:none}
+.amen-check.on{border-color:var(--gold);background:rgba(184,149,90,.08);color:var(--dark)}
+.amen-dot{width:8px;height:8px;border:1.5px solid var(--border2);border-radius:50%;flex-shrink:0;transition:all var(--t)}
+.amen-check.on .amen-dot{background:var(--gold);border-color:var(--gold)}
+.photo-upload-area{border:2px dashed var(--border2);padding:2.5rem;text-align:center;cursor:pointer;transition:all var(--t);background:var(--linen)}
+.photo-upload-area:hover{border-color:var(--gold);background:rgba(184,149,90,.04)}
+.photo-upload-area svg{width:32px;height:32px;stroke:var(--gold);fill:none;stroke-width:1.5;margin:0 auto .75rem}
+.photo-upload-area p{font-size:.78rem;color:var(--muted);line-height:1.7}
+.photo-previews{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.5rem;margin-top:1rem}
+.photo-preview{position:relative;aspect-ratio:1;background:var(--linen);border:1px solid var(--border);overflow:hidden}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-preview .rm{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(16,13,8,.7);color:#fff;border:none;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center}
+.submit-section{padding:2rem 2.5rem;background:var(--dark);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.submit-note{font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.7;max-width:340px}
+.submit-btn{background:var(--gold);color:var(--dark);border:none;font-family:'Jost',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:.9rem 2.5rem;cursor:pointer;transition:background var(--t);white-space:nowrap;display:flex;align-items:center;gap:.6rem}
+.submit-btn:hover{background:var(--gold-l)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.success-screen{display:none;text-align:center;padding:4rem 2rem}
+.success-ico{width:60px;height:60px;background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem}
+.success-ico svg{width:28px;height:28px;stroke:var(--green);fill:none;stroke-width:1.5}
+.success-screen h2{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--dark);font-weight:300;margin-bottom:.75rem}
+.success-screen p{font-size:.82rem;color:var(--muted);line-height:1.8;max-width:400px;margin:0 auto 2rem}
+.trust-bar{background:var(--dark);padding:3rem var(--px);border-top:1px solid rgba(184,149,90,.1)}
+.trust-bar-inner{max-width:860px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem}
+.trust-item{display:flex;align-items:flex-start;gap:1rem}
+.trust-ico{width:36px;height:36px;background:rgba(184,149,90,.1);border:1px solid rgba(184,149,90,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.trust-ico svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.trust-title{font-size:.72rem;font-weight:600;color:#fff;letter-spacing:.04em;margin-bottom:.2rem}
+.trust-desc{font-size:.68rem;color:rgba(255,255,255,.3);line-height:1.6;font-weight:300}
+footer{background:var(--dark);padding:2rem var(--px);border-top:1px solid rgba(184,149,90,.08)}
+.foot-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.foot-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(255,255,255,.4)}
+.foot-logo b{color:var(--gold)}
+.foot-links{display:flex;gap:1.5rem}
+.foot-links a{font-size:.65rem;letter-spacing:.08em;color:rgba(255,255,255,.25);text-decoration:none;transition:color var(--t)}
+.foot-links a:hover{color:var(--gold)}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:#fff;padding:.7rem 1.5rem;font-size:.75rem;letter-spacing:.06em;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;border:1px solid rgba(184,149,90,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+@media(max-width:640px){.form-row{grid-template-columns:1fr}.form-block{padding:1.5rem}.submit-section{flex-direction:column;align-items:stretch}.submit-btn{justify-content:center}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">Nest<b>Finder</b> <span style="opacity:.4">CUK</span></a>
+  <div class="nav-links">
+    <a href="index.html">Browse Listings</a>
+    <a href="movers.html">Trinity Movers</a>
+    <a href="#form" class="active">List Property</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><span></span>Currently accepting new listings</div>
+    <h1>Your property.<br><em>Seen by hundreds</em><br>of verified students.</h1>
+    <p class="hero-sub">NestFinder CUK connects landlords and caretakers with students near The Cooperative University of Kenya. Free to list. We handle the enquiries.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val" id="stat-students">200+</div><div class="hero-stat-label">Students on platform</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">Ksh 0</div><div class="hero-stat-label">Cost to list</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">24h</div><div class="hero-stat-label">Review turnaround</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">Verified</div><div class="hero-stat-label">All listings reviewed</div></div>
+    </div>
+  </div>
+</div>
+
+<section class="why">
+  <div class="why-inner">
+    <p class="sec-label">Why NestFinder CUK</p>
+    <h2 class="sec-title">Built for landlords who want results</h2>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div class="why-title">Verified Student Tenants</div><div class="why-desc">Every enquiry comes from a registered student. Students pay a contact fee before getting your number — so only serious ones reach you.</div></div>
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="why-title">Completely Free to List</div><div class="why-desc">Zero cost to submit your property. We earn from students, not landlords. Your listing stays live until you take it down or mark it as taken.</div></div>
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="why-title">Admin-Verified Listings</div><div class="why-desc">Every listing is reviewed by our team before going live. This protects your reputation and ensures students trust what they see.</div></div>
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="why-title">Gataka & Surrounding Zones</div><div class="why-desc">Upper, Mid, and Lower Gataka, Karen View, Mosque area, Police Station and beyond. Your listing gets placed in front of students actively looking.</div></div>
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="why-title">Short Stay Option</div><div class="why-desc">Have a spare room for a few days? List as Short Stay with per-night pricing. Perfect for holiday breaks when long-term tenants travel.</div></div>
+      <div class="why-card"><div class="why-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div class="why-title">Direct Contact</div><div class="why-desc">Once a student pays, they get your number directly. No middleman in the viewing process. You negotiate directly — we just make the introduction.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="how-inner">
+    <p class="sec-label">The Process</p>
+    <h2 class="sec-title">From submission to first enquiry in 24 hours</h2>
+    <div class="how-step"><div class="how-num">01</div><div class="how-content"><h3>Submit your listing below</h3><p>Fill in your property details — type, rent, location, amenities and upload up to 6 photos. The more detail you give, the more trust students place in your listing.</p></div></div>
+    <div class="how-step"><div class="how-num">02</div><div class="how-content"><h3>Admin reviews within 24 hours</h3><p>Our team verifies your submission and contacts you on WhatsApp if anything needs clarification. Approved listings go live immediately.</p></div></div>
+    <div class="how-step"><div class="how-num">03</div><div class="how-content"><h3>You get notified on WhatsApp</h3><p>Once your listing is approved and live, you receive a WhatsApp confirmation with a link to your listing. No need to follow up.</p></div></div>
+    <div class="how-step"><div class="how-num">04</div><div class="how-content"><h3>Students contact you directly</h3><p>Serious students pay to unlock your number and reach out. Arrange a viewing, show the house, close the deal. No agents, no commission.</p></div></div>
+  </div>
+</section>
+
+<section class="form-section" id="form">
+  <div class="form-wrap">
+    <div style="margin-bottom:3rem">
+      <p class="sec-label">List Your Property</p>
+      <h2 class="sec-title">Tell us about your space</h2>
+      <p style="font-size:.82rem;color:var(--muted);line-height:1.8;font-weight:300;margin-top:.5rem">All fields marked * are required. Your contact details are kept private — students only see your number after admin approval and payment.</p>
+    </div>
+
+    <div class="form-card" id="submission-form">
+      <div class="form-block">
+        <div class="form-block-title">Your Details</div>
+        <div class="form-row">
+          <div class="f-group"><label>Your Name *</label><input id="f-owner-name" type="text" placeholder="e.g. John Kamau"/></div>
+          <div class="f-group"><label>WhatsApp Number *</label><input id="f-owner-phone" type="tel" placeholder="e.g. 0712 345 678"/><span class="f-hint">You will be notified here when listing is approved</span></div>
+        </div>
+        <div class="form-row">
+          <div class="f-group"><label>Email Address</label><input id="f-owner-email" type="email" placeholder="e.g. john@gmail.com"/><span class="f-hint">Optional — for listing updates</span></div>
+          <div class="f-group"><label>Your Role *</label><select id="f-owner-role"><option value="">Select role</option><option value="landlord">Landlord (property owner)</option><option value="caretaker">Caretaker (manages for owner)</option><option value="agent">Agent</option></select></div>
+        </div>
+      </div>
+
+      <div class="form-block">
+        <div class="form-block-title">Property Details</div>
+        <div class="form-row single"><div class="f-group"><label>Listing Title *</label><input id="f-title" type="text" placeholder="e.g. Cosy Bedsitter — Gataka Place, Near Mosque"/><span class="f-hint">Be specific — good titles get more views</span></div></div>
+        <div class="form-row">
+          <div class="f-group"><label>Room Type *</label><select id="f-type" onchange="toggleAirbnb(this.value)"><option value="">Select type</option><option value="single">Single Room</option><option value="bedsitter">Bedsitter</option><option value="one-bedroom">One Bedroom</option><option value="airbnb">Short Stay (per night)</option></select></div>
+          <div class="f-group"><label>Monthly Rent (Ksh) *</label><input id="f-price" type="number" placeholder="e.g. 5500" min="500"/></div>
+        </div>
+        <div class="form-row" id="airbnb-row" style="display:none">
+          <div class="f-group"><label>Price Per Night (Ksh)</label><input id="f-night-price" type="number" placeholder="e.g. 800"/></div>
+          <div class="f-group"><label>Minimum Nights</label><input id="f-min-nights" type="number" placeholder="1" min="1" value="1"/></div>
+        </div>
+        <div class="form-row">
+          <div class="f-group"><label>Location / Area *</label><select id="f-location"><option value="">Select area</option><optgroup label="Upper Zone"><option>SKL</option><option>AIC</option><option>Rally Heights</option><option>Shoppers</option><option>Destiny Best Supermarket Area</option></optgroup><optgroup label="Mid Zone"><option>Mulikaa</option><option>Kajificheni</option><option>Behind Loliondo</option><option>Upendo Riverside</option><option>Upendo Choma Choma</option></optgroup><optgroup label="Lower Zone"><option>Nalis</option><option>Gataka Place</option><option>Karen View</option><option>Mosque Area</option><option>Police Station Area</option><option>PCEA</option></optgroup><optgroup label="Other"><option>Karen</option><option>Other (specify in description)</option></optgroup></select></div>
+          <div class="f-group"><label>Nearest Landmark</label><input id="f-landmark" type="text" placeholder="e.g. 50m from SKL stage"/></div>
+        </div>
+        <div class="form-row single"><div class="f-group"><label>Description *</label><textarea id="f-desc" placeholder="Describe the property honestly. Include floor, compound security, neighbours, nearby facilities, parking, etc."></textarea></div></div>
+      </div>
+
+      <div class="form-block">
+        <div class="form-block-title">Amenities Included</div>
+        <div class="amenities-grid">
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="water"/><div class="amen-dot"></div>Water Included</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="wifi"/><div class="amen-dot"></div>WiFi Available</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="electricity"/><div class="amen-dot"></div>Electricity (Prepaid)</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="security"/><div class="amen-dot"></div>Gated / Security</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="bathroom"/><div class="amen-dot"></div>Private Bathroom</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="kitchen"/><div class="amen-dot"></div>Kitchen Access</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="parking"/><div class="amen-dot"></div>Parking Available</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="furnished"/><div class="amen-dot"></div>Furnished</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="bed"/><div class="amen-dot"></div>Bed Included</label>
+          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="study_table"/><div class="amen-dot"></div>Study Table</label>
+        </div>
+      </div>
+
+      <div class="form-block">
+        <div class="form-block-title">Property Photos</div>
+        <div class="photo-upload-area" onclick="document.getElementById('photo-input').click()">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <p><strong>Tap to upload photos</strong><br/>Up to 6 photos · JPG or PNG · Max 5MB each<br/><span style="font-size:.68rem;opacity:.6">More photos = more trust = faster rental</span></p>
+        </div>
+        <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)"/>
+        <div class="photo-previews" id="photo-previews"></div>
+        <p class="f-hint" style="margin-top:.5rem">Photos are reviewed before publishing. We crop and optimise them for best display.</p>
+      </div>
+
+      <div class="form-block">
+        <div class="form-block-title">Additional Notes</div>
+        <div class="form-row single"><div class="f-group"><label>Anything else to tell us?</label><textarea id="f-notes" placeholder="e.g. Available from April 1st. Currently occupied. Prefer female tenant." style="min-height:70px"></textarea></div></div>
+      </div>
+
+      <div class="submit-section">
+        <p class="submit-note">Free to list. Admin reviews within 24h and notifies you on WhatsApp when live.</p>
+        <button class="submit-btn" id="submit-btn" onclick="submitListing()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Submit Listing
+        </button>
+      </div>
+    </div>
+
+    <div class="success-screen" id="success-screen">
+      <div class="success-ico"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <h2>Listing Received</h2>
+      <p>Thank you. Our team will review your submission and send you a WhatsApp confirmation within 24 hours. Once approved your listing goes live immediately.</p>
+      <a href="index.html" style="display:inline-block;background:var(--dark);color:#fff;font-family:'Jost',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:.85rem 2rem;text-decoration:none">Browse Live Listings</a>
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="trust-item"><div class="trust-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="trust-title">Your number stays private</div><div class="trust-desc">Students only see your contact after paying. No spam, no ghost calls.</div></div></div>
+    <div class="trust-item"><div class="trust-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="trust-title">24-hour review</div><div class="trust-desc">We review every listing before it goes live. Quality over quantity.</div></div></div>
+    <div class="trust-item"><div class="trust-ico"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div><div class="trust-title">Free forever</div><div class="trust-desc">No listing fees, no commission, no hidden charges to landlords.</div></div></div>
+    <div class="trust-item"><div class="trust-ico"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.63 19.79 19.79 0 010 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.373 1.903.73 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.357 1.85.603 2.81.73A2 2 0 0122 14z"/></svg></div><div><div class="trust-title">Direct support</div><div class="trust-desc">Questions? WhatsApp admin on 0704 285 315 anytime.</div></div></div>
+  </div>
+</div>
+
+<footer><div class="foot-inner"><span class="foot-logo">Nest<b>Finder</b> CUK</span><div class="foot-links"><a href="index.html">Listings</a><a href="movers.html">Movers</a><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a><a href="https://wa.me/254704285315" target="_blank">WhatsApp</a></div></div></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const SBH={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+let photoFiles=[];
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='err'?' err':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function toggleAmen(el){el.classList.toggle('on');el.querySelector('input').checked=el.classList.contains('on');}
+function toggleAirbnb(v){document.getElementById('airbnb-row').style.display=v==='airbnb'?'grid':'none';}
+function handlePhotos(input){
+  const files=Array.from(input.files);
+  const remaining=6-photoFiles.length;
+  if(files.length>remaining){toast('Max 6 photos. You can add '+remaining+' more.','err');return;}
+  files.forEach(f=>{
+    if(f.size>5*1024*1024){toast('Photo too large (max 5MB)','err');return;}
+    photoFiles.push(f);
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const prev=document.getElementById('photo-previews');
+      const div=document.createElement('div');div.className='photo-preview';
+      const idx=photoFiles.length-1;
+      div.innerHTML='<img src="'+e.target.result+'"/><button class="rm" onclick="removePhoto('+idx+',this.parentElement)">x</button>';
+      prev.appendChild(div);
+    };
+    reader.readAsDataURL(f);
+  });
+  input.value='';
+}
+function removePhoto(idx,el){photoFiles.splice(idx,1);el.remove();document.querySelectorAll('.photo-preview .rm').forEach((btn,i)=>{btn.setAttribute('onclick','removePhoto('+i+',this.parentElement)');});}
+async function uploadPhoto(file){
+  const ext=file.name.split('.').pop();
+  const name='submissions/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
+  const r=await fetch(SB_URL+'/storage/v1/object/listing-photos/'+name,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type},body:file});
+  if(!r.ok)return null;
+  return SB_URL+'/storage/v1/object/public/listing-photos/'+name;
+}
+async function submitListing(){
+  const name=document.getElementById('f-owner-name').value.trim();
+  const phone=document.getElementById('f-owner-phone').value.trim();
+  const email=document.getElementById('f-owner-email').value.trim();
+  const role=document.getElementById('f-owner-role').value;
+  const title=document.getElementById('f-title').value.trim();
+  const type=document.getElementById('f-type').value;
+  const price=document.getElementById('f-price').value;
+  const location=document.getElementById('f-location').value;
+  const landmark=document.getElementById('f-landmark').value.trim();
+  const desc=document.getElementById('f-desc').value.trim();
+  const notes=document.getElementById('f-notes').value.trim();
+  if(!name||!phone||!role){toast('Please fill in your name, phone and role','err');return;}
+  if(!title||!type||!price||!location){toast('Please fill in all required property fields','err');return;}
+  if(!desc){toast('Please add a property description','err');return;}
+  const amenities=Array.from(document.querySelectorAll('.amen-check.on input')).map(i=>i.value);
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;btn.textContent='Submitting...';
+  let photoUrls=[];
+  if(photoFiles.length){toast('Uploading photos...');for(const f of photoFiles){const url=await uploadPhoto(f);if(url)photoUrls.push(url);}}
+  const payload={owner_name:name,owner_phone:phone,owner_email:email||null,owner_role:role,title,room_type:type,price:parseInt(price),location,landmark:landmark||null,description:desc,amenities,photos:photoUrls,notes:notes||null,status:'pending',night_price:type==='airbnb'?parseInt(document.getElementById('f-night-price').value||0):null,min_nights:type==='airbnb'?parseInt(document.getElementById('f-min-nights').value||1):null,created_at:new Date().toISOString()};
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/listing_submissions',{method:'POST',headers:Object.assign({},SBH,{'Prefer':'return=minimal'}),body:JSON.stringify(payload)});
+    if(!r.ok){const err=await r.text();throw new Error(err);}
+    const waMsg=encodeURIComponent('*NEW LISTING SUBMISSION*\n\nFrom: '+name+' ('+role+')\nPhone: '+phone+'\nTitle: '+title+'\nType: '+type+'\nRent: Ksh '+price+'/mo\nLocation: '+location+'\n\nReview in admin panel.');
+    window.open('https://wa.me/254704285315?text='+waMsg,'_blank');
+    document.getElementById('submission-form').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){
+    toast('Submission failed. Please WhatsApp us directly.','err');
+    btn.disabled=false;btn.textContent='Submit Listing';
+  }
+}
+fetch(SB_URL+'/rest/v1/profiles?select=id&role=eq.student',{headers:Object.assign({},SBH,{'Prefer':'count=exact'})}).then(r=>{const c=r.headers.get('content-range');if(c){const n=parseInt(c.split('/')[1])||0;if(n>0)document.getElementById('stat-students').textContent=n+'+';}}).catch(()=>{});
+</script>
+</body>
+</html>
