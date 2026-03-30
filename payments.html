@@ -666,6 +666,77 @@ async function load(){
     <div class="cards-wrap">
       ${payments.map(p=>cardHTML(p,contacts)).join('')}
     </div>`;
+
+  // Load referral section
+  loadReferrals();
+}
+
+async function loadReferrals(){
+  try{
+    const t=localStorage.getItem('sb-token');
+    if(!t)return;
+    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+    // Get user id from token
+    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{headers:{'apikey':K,'Authorization':'Bearer '+t}});
+    const u=await ur.json();
+    if(!u.id)return;
+    // Get promo code owned by user
+    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/promo_codes?select=code,used_by,discount&owner_id=eq.'+u.id,{headers:{'apikey':K,'Authorization':'Bearer '+t}});
+    const promos=await pr.json();
+    // Get referral earnings
+    const er=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/referral_earnings?select=amount,status,created_at&referrer_id=eq.'+u.id+'&order=created_at.desc',{headers:{'apikey':K,'Authorization':'Bearer '+t}});
+    const earnings=await er.json();
+    const code=Array.isArray(promos)&&promos[0]?promos[0].code:null;
+    const total=Array.isArray(earnings)?earnings.reduce((s,e)=>s+(e.amount||50),0):0;
+    const pending=Array.isArray(earnings)?earnings.filter(e=>e.status==='pending').length:0;
+    // Build referral section
+    const root=document.getElementById('root');
+    if(!root)return;
+    const msg=code?'Use my NestFinder CUK code '+code+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks':'';
+    const section=document.createElement('div');
+    section.style.cssText='margin-top:2.5rem;border-top:1px solid rgba(184,149,90,.15);padding-top:2rem';
+    section.innerHTML=`
+      <div class="section-label" style="margin-bottom:1.25rem">Referral Programme</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem">
+        <div style="background:#fff;border:1px solid rgba(184,149,90,.15);padding:1.25rem 1.5rem">
+          <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.4rem">Total Earned</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#16130E;font-weight:300">Ksh ${total.toLocaleString()}</div>
+          <div style="font-size:.65rem;color:#8A8070;margin-top:.2rem">${pending} pending payout${pending!==1?'s':''}</div>
+        </div>
+        <div style="background:#fff;border:1px solid rgba(184,149,90,.15);padding:1.25rem 1.5rem">
+          <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.4rem">Friends Referred</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#16130E;font-weight:300">${Array.isArray(earnings)?earnings.length:0}</div>
+          <div style="font-size:.65rem;color:#8A8070;margin-top:.2rem">Ksh 50 per successful referral</div>
+        </div>
+      </div>
+      ${code?`
+      <div style="background:#16130E;border:1px solid rgba(184,149,90,.2);padding:1.25rem 1.5rem;margin-bottom:1rem">
+        <div style="font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:#B8955A;margin-bottom:.6rem">Your Referral Code</div>
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem">
+          <div style="font-family:'Courier New',monospace;font-size:1.15rem;color:#D4B483;letter-spacing:.15em;flex:1">${code}</div>
+          <button onclick="navigator.clipboard.writeText('${code}');alert('Code copied!')" style="background:transparent;border:1px solid rgba(184,149,90,.3);color:#B8955A;font-family:Jost,sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.45rem .9rem;cursor:pointer">Copy</button>
+        </div>
+        <p style="font-size:.72rem;color:#8A8070;line-height:1.7;margin-bottom:.85rem">Share this code with friends. When they use it to unlock a caretaker contact, <strong style="color:#B8955A">they save Ksh 50</strong> and you earn <strong style="color:#B8955A">Ksh 50</strong> — paid out via M-Pesa.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <button onclick="(()=>{if(navigator.share){navigator.share({title:'NestFinder CUK',text:'${msg}'})}else{navigator.clipboard.writeText('${msg}');alert('Copied — paste to share!')}})()" style="background:#B8955A;color:#16130E;border:none;font-family:Jost,sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.25rem;cursor:pointer">Share & Earn</button>
+          <a href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" style="background:transparent;color:#25D366;border:1px solid rgba(37,211,102,.4);font-family:Jost,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1rem;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.878-1.438A9.945 9.945 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+      </div>`:'<div style="background:#fff;border:1px solid rgba(184,149,90,.12);padding:1.25rem 1.5rem;font-size:.78rem;color:#8A8070">Make your first payment to unlock your referral code.</div>'}
+      ${Array.isArray(earnings)&&earnings.length?`
+      <div style="margin-top:1rem">
+        <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.75rem">Earnings History</div>
+        ${earnings.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid rgba(184,149,90,.08);font-size:.75rem">
+          <span style="color:#4A4438">${new Date(e.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</span>
+          <span style="color:#1D9E75;font-weight:500">+Ksh ${e.amount||50}</span>
+          <span style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:${e.status==='paid'?'#1D9E75':'#B8955A'}">${e.status}</span>
+        </div>`).join('')}
+      </div>`:''}
+    `;
+    root.appendChild(section);
+  }catch(e){console.error('Referrals error:',e);}
 }
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
