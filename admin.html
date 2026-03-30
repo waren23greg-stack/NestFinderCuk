@@ -561,7 +561,7 @@ async function loadMovers(){
   if(!tbody)return;
   tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr>';
   const t=localStorage.getItem('sb-token');
-  const r=await fetch(_B+'/rest/v1/moving_requests?select=*&order=created_at.desc',{headers:_h(t)});
+  const r=await fetch(_B+'/rest/v1/moving_requests?select=*&order=created_at.desc',{headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K),'Content-Type':'application/json'}});
   const data=await r.json();
   if(!Array.isArray(data)||!data.length){
     tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">No bookings yet</td></tr>';
@@ -588,7 +588,7 @@ async function updateMover(id,status){
   const t=localStorage.getItem('sb-token');
   await fetch(_B+'/rest/v1/moving_requests?id=eq.'+id,{
     method:'PATCH',
-    headers:Object.assign({},_h(t),{'Prefer':'return=minimal'}),
+    headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K),'Content-Type':'application/json','Prefer':'return=minimal'},
     body:JSON.stringify({status})
   });
   toast(status==='confirmed'?'Booking confirmed':status==='done'?'Marked as done':'Booking cancelled');

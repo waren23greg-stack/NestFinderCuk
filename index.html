@@ -1429,7 +1429,6 @@ function toggleChip(el){
 }
 function fav(e,id){
   e.stopPropagation();
-  if(!user){toast('Sign in to save favourites','err');return;}
   let favs=JSON.parse(localStorage.getItem('nf-favs')||'[]');
   const el=document.getElementById('fav-'+id);
   if(favs.includes(id)){favs=favs.filter(x=>x!==id);el.classList.remove('on');toast('Removed from saved');}
@@ -1526,7 +1525,8 @@ async function openListing(id){
   if(mapDiv){
     if(l.latitude&&l.longitude){
       const q=l.latitude+","+l.longitude;
-      const mapsLink="https://www.google.com/maps/search/?api=1&query="+q;
+      const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const mapsLink=isMobile?'geo:'+l.latitude+','+l.longitude+'?q='+q:'https://www.google.com/maps/search/?api=1&query='+q;
       mapDiv.innerHTML='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;background:var(--linen);text-decoration:none;border:1px solid var(--border);gap:.75rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-family:Jost,sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(184,149,90,.35);padding:.45rem 1.25rem">Open in Google Maps</span><span style="font-size:.62rem;color:var(--muted)">'+l.location+'</span></a>';
       if(dirBtn){dirBtn.style.display="";dirBtn.href=mapsLink;}
     } else {
@@ -1760,7 +1760,6 @@ async function loadRatings(){
 
 /* FAVOURITES */
 function showFavs(){
-  if(!user){toast('Sign in to view your saved listings','err');return;}
   const favIds=JSON.parse(localStorage.getItem('nf-favs')||'[]');
   const favListings=listings.filter(l=>favIds.includes(l.id));
   const grid=document.getElementById('favs-grid');
