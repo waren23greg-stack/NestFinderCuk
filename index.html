@@ -1278,6 +1278,18 @@ window.sb={
           <button class="btn btn-share-modal btn-full" style="margin-top:8px" onclick="shareCurrentListing()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share This Listing
           </button>
+        <div id="referral-banner" style="display:none;margin-top:1.25rem;background:#16130E;border:1px solid rgba(184,149,90,.25);padding:1.25rem 1.5rem">
+          <div style="font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:#B8955A;margin-bottom:.6rem;font-weight:600">🎁 You Earned a Referral Code</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:.9rem;color:#D4B483;margin-bottom:.75rem;font-weight:300;line-height:1.6">Share this code with a friend. When they use it to unlock a contact, <strong style="color:#B8955A">they save Ksh 50</strong> — and you earn a <strong style="color:#B8955A">Ksh 50 claim</strong> you can redeem anytime.</div>
+          <div style="display:flex;align-items:center;gap:.75rem;background:rgba(184,149,90,.08);border:1px solid rgba(184,149,90,.2);padding:.75rem 1rem;margin-bottom:.75rem">
+            <div id="referral-code-val" style="font-family:'Courier New',monospace;font-size:1.1rem;color:#D4B483;letter-spacing:.15em;flex:1">—</div>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('referral-code-val').textContent);toast('Code copied!')" style="background:transparent;border:1px solid rgba(184,149,90,.3);color:#B8955A;font-family:Jost,sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.45rem .9rem;cursor:pointer">Copy</button>
+          </div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <button onclick="(()=>{const c=document.getElementById('referral-code-val').textContent;const msg='Use my NestFinder CUK code '+c+' to get Ksh 50 off your first house contact! https://nestfindercuk.rocks';if(navigator.share){navigator.share({title:'NestFinder CUK',text:msg})}else{navigator.clipboard.writeText(msg);toast('Copied — paste anywhere to share!')}})()" style="background:#B8955A;color:#16130E;border:none;font-family:Jost,sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:.4rem"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share & Earn</button>
+            <a id="referral-wa-btn" href="#" target="_blank" style="background:transparent;color:#25D366;border:1px solid rgba(37,211,102,.4);font-family:Jost,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;text-decoration:none;display:flex;align-items:center;gap:.4rem"><svg width="11" height="11" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.878-1.438A9.945 9.945 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>WhatsApp</a>
+          </div>
+        </div>
         <div class="promo-box" id="promo-reward-box" style="display:none">
           <div class="promo-box-label">Your Referral Code</div>
           <div class="promo-code-row">
@@ -1732,7 +1744,35 @@ async function showContact(lid,showSuccSec=true){
     }catch(e){}
     loadReviews(lid);pickedStar=0;
     document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
+    // Show referral reward banner
+    generateAndShowPromo_banner();
   }
+}
+
+async function generateAndShowPromo_banner(){
+  try{
+    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+    const t=localStorage.getItem('sb-token')||K;
+    const r=await fetch(_SB_URL+'/rest/v1/promo_codes?select=code&used_by=is.null&owner_id=eq.'+user.id+'&limit=1',{headers:_SBH(t)});
+    const d=await r.json();
+    let code=Array.isArray(d)&&d[0]?d[0].code:null;
+    if(!code){
+      // generate one
+      const cr=await fetch('/api/generate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_id:user.id})});
+      const cd=await cr.json().catch(()=>({}));
+      code=cd.code||null;
+    }
+    if(!code)return;
+    const msg='Use my NestFinder CUK code '+code+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks';
+    const banner=document.getElementById('referral-banner');
+    const codeEl=document.getElementById('referral-code-val');
+    if(banner&&codeEl){
+      codeEl.textContent=code;
+      document.getElementById('referral-wa-btn').href='https://wa.me/?text='+encodeURIComponent(msg);
+      banner.style.display='';
+      banner.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  }catch(e){}
 }
 
 function toast(msg,type=''){
