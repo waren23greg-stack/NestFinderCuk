@@ -197,22 +197,26 @@ footer{background:var(--dark);padding:2rem var(--px);border-top:1px solid rgba(1
           <div class="f-group"><label>Location / Area *</label><select id="f-location"><option value="">Select area</option><optgroup label="Upper Zone"><option>SKL</option><option>AIC</option><option>Rally Heights</option><option>Shoppers</option><option>Destiny Best Supermarket Area</option></optgroup><optgroup label="Mid Zone"><option>Mulikaa</option><option>Kajificheni</option><option>Behind Loliondo</option><option>Upendo Riverside</option><option>Upendo Choma Choma</option></optgroup><optgroup label="Lower Zone"><option>Nalis</option><option>Gataka Place</option><option>Karen View</option><option>Mosque Area</option><option>Police Station Area</option><option>PCEA</option></optgroup><optgroup label="Other"><option>Karen</option><option>Other (specify in description)</option></optgroup></select></div>
           <div class="f-group"><label>Nearest Landmark</label><input id="f-landmark" type="text" placeholder="e.g. 50m from SKL stage"/></div>
         </div>
+        <div class="form-row">
+          <div class="f-group"><label>Units / Vacants Available *</label><input id="f-vacants" type="number" placeholder="e.g. 3" min="1" max="50"/><span class="f-hint">How many rooms/units are currently available</span></div>
+          <div class="f-group"><label>Contact Number for Students *</label><input id="f-contact" type="tel" placeholder="e.g. 0712 345 678"/><span class="f-hint">This is shown to students after payment — can be different from your WhatsApp</span></div>
+        </div>
         <div class="form-row single"><div class="f-group"><label>Description *</label><textarea id="f-desc" placeholder="Describe the property honestly. Include floor, compound security, neighbours, nearby facilities, parking, etc."></textarea></div></div>
       </div>
 
       <div class="form-block">
         <div class="form-block-title">Amenities Included</div>
-        <div class="amenities-grid">
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="water"/><div class="amen-dot"></div>Water Included</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="wifi"/><div class="amen-dot"></div>WiFi Available</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="electricity"/><div class="amen-dot"></div>Electricity (Prepaid)</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="security"/><div class="amen-dot"></div>Gated / Security</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="bathroom"/><div class="amen-dot"></div>Private Bathroom</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="kitchen"/><div class="amen-dot"></div>Kitchen Access</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="parking"/><div class="amen-dot"></div>Parking Available</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="furnished"/><div class="amen-dot"></div>Furnished</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="bed"/><div class="amen-dot"></div>Bed Included</label>
-          <label class="amen-check" onclick="toggleAmen(this)"><input type="checkbox" value="study_table"/><div class="amen-dot"></div>Study Table</label>
+        <div class="amenities-grid" id="amenities-grid">
+          <label class="amen-check"><input type="checkbox" value="water"/><div class="amen-dot"></div>Water Included</label>
+          <label class="amen-check"><input type="checkbox" value="wifi"/><div class="amen-dot"></div>WiFi Available</label>
+          <label class="amen-check"><input type="checkbox" value="electricity"/><div class="amen-dot"></div>Electricity (Prepaid)</label>
+          <label class="amen-check"><input type="checkbox" value="security"/><div class="amen-dot"></div>Gated / Security</label>
+          <label class="amen-check"><input type="checkbox" value="bathroom"/><div class="amen-dot"></div>Private Bathroom</label>
+          <label class="amen-check"><input type="checkbox" value="kitchen"/><div class="amen-dot"></div>Kitchen Access</label>
+          <label class="amen-check"><input type="checkbox" value="parking"/><div class="amen-dot"></div>Parking Available</label>
+          <label class="amen-check"><input type="checkbox" value="furnished"/><div class="amen-dot"></div>Furnished</label>
+          <label class="amen-check"><input type="checkbox" value="bed"/><div class="amen-dot"></div>Bed Included</label>
+          <label class="amen-check"><input type="checkbox" value="study_table"/><div class="amen-dot"></div>Study Table</label>
         </div>
       </div>
 
@@ -269,6 +273,15 @@ const SBH={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'appl
 let photoFiles=[];
 function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='err'?' err':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function toggleAmen(el){el.classList.toggle('on');el.querySelector('input').checked=el.classList.contains('on');}
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.amen-check').forEach(function(label){
+    label.addEventListener('click',function(e){
+      e.preventDefault();
+      label.classList.toggle('on');
+      label.querySelector('input').checked=label.classList.contains('on');
+    });
+  });
+});
 function toggleAirbnb(v){document.getElementById('airbnb-row').style.display=v==='airbnb'?'grid':'none';}
 function handlePhotos(input){
   const files=Array.from(input.files);
@@ -309,7 +322,11 @@ async function submitListing(){
   const landmark=document.getElementById('f-landmark').value.trim();
   const desc=document.getElementById('f-desc').value.trim();
   const notes=document.getElementById('f-notes').value.trim();
+  const vacants=document.getElementById('f-vacants').value;
+  const contact=document.getElementById('f-contact').value.trim();
   if(!name||!phone||!role){toast('Please fill in your name, phone and role','err');return;}
+  if(!contact){toast('Please add the contact number for students','err');return;}
+  if(!vacants||parseInt(vacants)<1){toast('Please enter number of vacants available','err');return;}
   if(!title||!type||!price||!location){toast('Please fill in all required property fields','err');return;}
   if(!desc){toast('Please add a property description','err');return;}
   const amenities=Array.from(document.querySelectorAll('.amen-check.on input')).map(i=>i.value);
@@ -317,7 +334,7 @@ async function submitListing(){
   btn.disabled=true;btn.textContent='Submitting...';
   let photoUrls=[];
   if(photoFiles.length){toast('Uploading photos...');for(const f of photoFiles){const url=await uploadPhoto(f);if(url)photoUrls.push(url);}}
-  const payload={owner_name:name,owner_phone:phone,owner_email:email||null,owner_role:role,title,room_type:type,price:parseInt(price),location,landmark:landmark||null,description:desc,amenities,photos:photoUrls,notes:notes||null,status:'pending',night_price:type==='airbnb'?parseInt(document.getElementById('f-night-price').value||0):null,min_nights:type==='airbnb'?parseInt(document.getElementById('f-min-nights').value||1):null,created_at:new Date().toISOString()};
+  const payload={owner_name:name,owner_phone:phone,owner_email:email||null,owner_role:role,title,room_type:type,price:parseInt(price),location,landmark:landmark||null,description:desc,vacants:parseInt(document.getElementById('f-vacants').value||1),contact_number:document.getElementById('f-contact').value.trim(),amenities,photos:photoUrls,notes:notes||null,status:'pending',night_price:type==='airbnb'?parseInt(document.getElementById('f-night-price').value||0):null,min_nights:type==='airbnb'?parseInt(document.getElementById('f-min-nights').value||1):null,created_at:new Date().toISOString()};
   try{
     const r=await fetch(SB_URL+'/rest/v1/listing_submissions',{method:'POST',headers:Object.assign({},SBH,{'Prefer':'return=minimal'}),body:JSON.stringify(payload)});
     if(!r.ok){const err=await r.text();throw new Error(err);}
