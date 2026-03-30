@@ -350,6 +350,7 @@ window.sb={
     <button class="sb-item" onclick="goto('payments',this)"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Payments</button>
     <button class="sb-item" onclick="goto('students',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Students</button>
     <button class="sb-item" onclick="goto('movers',this)"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Movers</button>
+    <button class="sb-item" onclick="goto('submissions',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Submissions<span id="sub-badge" style="background:#B8955A;color:#16130E;font-size:.5rem;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;display:none"></span></button>
     <button class="sb-item" onclick="goto('reports',this)"><svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>Reports</button>
     <div class="sb-divider"></div>
     <a class="sb-item" href="index.html" style="text-decoration:none;"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>View Site</a>
@@ -414,6 +415,19 @@ window.sb={
       <div class="sec-head"><div><div class="sec-title">Trinity Movers — Bookings</div><div class="sec-sub">Manage student moving requests · Confirm or mark as done</div></div></div>
       <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Pickup</th><th>Drop-off</th><th>Date</th><th>Tier</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="movers-tbody"><tr class="empty-row"><td colspan="9">Loading...</td></tr></tbody></table></div>
     </div>
+  </div>
+
+  <!-- SUBMISSIONS PAGE -->
+  <div class="page" id="page-submissions" style="display:none">
+    <div style="margin-bottom:1.5rem">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:#16130E">Listing Submissions</h2>
+      <p style="font-size:.75rem;color:#8A8070;margin-top:.25rem">Review landlord submissions · Set contact fee · Approve to go live</p>
+    </div>
+    <div id="submissions-empty" style="display:none;text-align:center;padding:4rem 2rem;color:#8A8070">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin:0 auto 1rem;display:block;opacity:.25"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
+      <p style="font-size:.8rem">No submissions yet</p>
+    </div>
+    <div id="submissions-list" style="display:grid;gap:1.25rem"></div>
   </div>
 </main>
 
@@ -615,6 +629,7 @@ function goto(name,btn){
   if(name==='students')loadStudents();
   if(name==='reports')loadReports();
   if(name==='movers')loadMovers();
+  if(name==='submissions')loadSubmissions();
 }
 
 /* ── TOAST ── */
@@ -1040,6 +1055,90 @@ function initAdminMap(lat,lng){
     document.getElementById("fLng").value=lng;
     document.getElementById("pin-coords").textContent="📍 Saved: "+parseFloat(lat).toFixed(5)+", "+parseFloat(lng).toFixed(5);
   }
+}
+
+async function loadSubmissions(){
+  const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+  const t=localStorage.getItem('sb-token')||K;
+  const r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listing_submissions?select=*&order=created_at.desc',{
+    headers:{'apikey':K,'Authorization':'Bearer '+t}
+  });
+  const subs=await r.json();
+  const list=document.getElementById('submissions-list');
+  const empty=document.getElementById('submissions-empty');
+  if(!Array.isArray(subs)||!subs.length){empty.style.display='block';list.innerHTML='';return;}
+  empty.style.display='none';
+  const pending=subs.filter(s=>s.status==='pending').length;
+  const badge=document.getElementById('sub-badge');
+  if(badge){badge.textContent=pending;badge.style.display=pending?'inline':'none';}
+  list.innerHTML=subs.map(s=>{
+    const photos=(s.photos||[]);
+    const amens=(s.amenities||[]).join(', ')||'None listed';
+    const sc=s.status==='approved'?'#1D9E75':s.status==='rejected'?'#C0392B':'#B8955A';
+    const dt=new Date(s.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+    const rawPhone=(s.owner_phone||'').replace(/[^0-9]/g,'').replace(/^0/,'254');
+    const waAdmin='https://wa.me/'+rawPhone+'?text='+encodeURIComponent('Hi '+s.owner_name+', NestFinder CUK admin here regarding your listing: '+s.title+'. ');
+    const approveMsg='Hello '+s.owner_name+' \u2705\n\nYour listing *"'+s.title+'"* has been reviewed and is now *LIVE* on NestFinder CUK.\n\nStudents can now find and contact you after a small verification fee.\n\nView it at: https://nestfindercuk.rocks\n\nThank you!\n- NestFinder CUK Admin';
+    const waApprove='https://wa.me/'+rawPhone+'?text='+encodeURIComponent(approveMsg);
+    return '<div style="background:#fff;border:1px solid rgba(184,149,90,.18);overflow:hidden" id="sub-'+s.id+'">'
+      +'<div style="padding:1rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.1);display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;flex-wrap:wrap">'
+      +'<div><div style="font-family:Cormorant Garamond,serif;font-size:1.2rem;color:#16130E">'+s.title+'</div>'
+      +'<div style="font-size:.68rem;color:#8A8070;margin-top:.2rem">'+(s.room_type||'')+(s.location?' · '+s.location:'')+' · '+dt+'</div></div>'
+      +'<span style="font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:'+sc+';border:1px solid '+sc+';padding:2px 8px">'+s.status+'</span></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(184,149,90,.08)">'
+      +'<div style="padding:1rem 1.5rem;border-right:1px solid rgba(184,149,90,.08)">'
+      +'<div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.5rem">Owner</div>'
+      +'<div style="font-size:.85rem;font-weight:500;color:#16130E">'+s.owner_name+'</div>'
+      +'<div style="font-size:.75rem;color:#4A4438;margin-top:.15rem">'+(s.owner_phone||'')+(s.owner_role?' · '+s.owner_role:'')+'</div>'
+      +(s.owner_email?'<div style="font-size:.7rem;color:#8A8070;margin-top:.1rem">'+s.owner_email+'</div>':'')+'</div>'
+      +'<div style="padding:1rem 1.5rem">'
+      +'<div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.5rem">Rent &amp; Contact Fee</div>'
+      +'<div style="font-family:Cormorant Garamond,serif;font-size:1.5rem;color:#16130E;font-weight:300">Ksh '+(s.price||0).toLocaleString()+'/mo</div>'
+      +(s.night_price?'<div style="font-size:.7rem;color:#8A8070">Short stay: Ksh '+s.night_price+'/night</div>':'')
+      +'<div style="margin-top:.6rem;display:flex;align-items:center;gap:.5rem">'
+      +'<input id="fee-'+s.id+'" type="number" value="'+(s.contact_fee||250)+'" min="100" max="1000" step="50" '
+      +'style="width:90px;padding:.35rem .5rem;border:1px solid rgba(184,149,90,.35);font-family:Jost,sans-serif;font-size:.82rem;background:#F8F4EE;color:#16130E;outline:none"/>'
+      +'<span style="font-size:.65rem;color:#8A8070">Ksh students pay</span></div></div></div>'
+      +(s.description?'<div style="padding:.85rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);font-size:.78rem;color:#4A4438;line-height:1.75">'+s.description+'</div>':'')
+      +'<div style="padding:.6rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);font-size:.68rem;color:#8A8070"><strong style="color:#B8955A">Amenities:</strong> '+amens+'</div>'
+      +(s.landmark?'<div style="padding:.5rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);font-size:.68rem;color:#8A8070"><strong style="color:#B8955A">Landmark:</strong> '+s.landmark+'</div>':'')
+      +(s.notes?'<div style="padding:.6rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);font-size:.72rem;color:#8A8070;font-style:italic">"'+s.notes+'"</div>':'')
+      +(photos.length?'<div style="padding:.75rem 1.5rem;border-bottom:1px solid rgba(184,149,90,.08);display:flex;gap:.5rem;flex-wrap:wrap">'+photos.map(p=>'<img src="'+p+'" style="width:76px;height:76px;object-fit:cover;border:1px solid rgba(184,149,90,.2);cursor:pointer" onclick="window.open(\''+p+'\',\'_blank\')"/>').join('')+'</div>':'')
+      +'<div style="padding:.85rem 1.5rem;background:#F8F4EE;display:flex;gap:.6rem;flex-wrap:wrap">'
+      +(s.status!=='approved'?'<button onclick="approveSubmission(\''+s.id+'\',\''+waApprove+'\')" style="background:#16130E;color:#fff;border:none;font-family:Jost,sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.25rem;cursor:pointer">Approve &amp; Go Live</button>':'')
+      +(s.status==='pending'?'<button onclick="rejectSubmission(\''+s.id+'\')" style="background:transparent;color:#C0392B;border:1px solid #C0392B;font-family:Jost,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1rem;cursor:pointer">Reject</button>':'')
+      +'<a href="'+waAdmin+'" target="_blank" style="background:transparent;color:#25D366;border:1px solid #25D366;font-family:Jost,sans-serif;font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:.6rem 1rem;text-decoration:none">WhatsApp Owner</a>'
+      +'</div></div>';
+  }).join('');
+}
+
+async function approveSubmission(id, waUrl){
+  const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+  const t=localStorage.getItem('sb-token')||K;
+  const fee=parseInt(document.getElementById('fee-'+id)?.value||250);
+  const r=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listing_submissions?id=eq.'+id,{
+    method:'PATCH',
+    headers:{'apikey':K,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({status:'approved',contact_fee:fee})
+  });
+  if(r.ok||r.status===204){
+    window.open(waUrl,'_blank');
+    setTimeout(loadSubmissions,1000);
+  } else {
+    alert('Update failed — check console');
+  }
+}
+
+async function rejectSubmission(id){
+  if(!confirm('Reject this submission?'))return;
+  const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+  const t=localStorage.getItem('sb-token')||K;
+  await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/listing_submissions?id=eq.'+id,{
+    method:'PATCH',
+    headers:{'apikey':K,'Authorization':'Bearer '+t,'Content-Type':'application/json','Prefer':'return=minimal'},
+    body:JSON.stringify({status:'rejected'})
+  });
+  setTimeout(loadSubmissions,600);
 }
 </script>
 </body>
