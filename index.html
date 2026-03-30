@@ -855,7 +855,7 @@ window.sb={
       <div style="margin-top:auto;padding:1rem 1.5rem;border-top:1px solid rgba(184,149,90,.12)">
         <div id="drawer-signed-in" style="display:none">
           <div id="drawer-signed-name" style="font-size:.72rem;color:#8A8070;margin-bottom:.75rem">Signed in</div>
-          <button onclick="signOut()" style="width:100%;padding:.7rem;background:transparent;border:1px solid rgba(184,149,90,.25);font-family:'Jost',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8A8070;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#B8955A';this.style.color='#B8955A'" onmouseout="this.style.borderColor='rgba(184,149,90,.25)';this.style.color='#8A8070'">Sign Out</button>
+          <button onclick="doSignOut()" style="width:100%;padding:.7rem;background:transparent;border:1px solid rgba(184,149,90,.25);font-family:'Jost',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8A8070;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#B8955A';this.style.color='#B8955A'" onmouseout="this.style.borderColor='rgba(184,149,90,.25)';this.style.color='#8A8070'">Sign Out</button>
         </div>
         <div id="drawer-signed-out" style="display:none">
           <button onclick="closeDrawer();document.getElementById('auth-modal').style.display='flex'" style="width:100%;padding:.7rem;background:#16130E;border:none;font-family:'Jost',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#D4B483;cursor:pointer">Sign In / Register</button>
@@ -1284,6 +1284,9 @@ async function initAuth(){
     document.getElementById('drawer-in').style.display='none';
     document.getElementById('drawer-out').style.display='';
     document.getElementById('drawer-user').textContent='Signed in as '+name;
+    const _dsi=document.getElementById('drawer-signed-in');if(_dsi)_dsi.style.display='';
+    const _dso=document.getElementById('drawer-signed-out');if(_dso)_dso.style.display='none';
+    const _dsn=document.getElementById('drawer-signed-name');if(_dsn)_dsn.textContent='Signed in as '+name;
     ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
     if(isAdmin){
       ['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
@@ -1847,6 +1850,7 @@ function copyPromoCode(){
   const code=document.getElementById("promo-reward-code").textContent;
   navigator.clipboard.writeText(code).then(()=>toast("Promo code copied!"));
 }
+const _dso2=document.getElementById('drawer-signed-out');if(_dso2)_dso2.style.display='';
 initAuth();load();loadRatings();
 </script>
 
