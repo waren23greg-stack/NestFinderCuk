@@ -796,93 +796,72 @@ window.sb={
   <div class="drawer-bg" onclick="closeDrawer()"></div>
   <div class="drawer-panel">
     <div class="drawer-links">
-      <a href="#listings" onclick="closeDrawer()">
-        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Listings
-      </a>
-      <a href="#" onclick="showFavs();closeDrawer();return false">
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favourites
-      </a>
-      <a href="payments.html" id="drawer-payments" style="display:none" onclick="closeDrawer()">
-        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>My Payments
-      </a>
-      <a href="#how" onclick="closeDrawer()">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>How It Works
-      </a>
-      <a href="#trust" onclick="closeDrawer()">
-        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety
-      </a>
-      <a href="movers.html" onclick="closeDrawer()" style="color:var(--gold)!important;background:rgba(184,149,90,.06);border:1px solid rgba(184,149,90,.2);border-radius:2px;margin-top:.25rem">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Trinity Movers
-      </a>
-      <a href="admin.html" id="drawer-admin" style="display:none" onclick="closeDrawer()">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Admin Panel
-      </a>
-      <a href="https://wa.me/254704285315?text=Hi%2C%20I%20found%20a%20listing%20on%20NestFinder%20CUK%20and%20I%20need%20help." target="_blank" rel="noopener" id="drawer-wa-admin" onclick="closeDrawer()" style="color:#25D366;">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>Contact Admin via WhatsApp
-      </a>
-    </div>
-    <div class="drawer-user" id="drawer-user"></div>
-    <a href="login.html" id="drawer-in" class="btn btn-gold" style="width:100%;margin-bottom:.75rem">Sign In</a>
-    <button id="drawer-out" class="btn btn-ghost" style="width:100%;display:none" onclick="doSignOut()">Sign Out</button>
-  </div>
-</div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <img class="hero-img" src="public/images/hero.jpg" alt="" loading="eager" fetchpriority="high"/>
-  <div class="hero-overlay"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">The Cooperative University of Kenya</div>
-    <h1>Find Your <em>Perfect</em><br/>Student Home</h1>
-    <p class="hero-sub">Browse real photos for free. Pay once to unlock the caretaker's number, call to arrange a viewing, and move in.</p>
-    <div class="hero-btns">
-      <a href="#listings" class="btn btn-gold">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        Browse Listings
-      </a>
-      <a href="#how" class="btn btn-ghost" style="color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.18)">How It Works</a>
-    </div>
-    <div class="hero-rule">
-      <div><div class="stat-n" id="stat-n">—</div><div class="stat-l">Verified Listings</div></div>
-      <div><div class="stat-n">3</div><div class="stat-l">Room Types</div></div>
-      <div><div class="stat-n" id="stat-fee">Ksh 250</div><div class="stat-l">Contact Fee</div></div>
-    </div>
-  </div>
-</section>
+      <!-- Brand header -->
+      <div style="padding:1.5rem 1.5rem 1rem;border-bottom:1px solid rgba(184,149,90,.12);margin-bottom:.5rem">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#16130E">Nest<b style="color:#B8955A">Finder</b> <span style="opacity:.4;font-size:.9rem">CUK</span></div>
+        <div id="drawer-user-label" style="font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:#8A8070;margin-top:.25rem">Student Housing Platform</div>
+      </div>
 
-<div id="main-listings" class="main-listings">
-<!-- SEARCH -->
-<div class="searchbar">
-  <div class="searchbar-inner">
-    <div class="sf" style="flex:2">
-      <svg class="sf-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="search" id="q" placeholder="Search location or name…" oninput="doFilter()" autocomplete="off"/>
-    </div>
-    <div class="sf" style="flex:1;min-width:140px">
-      <select id="tfilter" onchange="doFilter()">
-        <option value="">All Types</option>
-        <option value="single">Single Room</option>
-        <option value="bedsitter">Bedsitter</option>
-        <option value="one-bedroom">One Bedroom</option>
-      </select>
-    </div>
-    <div class="sf" style="flex:1;min-width:130px">
-      <select id="ltype-filter" onchange="doFilter()">
-        <option value="">All Listings</option>
-        <option value="rental">Rentals Only</option>
-        <option value="airbnb">Airbnb Only</option>
-      </select>
-    </div>
-    <div class="chips">
-      <div class="chip" data-f="water" onclick="toggleChip(this)"><div class="chip-dot"></div>Water</div>
-      <div class="chip" data-f="wifi" onclick="toggleChip(this)"><div class="chip-dot"></div>WiFi</div>
-      <div class="chip" data-f="avail" onclick="toggleChip(this)"><div class="chip-dot"></div>Available</div>
-    </div>
-    <div class="price-slider-wrap" style="flex:1;min-width:200px;">
-      <div class="price-range-label">Max: <span id="priceLabel">13,000</span></div>
-      <input type="range" class="price-range" id="priceRange" min="3500" max="13000" step="500" value="13000" oninput="onPriceRange(this.value)"/>
+      <!-- Main nav -->
+      <div style="padding:.5rem .75rem">
+        <a href="#listings" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>Listings
+        </a>
+        <a href="#" onclick="showFavs();closeDrawer();return false" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favourites
+        </a>
+        <a href="payments.html" id="drawer-payments" style="display:none;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onclick="closeDrawer()" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>My Payments
+        </a>
+        <a href="#how" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>How It Works
+        </a>
+        <a href="#trust" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Safety
+        </a>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:rgba(184,149,90,.12);margin:.25rem .75rem"></div>
+
+      <!-- Services -->
+      <div style="padding:.5rem .75rem">
+        <div style="font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;color:#B8955A;padding:.5rem .75rem .25rem;font-weight:600">Services</div>
+        <a href="movers.html" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;background:rgba(184,149,90,.05);border:1px solid rgba(184,149,90,.15);margin-bottom:.4rem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <span>Trinity Movers</span><span style="margin-left:auto;font-size:.52rem;background:#B8955A;color:#fff;padding:2px 6px;border-radius:2px;letter-spacing:.08em">BOOK</span>
+        </a>
+        <a href="landlord.html" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#fff;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;background:#16130E;border:1px solid rgba(184,149,90,.2)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9.5" y1="14.5" x2="14.5" y2="14.5"/></svg>
+          <span>List Your Property</span><span style="margin-left:auto;font-size:.52rem;background:#B8955A;color:#16130E;padding:2px 6px;border-radius:2px;letter-spacing:.08em;font-weight:700">FREE</span>
+        </a>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:rgba(184,149,90,.12);margin:.25rem .75rem"></div>
+
+      <!-- Admin + Support -->
+      <div style="padding:.5rem .75rem">
+        <a href="admin.html" id="drawer-admin" style="display:none;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#16130E;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onclick="closeDrawer()" onmouseover="this.style.background='rgba(184,149,90,.06)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B8955A" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Admin Panel
+        </a>
+        <a href="https://wa.me/254704285315?text=Hi%2C%20I%20need%20help%20with%20NestFinder%20CUK." target="_blank" rel="noopener" onclick="closeDrawer()" style="display:flex;align-items:center;gap:.85rem;padding:.75rem .75rem;color:#25D366;text-decoration:none;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:500;border-radius:3px;transition:background .2s" onmouseover="this.style.background='rgba(37,211,102,.04)'" onmouseout="this.style.background='transparent'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 2.005C6.478 2.005 2 6.483 2 12.003a9.988 9.988 0 001.499 5.288L2 22l4.853-1.476A9.969 9.969 0 0012 22c5.52 0 9.998-4.478 9.998-9.998 0-5.519-4.478-9.997-9.998-9.997z"/></svg>Contact Support
+        </a>
+      </div>
+
+      <!-- Sign in / user info -->
+      <div style="margin-top:auto;padding:1rem 1.5rem;border-top:1px solid rgba(184,149,90,.12)">
+        <div id="drawer-signed-in" style="display:none">
+          <div id="drawer-signed-name" style="font-size:.72rem;color:#8A8070;margin-bottom:.75rem">Signed in</div>
+          <button onclick="signOut()" style="width:100%;padding:.7rem;background:transparent;border:1px solid rgba(184,149,90,.25);font-family:'Jost',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8A8070;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#B8955A';this.style.color='#B8955A'" onmouseout="this.style.borderColor='rgba(184,149,90,.25)';this.style.color='#8A8070'">Sign Out</button>
+        </div>
+        <div id="drawer-signed-out" style="display:none">
+          <button onclick="closeDrawer();document.getElementById('auth-modal').style.display='flex'" style="width:100%;padding:.7rem;background:#16130E;border:none;font-family:'Jost',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#D4B483;cursor:pointer">Sign In / Register</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
