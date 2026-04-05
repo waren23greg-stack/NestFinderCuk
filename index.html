@@ -1401,7 +1401,12 @@ document.addEventListener('keydown',e=>{
 
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCodeAt(i)|0}return h;}
 function photo(l){
-  if(l.photos?.length){const p=l.photos[0];if(p.startsWith('http'))return p;}
+  if(l.photos?.length){const p=l.photos[0];if(p.startsWith('http')){
+    if(p.includes('cloudinary.com')){
+      return p.replace('/upload/','/upload/w_600,c_fill,q_auto,f_auto/l_text:Arial_18_bold:nestfindercuk.rocks,co_rgb:ffffff,o_40,g_south_east,x_8,y_8/');
+    }
+    return p;
+  }}
   const pool=PHOTOS[l.type]||PHOTOS.default;
   return pool[Math.abs(hash(l.id||'x'))%pool.length];
 }

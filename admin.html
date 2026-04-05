@@ -932,10 +932,11 @@ async function saveListing(){
 
   const urls=[...existingPhotos];
   for(const f of pendingPhotos){
-    const path=Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+f.name.split('.').pop();
-    const ur=await fetch(_B+'/storage/v1/object/house-photos/'+path,{method:'POST',headers:{apikey:_K,'Authorization':'Bearer '+localStorage.getItem('sb-token')},body:f});
-    if(!ur.ok){showFErr('Photo upload failed.');resetSave();return;}
-    urls.push(_B+'/storage/v1/object/public/house-photos/'+path);
+    const fd=new FormData();fd.append('file',f);fd.append('upload_preset','nestfinder_unsigned');fd.append('folder','nestfinder');
+    const ur=await fetch('https://api.cloudinary.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
+    const cd=await ur.json();
+    if(!cd.secure_url){showFErr('Photo upload failed.');resetSave();return;}
+    urls.push(cd.secure_url);
   }
 
   const payload={
