@@ -304,11 +304,14 @@ function handlePhotos(input){
 }
 function removePhoto(idx,el){photoFiles.splice(idx,1);el.remove();document.querySelectorAll('.photo-preview .rm').forEach((btn,i)=>{btn.setAttribute('onclick','removePhoto('+i+',this.parentElement)');});}
 async function uploadPhoto(file){
-  const ext=file.name.split('.').pop();
-  const name='submissions/'+Date.now()+'_'+Math.random().toString(36).slice(2)+'.'+ext;
-  const r=await fetch(SB_URL+'/storage/v1/object/listing-photos/'+name,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type},body:file});
-  if(!r.ok)return null;
-  return SB_URL+'/storage/v1/object/public/listing-photos/'+name;
+  const fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset','nestfinder_unsigned');
+  fd.append('folder','nestfinder');
+  const r=await fetch('https://api.cloudinary.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
+  const data=await r.json();
+  if(data.secure_url)return data.secure_url;
+  return null;
 }
 async function submitListing(){
   const name=document.getElementById('f-owner-name').value.trim();
