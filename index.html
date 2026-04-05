@@ -45,7 +45,27 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-@media print{.m-photo-strip,.m-photo-strip img{visibility:hidden!important;background:#000!important}}
+@media print{
+  .m-photo-strip,.m-photo-strip img,.lightbox-img,.lbox-wrap{visibility:hidden!important;background:#000!important}
+}
+/* Screenshot protection via mix-blend-mode trick */
+.photo-protect-wrap{position:relative;display:inline-block;background:#000}
+.photo-protect-wrap::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0);
+  mix-blend-mode:difference;
+  pointer-events:none;
+  z-index:2;
+}
+.photo-protect-wrap img{
+  mix-blend-mode:multiply;
+  background:#fff;
+  display:block;
+  -webkit-user-select:none;
+  user-select:none;
+}
 body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 img{display:block;max-width:100%}
 h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.1}
@@ -359,6 +379,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .m-photo-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 1.75rem 1rem;margin-top:.25rem}
 .m-photo-strip::-webkit-scrollbar{display:none}
 .m-photo-strip img{height:140px;min-width:200px;max-width:240px;object-fit:cover;border-radius:3px;cursor:zoom-in;flex-shrink:0;transition:opacity .2s;-webkit-user-select:none;user-select:none;pointer-events:none}
+.photo-protect-wrap{height:140px;min-width:200px;max-width:240px;flex-shrink:0;border-radius:3px;overflow:hidden;cursor:zoom-in}
 .m-photo-strip img:hover{opacity:.88}
 .m-desc{font-size:.82rem;color:var(--ink);line-height:1.7;padding:0 1.75rem .75rem;font-weight:300}
 .m-amenities{display:flex;gap:8px;flex-wrap:wrap;padding:0 1.75rem .75rem}
@@ -1404,7 +1425,7 @@ function hash(s){let h=0;for(let i=0;i<s.length;i++){h=Math.imul(31,h)+s.charCod
 function photo(l){
   if(l.photos?.length){const p=l.photos[0];if(p.startsWith('http')){
     if(p.includes('cloudinary.com')){
-      return p.replace('/upload/','/upload/w_600,c_fill,q_auto,f_auto/l_text:Arial_18_bold:nestfindercuk.rocks,co_rgb:ffffff,o_40,g_south_east,x_8,y_8/');
+      return p.replace('/upload/','/upload/w_600,c_fill,q_auto,f_auto/l_text:Arial_22_bold:nestfindercuk.rocks,co_rgb:FFD700,o_85,g_south_east,x_12,y_12/');
     }
     return p;
   }}
