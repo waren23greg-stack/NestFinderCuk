@@ -45,6 +45,7 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media print{.m-photo-strip,.m-photo-strip img{visibility:hidden!important;background:#000!important}}
 body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 img{display:block;max-width:100%}
 h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:400;line-height:1.1}
@@ -357,7 +358,7 @@ footer{background:var(--dark);padding:2.25rem var(--px);border-top:1px solid rgb
 .m-preview{padding:0}
 .m-photo-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 1.75rem 1rem;margin-top:.25rem}
 .m-photo-strip::-webkit-scrollbar{display:none}
-.m-photo-strip img{height:140px;min-width:200px;max-width:240px;object-fit:cover;border-radius:3px;cursor:zoom-in;flex-shrink:0;transition:opacity .2s}
+.m-photo-strip img{height:140px;min-width:200px;max-width:240px;object-fit:cover;border-radius:3px;cursor:zoom-in;flex-shrink:0;transition:opacity .2s;-webkit-user-select:none;user-select:none;pointer-events:none}
 .m-photo-strip img:hover{opacity:.88}
 .m-desc{font-size:.82rem;color:var(--ink);line-height:1.7;padding:0 1.75rem .75rem;font-weight:300}
 .m-amenities{display:flex;gap:8px;flex-wrap:wrap;padding:0 1.75rem .75rem}
@@ -1595,31 +1596,24 @@ async function openListing(id){
 
 
   },800);
-  // Map
+  // Map — locked behind contact approval, expires 72hrs
   const mapDiv=document.getElementById("m-map");
   const dirBtn=document.getElementById("m-directions-btn");
   if(mapDiv){
-    if(l.latitude&&l.longitude){
-      const q=l.latitude+","+l.longitude;
+    const mapKey='nf-map-'+l.id;
+    const mapExpiry=localStorage.getItem(mapKey);
+    const mapUnlocked=mapExpiry&&Date.now()<parseInt(mapExpiry);
+    if(mapUnlocked&&l.latitude&&l.longitude){
+      const q=l.latitude+','+l.longitude;
       const isMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
       const mapsLink=isMobile?'geo:'+l.latitude+','+l.longitude+'?q='+q:'https://www.google.com/maps/search/?api=1&query='+q;
-      mapDiv.innerHTML='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:160px;background:var(--linen);text-decoration:none;border:1px solid var(--border);gap:.75rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-family:Jost,sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(184,149,90,.35);padding:.45rem 1.25rem">Open in Google Maps</span><span style="font-size:.62rem;color:var(--muted)">'+l.location+'</span></a>';
-      if(dirBtn){dirBtn.style.display="";dirBtn.href=mapsLink;}
+      mapDiv.style.pointerEvents='auto';
+      mapDiv.innerHTML='<a href="'+mapsLink+'" target="_blank" rel="noopener" style="display:block;width:100%;height:100%;background:var(--linen);display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.78rem;color:var(--gold);font-weight:500;text-decoration:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Google Maps</a>';
+      if(dirBtn){dirBtn.href=mapsLink;dirBtn.style.display='inline-flex';}
     } else {
-      mapDiv.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:120px;font-size:.72rem;color:var(--muted)">No location pinned</div>';
-      if(dirBtn)dirBtn.style.display="none";
-    }
-  }
-  
-
-  if(user){
-    // Check for existing confirmed OR denied payment
-    const _cp=await fetch(_SB_URL+'/rest/v1/payments?select=id,status&user_id=eq.'+user.id+'&listing_id=eq.'+id+'&limit=1&order=created_at.desc',{headers:_SBH(localStorage.getItem('sb-token'))});
-    const _cpd=await _cp.json();
-    const existingPay=Array.isArray(_cpd)&&_cpd.length>0?_cpd[0]:null;
-    if(existingPay){
-      if(existingPay.status==='confirmed'){await showContact(id,false);sec('succ');openOv();fetch(_SB_URL+'/rest/v1/payments?user_id=eq.'+user.id+'&listing_id=eq.'+id+'&status=eq.confirmed&select=id&limit=1',{headers:_SBH(localStorage.getItem('sb-token'))}).then(r=>r.json()).then(d=>{if(Array.isArray(d)&&d[0])generateAndShowPromo(d[0].id);}).catch(()=>{});return;}
-      if(existingPay.status==='denied'){showDenied();sec('succ');openOv();return;}
+      mapDiv.innerHTML='<div style="text-align:center;padding:1.5rem"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(184,149,90,.4)" stroke-width="1.5" style="display:block;margin:0 auto .6rem"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div style="font-size:.72rem;color:var(--muted);font-weight:500">Map unlocks after contact approval</div><div style="font-size:.62rem;color:var(--muted);opacity:.6;margin-top:.25rem">Valid for 72 hours once unlocked</div></div>';
+      mapDiv.style.pointerEvents='none';
+      if(dirBtn)dirBtn.style.display='none';
     }
   }
   sec('preview');openOv();
@@ -1733,6 +1727,21 @@ async function showContact(lid,showSuccSec=true){
   const contactBox=document.getElementById('contact-box-wrap');
   if(deniedBox)deniedBox.style.display='none';
   if(contactBox)contactBox.style.display='';
+  // Unlock map for 72 hours
+  const mapExpKey='nf-map-'+lid;
+  localStorage.setItem(mapExpKey, Date.now()+(72*60*60*1000));
+  // Refresh map display
+  const mapDiv2=document.getElementById('m-map');
+  const dirBtn2=document.getElementById('m-directions-btn');
+  const curListing=listings&&listings.find?listings.find(x=>x.id===lid):null;
+  if(curListing&&curListing.latitude&&curListing.longitude&&mapDiv2){
+    const q2=curListing.latitude+','+curListing.longitude;
+    const isMob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const mLink=isMob?'geo:'+curListing.latitude+','+curListing.longitude+'?q='+q2:'https://www.google.com/maps/search/?api=1&query='+q2;
+    mapDiv2.style.pointerEvents='auto';
+    mapDiv2.innerHTML='<a href="'+mLink+'" target="_blank" rel="noopener" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;gap:.5rem;font-size:.78rem;color:var(--gold);font-weight:500;text-decoration:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Google Maps</a>';
+    if(dirBtn2){dirBtn2.href=mLink;dirBtn2.style.display='inline-flex';}
+  }
 
   if(data){
     document.getElementById('cb-name').textContent=data.caretaker_name;
@@ -2075,6 +2084,30 @@ async function submitReport(){
     startY=e.touches[0].clientY;
     e.stopPropagation();
   },{passive:true});
+})();
+
+// Screenshot detection — black out photos
+(function(){
+  function blackOut(on){
+    document.querySelectorAll('.m-photo-strip img').forEach(function(img){
+      img.style.filter=on?'brightness(0)':'';
+      img.style.transition='filter 0.1s';
+    });
+  }
+  document.addEventListener('keyup',function(e){
+    // Windows: PrintScreen, Mac: Cmd+Shift+3/4
+    if(e.key==='PrintScreen'||((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='3'||e.key==='4'||e.key==='s'))){
+      blackOut(true);setTimeout(function(){blackOut(false);},2000);
+    }
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='PrintScreen'){blackOut(true);}
+  });
+  // Visibility change (phone screenshot attempt)
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden){blackOut(true);}
+    else{setTimeout(function(){blackOut(false);},1500);}
+  });
 })();
 </script>
 </body>
