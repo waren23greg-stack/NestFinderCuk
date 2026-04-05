@@ -46,7 +46,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 @media print{
-  .m-photo-strip,.m-photo-strip img,.lightbox-img,.lbox-wrap{visibility:hidden!important;background:#000!important}
+  .m-photo-strip,.m-photo-strip img,.lightbox-img,.lbox-wrap,#gallery-img,.gallery-ov,#gallery-strip{visibility:hidden!important;background:#000!important}
 }
 /* Screenshot protection via mix-blend-mode trick */
 .photo-protect-wrap{position:relative;display:inline-block;background:#000}
@@ -2107,28 +2107,41 @@ async function submitReport(){
   },{passive:true});
 })();
 
-// Screenshot detection — black out photos
+// Screenshot detection — black out photos + gallery
 (function(){
   function blackOut(on){
-    document.querySelectorAll('.m-photo-strip img').forEach(function(img){
+    var targets=document.querySelectorAll('.m-photo-strip img, #gallery-img, #gallery-strip img');
+    targets.forEach(function(img){
       img.style.filter=on?'brightness(0)':'';
-      img.style.transition='filter 0.1s';
+      img.style.transition='filter 0.15s';
     });
+    var ov=document.getElementById('gallery-ov');
+    if(ov&&ov.classList.contains('open')){
+      ov.style.background=on?'#000':'rgba(0,0,0,.96)';
+    }
   }
-  document.addEventListener('keyup',function(e){
-    // Windows: PrintScreen, Mac: Cmd+Shift+3/4
-    if(e.key==='PrintScreen'||((e.metaKey||e.ctrlKey)&&e.shiftKey&&(e.key==='3'||e.key==='4'||e.key==='s'))){
-      blackOut(true);setTimeout(function(){blackOut(false);},2000);
+  // Keyboard: PrintScreen / Mac screenshot shortcuts
+  document.addEventListener('keydown',function(e){
+    if(e.key==='PrintScreen'||(e.metaKey&&e.shiftKey&&(e.key==='3'||e.key==='4'||e.key==='5'))){
+      blackOut(true);
     }
   });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='PrintScreen'){blackOut(true);}
+  document.addEventListener('keyup',function(e){
+    if(e.key==='PrintScreen'||(e.metaKey&&e.shiftKey&&(e.key==='3'||e.key==='4'||e.key==='5'))){
+      setTimeout(function(){blackOut(false);},2500);
+    }
   });
-  // Visibility change (phone screenshot attempt)
+  // Mobile / app switch — visibilitychange fires on screenshot on most Android
   document.addEventListener('visibilitychange',function(){
     if(document.hidden){blackOut(true);}
-    else{setTimeout(function(){blackOut(false);},1500);}
+    else{setTimeout(function(){blackOut(false);},2000);}
   });
+  // CSS-level: add a transparent overlay that turns black on focus loss
+  var style=document.createElement('style');
+  style.textContent='#gallery-img{-webkit-user-select:none;user-select:none;pointer-events:none}'
+    +'@media(display-mode:standalone){#gallery-img{-webkit-user-drag:none}}'
+    +'.m-photo-strip img{-webkit-user-select:none;user-select:none;-webkit-user-drag:none}';
+  document.head.appendChild(style);
 })();
 </script>
 </body>
