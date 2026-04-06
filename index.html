@@ -1434,17 +1434,73 @@ function photo(l){
 }
 
 async function load(){
+  // Cache listings for 10 minutes to reduce Supabase reads
+  const CACHE_KEY='nf-listings-cache';
+  const CACHE_TTL=10*60*1000; // 10 minutes
+  const cached=localStorage.getItem(CACHE_KEY);
+  if(cached){
+    try{
+      const {data:cData,ts}=JSON.parse(cached);
+      if(Date.now()-ts<CACHE_TTL&&Array.isArray(cData)&&cData.length){
+        listings=cData;
+        renderFromCache(cData);
+        // Refresh in background silently
+        refreshListingsBackground();
+        return;
+      }
+    }catch(e){}
+  }
   const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
-  if(error||!data){emptyState();return;}
+  if(error||!data){
+    // Fallback to stale cache if Supabase is down
+    const stale=localStorage.getItem(CACHE_KEY);
+    if(stale){
+      try{
+        const {data:sData}=JSON.parse(stale);
+        if(Array.isArray(sData)&&sData.length){
+          listings=sData;
+          renderFromCache(sData);
+          showToast('Showing cached listings — reconnecting…','warn');
+          return;
+        }
+      }catch(e){}
+    }
+    emptyState();return;
+  }
+  // Save fresh data to cache
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({data,ts:Date.now()}));}catch(e){}
   listings=data;
+  try{localStorage.setItem('nf-listings-cache',JSON.stringify({data,ts:Date.now()}));}catch(e){}
   document.getElementById('stat-n').textContent=data.length;
-  // Update hero contact fee stat with range if fees vary
   const fees=[...new Set(data.map(l=>l.contact_fee||250))];
   if(fees.length>1){
     const mn=Math.min(...fees),mx=Math.max(...fees);
     document.getElementById('stat-fee').textContent='Ksh '+mn+'–'+mx;
   }
   render(data);
+}
+
+function renderFromCache(data){
+  document.getElementById('stat-n').textContent=data.length;
+  const fees=[...new Set(data.map(l=>l.contact_fee||250))];
+  if(fees.length>1){
+    const mn=Math.min(...fees),mx=Math.max(...fees);
+    document.getElementById('stat-fee').textContent='Ksh '+mn+'–'+mx;
+  }
+  render(data);
+}
+
+async function refreshListingsBackground(){
+  try{
+    const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
+    if(!error&&data&&data.length){
+      listings=data;
+      try{localStorage.setItem('nf-listings-cache',JSON.stringify({data,ts:Date.now()}));}catch(e){}
+      // Only re-render if data changed
+      const cached=JSON.parse(localStorage.getItem('nf-listings-cache')||'{}');
+      if(data.length!==(cached.data||[]).length)renderFromCache(data);
+    }
+  }catch(e){}
 }
 
 function render(list,g){
