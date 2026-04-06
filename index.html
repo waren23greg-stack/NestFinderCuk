@@ -1435,7 +1435,7 @@ function photo(l){
 
 async function load(){
   // Cache listings for 10 minutes to reduce Supabase reads
-  const CACHE_KEY='nf-listings-cache';
+  const CACHE_KEY='nf-listings-cache-v2';
   const CACHE_TTL=10*60*1000; // 10 minutes
   const cached=localStorage.getItem(CACHE_KEY);
   if(cached){
