@@ -1823,7 +1823,13 @@ const MIN_SCALE=1,MAX_SCALE=4;
 function openGallery(id){
   const l=listings.find(x=>x.id===id);if(!l)return;
   const pool=PHOTOS[l.type]||PHOTOS.default;
-  galPhotos=(l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,3)]).map(u=>u.replace(/\?w=\d+/,'?w=1600').replace(/&q=\d+/,'&q=95'));
+  galPhotos=(l.photos&&l.photos.length?l.photos:[photo(l),...pool.slice(1,3)]).map(u=>{
+    u=u.replace(/\?w=\d+/,'?w=1600').replace(/&q=\d+/,'&q=95');
+    if(u.includes('cloudinary.com')&&!u.includes('nestfindercuk')){
+      u=u.replace('/upload/','/upload/q_auto,f_auto/l_text:Arial_22_bold:nestfindercuk.rocks,co_rgb:FFD700,o_85,g_south_east,x_12,y_12/');
+    }
+    return u;
+  });
   galIdx=0;document.getElementById('gallery-title').textContent=l.title;
   resetZoom();renderGalleryImg();
   document.getElementById('gallery-ov').classList.add('open');document.body.style.overflow='hidden';
