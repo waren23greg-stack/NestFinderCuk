@@ -161,59 +161,12 @@ body{
 }
 </style>
 
-<script>
-/* ── SUPABASE INLINE CLIENT ── */
-(function(){
-var _B='https://mtycapgbtvpczvswpjpo.supabase.co',_K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-function h(t){return{'apikey':_K,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_K),'Content-Type':'application/json'};}
-window.SB_URL=_B;window.SB_KEY=_K;window.SB_H=h;
-function q(table){
-  var _f=[],_s='*',_ord=null,_lim=null,_cnt=false;
-  var obj={
-    select:function(s,o){_s=s||'*';if(o&&o.count)_cnt=true;return obj;},
-    eq:function(c,v){_f.push(c+'=eq.'+encodeURIComponent(v));return obj;},
-    order:function(c,o){_ord=c+'.'+(o&&o.ascending===false?'desc':'asc');return obj;},
-    limit:function(n){_lim=n;return obj;},
-    single:function(){return obj._run(true,false);},
-    then:function(res,rej){return obj._run(false,false).then(res,rej);},
-    _run:function(single,maybe){
-      var t=localStorage.getItem('sb-token');
-      var url=_B+'/rest/v1/'+table+'?select='+encodeURIComponent(_s);
-      _f.forEach(function(f){url+='&'+f;});
-      if(_ord)url+='&order='+_ord;
-      if(_lim)url+='&limit='+_lim;
-      var hh=h(t);
-      if(single)hh['Accept']='application/vnd.pgrst.object+json';
-      if(_cnt)hh['Prefer']='count=exact';
-      return fetch(url,{headers:hh}).then(function(r){
-        var count=r.headers.get('content-range');
-        return r.json().then(function(d){
-          if(d&&d.code&&d.message)return{data:null,error:d,count:0};
-          if(single||maybe)return{data:d,error:null};
-          return{data:Array.isArray(d)?d:[],error:null,count:count?parseInt(count.split('/')[1])||0:0};
-        });
-      }).catch(function(e){return{data:null,error:e};});
-    },
-    upsert:function(data){
-      var t=localStorage.getItem('sb-token');
-      return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},h(t),{'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(data)})
-        .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};}).catch(function(e){return{data:null,error:e};});
-    }
-  };
-  return obj;
-}
-window.sb={
-  from:function(t){return q(t);},
-  auth:{
-    getUser:function(){
-      var t=localStorage.getItem('sb-token');
-      if(!t)return Promise.resolve({data:{user:null},error:null});
-      return fetch(_B+'/auth/v1/user',{headers:h(t)}).then(function(r){return r.json();}).then(function(d){return{data:{user:d.id?d:null},error:null};}).catch(function(){return{data:{user:null},error:null};});
-    }
-  }
-};
-})();
-</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="sb-client.js"></script>
+<script src="firebase-config.js"></script>
 </head>
 <body>
 <div class="split">
@@ -451,301 +404,89 @@ window.sb={
 </div><!-- /split -->
 
 <script>
-const _B = window.SB_URL;
-const _K = window.SB_KEY;
-const _H = window.SB_H;
+const _auth = firebase.auth();
+const _db   = firebase.firestore();
 
-/* ── load listing count ── */
-(async()=>{
-  try{
-    const r=await fetch(_B+'/rest/v1/listings?select=id',{headers:{apikey:_K,Authorization:'Bearer '+_K,'Prefer':'count=exact'}});
-    const count=r.headers.get('content-range');
-    const el=document.getElementById('ls-listings');
-    if(el&&count)el.textContent=count.split('/')[1]||'—';
-  }catch(e){}
-})();
-
-/* ── already logged in? ── */
-(async()=>{
-  const t=localStorage.getItem('sb-token');if(!t)return;
-  try{
-    const r=await fetch(_B+'/auth/v1/user',{headers:_H(t)});
-    const u=await r.json();
-    if(!u.id){localStorage.removeItem('sb-token');return;}
-    const pr=await fetch(_B+'/rest/v1/profiles?select=full_name,role&id=eq.'+u.id,{headers:_H(t)});
-    const pd=await pr.json();
-    const p=Array.isArray(pd)&&pd[0]?pd[0]:null;
-    if(p?.role==='admin'){location.href='admin.html';return;}
-    showDone(p?.full_name?.split(' ')[0]||'Student');
-  }catch(e){}
-})();
-
-/* ── TABS ── */
-function switchTo(mode){
-  const isReg=mode==='reg';
-  document.getElementById('tabs').classList.toggle('on-reg',isReg);
-  document.getElementById('btn-in').classList.toggle('on',!isReg);
-  document.getElementById('btn-reg').classList.toggle('on',isReg);
-  showPanel(isReg?'p-reg':'p-in');
-}
-
-function showPanel(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  const el=document.getElementById(id);
-  if(el){
-    el.classList.add('on');
-    el.querySelectorAll('.stagger > *').forEach(c=>{
-      c.style.animation='none';
-      requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.animation='';}));
+async function getCurrentUser() {
+  return new Promise(resolve => {
+    _auth.onAuthStateChanged(async user => {
+      if (!user) { resolve(null); return; }
+      try {
+        const doc = await _db.collection('users').doc(user.uid).get();
+        resolve({ id: user.uid, email: user.email, ...(doc.exists ? doc.data() : {}) });
+      } catch(e) { resolve({ id: user.uid, email: user.email }); }
     });
-  }
-}
-
-/* ── EYE TOGGLE ── */
-function toggleEye(inputId,btn){
-  const inp=document.getElementById(inputId);
-  const isPass=inp.type==='password';
-  inp.type=isPass?'text':'password';
-  btn.querySelector('svg').innerHTML=isPass
-    ?'<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
-    :'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
-}
-
-/* ── MSG ── */
-function showMsg(id,text,type='err'){
-  const el=document.getElementById(id),tx=document.getElementById(id+'-txt');
-  if(!el||!tx)return;
-  tx.textContent=text;el.className='msg '+type+' show';
-}
-function clearMsg(id){const el=document.getElementById(id);if(el)el.className='msg';}
-
-/* ── LOADING STATE ── */
-function setLoading(btnId,arrowId,loading,label=''){
-  const btn=document.getElementById(btnId);
-  const lbl=document.getElementById(btnId+'-lbl');
-  const arr=document.getElementById(arrowId);
-  if(!btn)return;
-  btn.disabled=loading;
-  if(loading){
-    if(lbl)lbl.textContent='Please wait…';
-    if(arr)arr.style.display='none';
-    if(!document.getElementById('sp-'+btnId))
-      btn.insertAdjacentHTML('beforeend','<div class="spin-small" id="sp-'+btnId+'"></div>');
-  }else{
-    if(lbl)lbl.textContent=label;
-    if(arr)arr.style.display='';
-    document.getElementById('sp-'+btnId)?.remove();
-  }
-}
-
-/* ══════════════════════════════════════
-   SIGN IN
-══════════════════════════════════════ */
-async function doSignIn(){
-  clearMsg('in-msg');
-  const email=document.getElementById('in-email').value.trim();
-  const pass=document.getElementById('in-pass').value;
-  if(!email||!pass){showMsg('in-msg','Please enter your email and password.');return;}
-  setLoading('in-btn','in-arrow',true);
-
-  const r=await fetch(_B+'/auth/v1/token?grant_type=password',{
-    method:'POST',
-    headers:{apikey:_K,'Content-Type':'application/json'},
-    body:JSON.stringify({email,password:pass})
   });
-  const d=await r.json();
-  setLoading('in-btn','in-arrow',false,'Sign In');
-
-  if(!d.access_token){
-    showMsg('in-msg',d.error_description||d.msg||'Incorrect email or password. Please try again.');
-    return;
-  }
-  localStorage.setItem('sb-token',d.access_token);
-  localStorage.setItem('sb-refresh',d.refresh_token||'');
-
-  const pr=await fetch(_B+'/rest/v1/profiles?select=full_name,role&id=eq.'+d.user.id,{headers:_H(d.access_token)});
-  const pd=await pr.json();
-  const p=Array.isArray(pd)&&pd[0]?pd[0]:null;
-  if(p?.role==='admin'){location.href='admin.html';return;}
-  showDone(p?.full_name?.split(' ')[0]||'Student');
 }
 
-/* ══════════════════════════════════════
-   REGISTER
-══════════════════════════════════════ */
-async function doRegister(){
-  clearMsg('reg-msg');
-  const name=document.getElementById('reg-name').value.trim();
-  const email=document.getElementById('reg-email').value.trim();
-  const phone=document.getElementById('reg-phone').value.trim();
-  const pass=document.getElementById('reg-pass').value;
-  if(!name||!email||!pass){showMsg('reg-msg','Please fill in all required fields.');return;}
-  if(pass.length<6){showMsg('reg-msg','Password must be at least 6 characters.');return;}
-  setLoading('reg-btn','reg-arrow',true);
+async function checkAlreadyLoggedIn() {
+  const user = await getCurrentUser();
+  if (!user) return;
+  window.location.href = (user.role === 'admin') ? 'admin.html' : 'index.html';
+}
+checkAlreadyLoggedIn();
 
-  const r=await fetch(_B+'/auth/v1/signup',{
-    method:'POST',
-    headers:{apikey:_K,'Content-Type':'application/json'},
-    body:JSON.stringify({email,password:pass,data:{full_name:name,phone}})
-  });
-  const d=await r.json();
-  setLoading('reg-btn','reg-arrow',false,'Create Account');
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const btn   = document.getElementById('login-btn');
+  showMsg('in-msg', '');
+  if (!email || !pass) { showMsg('in-msg', 'Please enter email and password.'); return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const cred = await _auth.signInWithEmailAndPassword(email, pass);
+    const doc  = await _db.collection('users').doc(cred.user.uid).get();
+    const role = doc.exists ? (doc.data().role || 'student') : 'student';
+    window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
+  } catch(e) {
+    showMsg('in-msg', e.message || 'Incorrect email or password.');
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+}
 
-  if(d.error||d.msg){showMsg('reg-msg',d.error_description||d.msg||d.error||'Registration failed.');return;}
-
-  const userId=d.user?.id||d.id;
-  if(userId){
-    await fetch(_B+'/rest/v1/profiles',{
-      method:'POST',
-      headers:Object.assign({},_H(d.session?.access_token||_K),{'Prefer':'resolution=merge-duplicates,return=minimal'}),
-      body:JSON.stringify({id:userId,full_name:name,phone,role:'student'})
+async function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+  const btn   = document.getElementById('reg-btn');
+  showMsg('reg-msg', '');
+  if (!name || !email || !pass) { showMsg('reg-msg', 'All fields are required.'); return; }
+  if (pass !== pass2) { showMsg('reg-msg', 'Passwords do not match.'); return; }
+  if (pass.length < 6) { showMsg('reg-msg', 'Password must be at least 6 characters.'); return; }
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  try {
+    const cred = await _auth.createUserWithEmailAndPassword(email, pass);
+    await _db.collection('users').doc(cred.user.uid).set({
+      uid: cred.user.uid,
+      email: email,
+      display_name: name,
+      role: 'student',
+      created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
-  }
-
-  if(d.session?.access_token){
-    localStorage.setItem('sb-token',d.session.access_token);
-    localStorage.setItem('sb-refresh',d.session.refresh_token||'');
-    showDone(name.split(' ')[0]);
-  }else{
-    document.getElementById('conf-email').textContent=email;
-    showPanel('p-email');
+    window.location.href = 'index.html';
+  } catch(e) {
+    showMsg('reg-msg', e.message || 'Registration failed.');
+    btn.disabled = false; btn.textContent = 'Create Account';
   }
 }
 
-/* ══════════════════════════════════════
-   FORGOT PASSWORD — sends reset email
-══════════════════════════════════════ */
-async function doReset(){
-  clearMsg('reset-msg');
-  const email=document.getElementById('reset-email').value.trim();
-  if(!email){showMsg('reset-msg','Please enter your email address.');return;}
-  setLoading('reset-btn','reset-arrow',true);
-
-  const r=await fetch(_B+'/auth/v1/recover',{
-    method:'POST',
-    headers:{apikey:_K,'Content-Type':'application/json'},
-    body:JSON.stringify({email,gotrue_meta_security:{},redirect_to:'https://nestfindercuk.rocks/login.html'})
-  });
-  setLoading('reset-btn','reset-arrow',false,'Send Reset Link');
-
-  if(!r.ok){
-    const d=await r.json().catch(()=>({}));
-    showMsg('reset-msg',d.message||'Could not send reset email. Please try again.');
-    return;
+async function doForgot() {
+  const email = document.getElementById('forgot-email').value.trim();
+  showMsg('forgot-msg', '');
+  if (!email) { showMsg('forgot-msg', 'Enter your email address.'); return; }
+  try {
+    await _auth.sendPasswordResetEmail(email);
+    showMsg('forgot-msg', 'Reset email sent — check your inbox.');
+  } catch(e) {
+    showMsg('forgot-msg', e.message || 'Could not send reset email.');
   }
-  document.getElementById('reset-sent-email').textContent=email;
-  showPanel('p-reset-sent');
 }
 
-/* ══════════════════════════════════════
-   SET NEW PASSWORD
-   Called after user clicks email link,
-   lands here with #access_token=<token_hash>&type=recovery
-══════════════════════════════════════ */
-async function doNewPass(){
-  clearMsg('newpass-msg');
-  const p1=document.getElementById('newpass-1').value;
-  const p2=document.getElementById('newpass-2').value;
-  if(!p1||p1.length<6){showMsg('newpass-msg','Password must be at least 6 characters.');return;}
-  if(p1!==p2){showMsg('newpass-msg','Passwords do not match.');return;}
-  setLoading('newpass-btn','newpass-arrow',true);
-
-  const token=localStorage.getItem('sb-token');
-  if(!token){
-    setLoading('newpass-btn','newpass-arrow',false,'Set New Password');
-    showMsg('newpass-msg','Session expired. Please request a new reset link.');
-    return;
-  }
-
-  const r=await fetch(_B+'/auth/v1/user',{
-    method:'PUT',
-    headers:{apikey:_K,Authorization:'Bearer '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({password:p1})
-  });
-  const d=await r.json().catch(()=>({}));
-  setLoading('newpass-btn','newpass-arrow',false,'Set New Password');
-
-  if(!r.ok||d.error){
-    showMsg('newpass-msg',d.message||d.error||'Update failed. Link may have expired — please request a new one.');
-    return;
-  }
-
-  localStorage.removeItem('sb-token');
-  localStorage.removeItem('sb-refresh');
-  showMsg('newpass-msg','Password updated successfully! Redirecting to sign in…','ok');
-  setTimeout(()=>{
-    history.replaceState(null,'',window.location.pathname);
-    document.getElementById('tabs').style.display='';
-    switchTo('in');
-  },1800);
+function showMsg(id, msg) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = msg;
 }
-
-/* ══════════════════════════════════════
-   DETECT RESET LINK ON PAGE LOAD
-   ─────────────────────────────────────
-   Supabase now sends token_hash (not a
-   JWT) so we must exchange it via
-   /auth/v1/verify before we can use it.
-══════════════════════════════════════ */
-(async()=>{
-  const hash=new URLSearchParams(window.location.hash.slice(1));
-  const type=hash.get('type');
-  const tokenHash=hash.get('access_token'); // token_hash from email template
-
-  if(type!=='recovery'||!tokenHash) return;
-
-  // Clean the hash from the URL bar immediately
-  history.replaceState(null,'',window.location.pathname);
-
-  // Hide tabs while processing
-  document.getElementById('tabs').style.display='none';
-
-  // Exchange token_hash → real session via /auth/v1/verify
-  let result;
-  try{
-    const res=await fetch(_B+'/auth/v1/verify',{
-      method:'POST',
-      headers:{apikey:_K,'Content-Type':'application/json'},
-      body:JSON.stringify({type:'recovery',token_hash:tokenHash})
-    });
-    result=await res.json();
-  }catch(e){
-    result={};
-  }
-
-  if(!result.access_token){
-    // Token expired, already used, or invalid
-    document.getElementById('tabs').style.display='';
-    showPanel('p-reset');
-    showMsg('reset-msg','Your reset link has expired or already been used. Please request a new one.','err');
-    return;
-  }
-
-  // Store the real JWT so doNewPass() can call /auth/v1/user PUT
-  localStorage.setItem('sb-token',result.access_token);
-  if(result.refresh_token) localStorage.setItem('sb-refresh',result.refresh_token);
-
-  // Show the new password form
-  showPanel('p-newpass');
-})();
-
-/* ══════════════════════════════════════
-   SHOW DONE SCREEN
-══════════════════════════════════════ */
-function showDone(name){
-  document.getElementById('done-name').textContent=name||'Student';
-  document.getElementById('tabs').style.display='none';
-  showPanel('p-done');
-}
-
-/* ── ENTER KEY ── */
-document.addEventListener('keydown',e=>{
-  if(e.key!=='Enter')return;
-  if(document.getElementById('p-in').classList.contains('on'))doSignIn();
-  else if(document.getElementById('p-reg').classList.contains('on'))doRegister();
-  else if(document.getElementById('p-reset').classList.contains('on'))doReset();
-  else if(document.getElementById('p-newpass').classList.contains('on'))doNewPass();
-});
 </script>
 </body>
 </html>
