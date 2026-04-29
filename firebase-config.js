@@ -9,4 +9,5 @@ const firebaseConfig = {
   appId: "1:508247387540:web:473ceb9425182fa0fe3301",
   measurementId: "G-VFLY44TEX1"
 };
-const supabase = createClient(firebaseConfig);
+
+firebase.initializeApp(firebaseConfig);
