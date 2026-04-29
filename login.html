@@ -412,8 +412,12 @@ function doSignIn(){doLogin();}
 </div><!-- /split -->
 
 <script>
-const _auth = firebase.auth();
-const _db   = firebase.firestore();
+let _auth, _db;
+document.addEventListener("DOMContentLoaded", () => {
+  try { _auth = firebase.auth(); _db = firebase.firestore(); checkAlreadyLoggedIn(); } catch(e) { console.error("Firebase init failed:", e); }
+});
+function _getAuth(){ return _auth; }
+function _getDb(){ return _db; }
 
 async function getCurrentUser() {
   return new Promise(resolve => {
@@ -432,7 +436,6 @@ async function checkAlreadyLoggedIn() {
   if (!user) return;
   window.location.href = (user.role === 'admin') ? 'admin.html' : 'index.html';
 }
-checkAlreadyLoggedIn();
 
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
