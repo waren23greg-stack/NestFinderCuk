@@ -1329,23 +1329,12 @@ async function load(){
       }
     }catch(e){}
   }
-  const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
-  if(error||!data){
-    // Fallback to stale cache if Supabase is down
-    const stale=localStorage.getItem(CACHE_KEY);
-    if(stale){
-      try{
-        const {data:sData}=JSON.parse(stale);
-        if(Array.isArray(sData)&&sData.length){
-          listings=sData;
-          renderFromCache(sData);
-          showToast('Showing cached listings — reconnecting…','warn');
-          return;
-        }
-      }catch(e){}
-    }
-    emptyState();return;
-  }
+let data;
+try{
+  const snap=await firebase.firestore().collection('listings').get();
+  data=snap.docs.map(d=>({id:d.id,...d.data()}));
+}catch(e){emptyState();return;}
+if(!data||!data.length){emptyState();return;}
   // Save fresh data to cache
   try{localStorage.setItem(CACHE_KEY,JSON.stringify({data,ts:Date.now()}));}catch(e){}
   listings=data;
