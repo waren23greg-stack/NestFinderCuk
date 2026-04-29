@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com https://unpkg.com;">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://storage.googleapis.com https://api.safaricom.co.ke https://api.resend.com;">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#0E0B07"/>
@@ -10,147 +8,109 @@
 <title>NestFinder CUK — Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-/* ── TOKENS ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#0E0B07;--ink2:#1C1810;--ink3:#2E2920;
   --gold:#C09A5A;--gold-l:#D8B97A;--gold-d:#8B6B35;--gold-gl:rgba(192,154,90,.12);
   --sand:#F7F2EA;--sand2:#EDE6D8;--sand3:#DDD4C0;
   --muted:#9C8E78;--pale:#FAF8F4;--white:#FFFFFF;
   --err:#C0392B;--ok:#2D6A4F;
-  --t:.26s;--ease:cubic-bezier(.4,0,.2,1);
+  --ease:cubic-bezier(.4,0,.2,1);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{height:100%;-webkit-text-size-adjust:100%}
-body{
-  font-family:'DM Sans',sans-serif;background:var(--pale);color:var(--ink);
-  min-height:100dvh;display:flex;overflow-x:hidden;-webkit-font-smoothing:antialiased;
-}
+html,body{height:100%;min-height:100dvh}
+body{font-family:'DM Sans',sans-serif;background:var(--pale);color:var(--ink);display:flex;min-height:100dvh}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── SPLIT LAYOUT ── */
-.split{display:flex;width:100%;min-height:100dvh}
+.split{display:flex;min-height:100dvh;width:100%}
 
-/* ── LEFT PANEL ── */
+/* LEFT PANEL */
 .left{width:46%;flex-shrink:0;position:relative;overflow:hidden;display:flex;flex-direction:column;background:var(--ink)}
 .left-bg{position:absolute;inset:0;background:linear-gradient(165deg,#1A1408 0%,#0E0B07 40%,#1C160A 100%)}
-.left-lines{
-  position:absolute;inset:0;
-  background-image:
-    repeating-linear-gradient(0deg,transparent,transparent 79px,rgba(192,154,90,.04) 79px,rgba(192,154,90,.04) 80px),
-    repeating-linear-gradient(90deg,transparent,transparent 79px,rgba(192,154,90,.03) 79px,rgba(192,154,90,.03) 80px);
-}
-.left-grain{
-  position:absolute;inset:0;opacity:.06;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.left-mark{position:absolute;right:-60px;bottom:-60px;width:420px;height:420px;opacity:.04}
-.left-mark svg{width:100%;height:100%}
-.left-inner{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:space-between;height:100%;padding:3rem 3.25rem}
-.l-logo{display:flex;align-items:center;gap:11px}
-.l-logo-ring{width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center}
-.l-logo-ring svg{width:16px;height:16px;stroke:var(--gold);fill:none;stroke-width:1.7}
+.left-noise{position:absolute;inset:0;opacity:.04;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E")}
+.left-content{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;padding:2.5rem 3rem}
+.l-logo{display:flex;align-items:center;gap:.65rem;margin-bottom:auto}
+.l-logo-ring{width:32px;height:32px;border:1px solid rgba(192,154,90,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.l-logo-ring svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.5}
 .l-logo-text{font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff;letter-spacing:.02em}
-.l-logo-text b{color:var(--gold);font-weight:500}
-.l-editorial{margin-top:auto;margin-bottom:auto;padding:3rem 0}
-.l-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-l);margin-bottom:1.75rem}
+.l-logo-text b{color:var(--gold)}
+.l-mid{padding:3rem 0;flex:1;display:flex;flex-direction:column;justify-content:center}
+.l-eyebrow{display:flex;align-items:center;gap:.65rem;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
 .l-eyebrow::before{content:'';display:block;width:28px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);flex-shrink:0}
 .l-headline{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,3.5vw,3.4rem);font-weight:400;color:#fff;line-height:1.12;margin-bottom:1.6rem}
-.l-headline em{color:var(--gold-l);font-style:italic;display:block}
+.l-headline em{color:var(--gold);font-style:italic}
 .l-sub{font-size:.86rem;color:rgba(255,255,255,.42);line-height:1.8;font-weight:300;max-width:360px;margin-bottom:2.75rem}
-.l-stats{display:flex;gap:0;border-top:1px solid rgba(192,154,90,.15)}
-.l-stat{flex:1;padding:1.25rem 0;border-right:1px solid rgba(192,154,90,.12);padding-right:1.5rem}
-.l-stat:last-child{border-right:none;padding-right:0;padding-left:1.5rem}
-.l-stat:not(:first-child):not(:last-child){padding-left:1.5rem}
+.l-stats{display:flex;gap:2rem}
 .l-stat-n{font-family:'Playfair Display',serif;font-size:1.9rem;color:#fff;font-weight:400;line-height:1}
-.l-stat-l{font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-top:4px}
+.l-stat-l{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:.3rem}
+.l-divider{width:1px;background:rgba(255,255,255,.08);margin:0 .5rem}
 .l-accent{position:absolute;top:0;right:0;bottom:0;width:1px;background:linear-gradient(180deg,transparent,rgba(192,154,90,.3) 30%,rgba(192,154,90,.5) 60%,transparent)}
 .l-quote{border-left:2px solid var(--gold);padding-left:1rem;font-family:'Playfair Display',serif;font-size:.96rem;font-style:italic;color:rgba(255,255,255,.45);line-height:1.65;margin-top:2.5rem}
 .l-quote cite{display:block;margin-top:.5rem;font-family:'DM Sans',sans-serif;font-size:.62rem;font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.22)}
-.l-foot{font-size:.62rem;color:rgba(255,255,255,.2);letter-spacing:.04em}
+.l-foot{font-size:.65rem;color:rgba(255,255,255,.18);letter-spacing:.06em}
 
-/* ── RIGHT PANEL ── */
+/* RIGHT PANEL */
 .right{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 2rem;background:var(--pale);position:relative;overflow:hidden}
-.right::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:500px;background:radial-gradient(circle,rgba(192,154,90,.07) 0%,transparent 70%);pointer-events:none}
+.right::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(192,154,90,.05) 0%,transparent 60%);pointer-events:none}
 .form-wrap{width:100%;max-width:420px;animation:fadeUp .55s var(--ease) both}
 
-/* ── TABS ── */
-.tabs{display:flex;gap:0;background:var(--sand2);border-radius:3px;padding:3px;margin-bottom:2.5rem;position:relative}
-.tab-btn{flex:1;padding:.62rem;font-family:'DM Sans',sans-serif;font-size:.73rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:transparent;border:none;cursor:pointer;color:var(--muted);transition:color var(--t);position:relative;z-index:1;-webkit-tap-highlight-color:transparent}
-.tab-btn.on{color:var(--ink)}
-.tab-ink{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--white);border-radius:2px;transition:transform var(--t) var(--ease);box-shadow:0 1px 4px rgba(14,11,7,.08)}
-.tabs.on-reg .tab-ink{transform:translateX(calc(100%))}
+/* TABS */
+.tabs{display:flex;background:var(--sand2);border-radius:3px;padding:3px;gap:3px;margin-bottom:2.25rem;position:relative}
+.tab-btn{flex:1;padding:.6rem 1rem;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s var(--ease);color:var(--muted)}
+.tab-btn.on{background:var(--white);color:var(--ink);box-shadow:0 1px 4px rgba(14,11,7,.08)}
 
-/* ── FORM HEADER ── */
-.form-title{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:400;color:var(--ink);margin-bottom:.5rem;line-height:1.15}
-.form-title em{color:var(--gold-d);font-style:italic}
-.form-sub{font-size:.82rem;color:var(--muted);margin-bottom:2rem;line-height:1.6;font-weight:300}
+/* PANELS */
+.panel{display:none}
+.panel.on{display:block}
 
-/* ── FIELDS ── */
-.field{margin-bottom:1.1rem;position:relative}
-.field label{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:.42rem;font-weight:500}
-.field-inner{position:relative}
-.field-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--sand3);fill:none;stroke-width:1.8;pointer-events:none;transition:stroke var(--t)}
-.field input{width:100%;height:48px;padding:0 13px 0 40px;background:var(--white);border:1px solid var(--sand3);border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color var(--t),box-shadow var(--t);-webkit-appearance:none}
-.field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(192,154,90,.1)}
-.field input:focus~.field-ico,.field-inner:focus-within .field-ico{stroke:var(--gold)}
-.field input::placeholder{color:var(--sand3)}
-.eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;-webkit-tap-highlight-color:transparent}
-.eye-btn svg{width:16px;height:16px;stroke:var(--sand3);fill:none;stroke-width:1.7;transition:stroke var(--t)}
-.eye-btn:hover svg{stroke:var(--muted)}
-.field-hint{font-size:.67rem;color:var(--muted);margin-top:.35rem;font-weight:300;padding-left:1px}
+/* FORM TITLE */
+.form-title{font-family:'Playfair Display',serif;font-size:clamp(1.75rem,2.5vw,2.1rem);font-weight:400;color:var(--ink);line-height:1.2;margin-bottom:.5rem}
+.form-title em{color:var(--gold);font-style:italic}
+.form-sub{font-size:.82rem;color:var(--muted);line-height:1.7;font-weight:300;max-width:320px;margin-bottom:1.75rem}
 
-/* ── SUBMIT ── */
-.submit-btn{width:100%;height:50px;background:var(--ink);color:#fff;border:none;border-radius:3px;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background var(--t),transform var(--t);-webkit-tap-highlight-color:transparent;margin-top:.25rem;position:relative;overflow:hidden}
-.submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 0%,rgba(192,154,90,.18) 100%);opacity:0;transition:opacity var(--t)}
-.submit-btn:hover{background:var(--ink3)}
-.submit-btn:hover::before{opacity:1}
-.submit-btn:active{transform:scale(.985)}
-.submit-btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
-.submit-btn svg{flex-shrink:0}
-.spin-small{width:16px;height:16px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* FIELDS */
+.field{margin-bottom:1.1rem}
+.field label{display:block;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;font-weight:500}
+.field-inner{position:relative;display:flex;align-items:center}
+.field-inner input{width:100%;height:50px;padding:0 2.75rem 0 2.75rem;background:var(--white);border:1px solid var(--sand3);font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--ink);outline:none;border-radius:2px;transition:border-color .2s var(--ease)}
+.field-inner input:focus{border-color:var(--gold)}
+.field-inner input::placeholder{color:var(--sand3)}
+.field-ico{position:absolute;left:.85rem;width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:1.5;pointer-events:none}
+.eye-btn{position:absolute;right:.85rem;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center}
+.eye-btn svg{width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:1.5}
 
-/* ── MISC ── */
-.forgot-row{text-align:right;margin-top:-.4rem;margin-bottom:.9rem}
-.forgot-link{font-size:.76rem;color:var(--gold-d);text-decoration:none;border-bottom:1px solid rgba(139,107,53,.25);transition:all var(--t)}
-.forgot-link:hover{color:var(--gold);border-color:var(--gold)}
-.switch-row{text-align:center;margin-top:1.5rem;font-size:.79rem;color:var(--muted)}
-.switch-row a{color:var(--gold-d);font-weight:500;text-decoration:none;border-bottom:1px solid rgba(192,154,90,.3);transition:border-color var(--t),color var(--t)}
-.switch-row a:hover{color:var(--gold);border-color:var(--gold)}
-
-/* ── MSG BANNER ── */
-.msg{display:none;align-items:flex-start;gap:8px;padding:.8rem 1rem;border-radius:3px;font-size:.78rem;line-height:1.5;margin-bottom:1rem;border-left:3px solid}
+/* MSG */
+.msg{display:none;align-items:flex-start;gap:.5rem;font-size:.78rem;color:var(--err);margin-bottom:1rem;line-height:1.5}
 .msg.show{display:flex}
-.msg.ok{background:#EFF9F3;border-color:var(--ok);color:#1D5439}
-.msg.err{background:#FCF0EE;border-color:var(--err);color:#7B2221}
-.msg svg{flex-shrink:0;margin-top:1px}
-.msg.ok svg{stroke:var(--ok)}
-.msg.err svg{stroke:var(--err)}
+.msg svg{stroke:var(--err);fill:none;stroke-width:1.5;flex-shrink:0;margin-top:1px}
+.msg.ok-msg{color:var(--ok)}
+.msg.ok-msg svg{stroke:var(--ok)}
 
-/* ── PANELS ── */
-.panel{display:none}.panel.on{display:block}
+/* FORGOT */
+.forgot-row{text-align:right;margin-bottom:1.25rem}
+.forgot-link{font-size:.75rem;color:var(--gold);text-decoration:none}
+.forgot-link:hover{text-decoration:underline}
 
-/* ── SPECIAL SCREENS ── */
-.special{text-align:center;padding:2rem 0;animation:fadeUp .4s var(--ease) both}
-.special-ico{width:64px;height:64px;border:1.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.4rem}
-.special-ico svg{width:26px;height:26px;stroke:var(--gold);fill:none;stroke-width:1.5}
-.special-t{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:400;color:var(--ink);margin-bottom:.6rem;line-height:1.2}
+/* SUBMIT */
+.submit-btn{width:100%;height:52px;background:var(--ink);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.6rem;border-radius:2px;transition:background .2s var(--ease)}
+.submit-btn:hover{background:var(--ink3)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed}
+.switch-row{text-align:center;margin-top:1.25rem;font-size:.78rem;color:var(--muted)}
+.switch-row a{color:var(--gold);text-decoration:none}
+.switch-row a:hover{text-decoration:underline}
+
+/* SPECIAL PANEL (success, etc) */
+.special-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--ink);margin-bottom:.75rem}
 .special-sub{font-size:.82rem;color:var(--muted);line-height:1.7;font-weight:300;max-width:320px;margin:0 auto 2rem}
-.special-email{display:inline-block;font-weight:500;color:var(--ink);background:var(--sand);padding:.25rem .75rem;border-radius:2px;font-size:.86rem}
+.back-link{display:inline-flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--muted);background:none;border:none;cursor:pointer;margin-bottom:1.25rem;padding:0}
+.back-link svg{stroke:var(--muted);fill:none;stroke-width:1.5}
 
-/* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.stagger>*{animation:fadeUp .45s var(--ease) both}
-.stagger>*:nth-child(1){animation-delay:.05s}
-.stagger>*:nth-child(2){animation-delay:.11s}
-.stagger>*:nth-child(3){animation-delay:.17s}
-.stagger>*:nth-child(4){animation-delay:.23s}
-.stagger>*:nth-child(5){animation-delay:.29s}
-.stagger>*:nth-child(6){animation-delay:.35s}
-
-/* ── RESPONSIVE ── */
+/* RESPONSIVE */
 @media(max-width:900px){
   .left{display:none}
-  .right{padding:2.5rem 1.5rem;align-items:flex-start;min-height:100dvh}
+  body,html{min-height:100dvh}
+  .right{flex:1;padding:2.5rem 1.5rem;align-items:flex-start;min-height:100dvh;width:100%}
   .form-wrap{max-width:460px;margin:0 auto;padding-top:2rem}
   .form-wrap::before{content:'NestFinder CUK';display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);margin-bottom:2.25rem;letter-spacing:.01em}
 }
@@ -158,8 +118,10 @@ body{
   .right{padding:1.5rem 1rem;align-items:flex-start}
   .form-wrap{padding-top:1.25rem}
   .form-title{font-size:1.55rem}
-  .field input{height:46px}
+  .field-inner input{height:46px}
   .submit-btn{height:48px}
+  .tabs{width:100%}
+  .tab-btn{flex:1;text-align:center}
 }
 </style>
 
@@ -169,336 +131,280 @@ body{
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="sb-client.js"></script>
 <script src="firebase-config.js"></script>
-<!-- cache-bust: Wed Apr 29 10:25:43 EAST 2026 -->
 </head>
 <body>
 <div class="split">
 
-  <!-- ── LEFT PANEL ── -->
+  <!-- LEFT PANEL -->
   <div class="left">
     <div class="left-bg"></div>
-    <div class="left-lines"></div>
-    <div class="left-grain"></div>
-    <div class="left-mark">
-      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 100L100 30L180 100V180H20V100Z" stroke="white" stroke-width="4"/>
-        <path d="M75 180V130H125V180" stroke="white" stroke-width="4"/>
-        <path d="M40 100V175" stroke="white" stroke-width="2" stroke-dasharray="4 4"/>
-        <path d="M160 100V175" stroke="white" stroke-width="2" stroke-dasharray="4 4"/>
-        <circle cx="100" cy="85" r="12" stroke="white" stroke-width="3"/>
-        <path d="M60 140H85M115 140H140" stroke="white" stroke-width="2"/>
-      </svg>
-    </div>
-    <div class="l-accent"></div>
-    <div class="left-inner">
+    <div class="left-noise"></div>
+    <div class="left-content">
       <div class="l-logo">
         <div class="l-logo-ring">
           <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>
         </div>
-        <div class="l-logo-text">Nest<b>Finder</b> CUK</div>
+        <span class="l-logo-text">Nest<b>Finder</b> CUK</span>
       </div>
-      <div class="l-editorial">
+      <div class="l-mid">
         <div class="l-eyebrow">Cooperative University of Kenya</div>
-        <h1 class="l-headline">Your next home<br/>is <em>waiting for you.</em></h1>
+        <h1 class="l-headline">Your next home is<br><em>waiting for you.</em></h1>
         <p class="l-sub">Safe, verified, affordable housing near CUK. Browse real listings, pay Ksh 250 via M-Pesa, and move in with confidence.</p>
         <div class="l-stats">
-          <div class="l-stat"><div class="l-stat-n" id="ls-listings">—</div><div class="l-stat-l">Listings</div></div>
-          <div class="l-stat"><div class="l-stat-n">3</div><div class="l-stat-l">Room Types</div></div>
-          <div class="l-stat"><div class="l-stat-n">250</div><div class="l-stat-l">Ksh Only</div></div>
+          <div><div class="l-stat-n">—</div><div class="l-stat-l">Listings</div></div>
+          <div class="l-divider"></div>
+          <div><div class="l-stat-n">3</div><div class="l-stat-l">Room Types</div></div>
+          <div class="l-divider"></div>
+          <div><div class="l-stat-n">250</div><div class="l-stat-l">Ksh Only</div></div>
         </div>
         <blockquote class="l-quote">
           "No more walking estate to estate. Real photos, real contacts, real houses."
           <cite>— CUK Student, 2025</cite>
         </blockquote>
       </div>
-      <div class="l-foot">© 2025 NestFinder CUK · Student Housing Platform</div>
+      <div class="l-foot">© 2026 NestFinder CUK · Student Housing Platform</div>
     </div>
+    <div class="l-accent"></div>
   </div>
 
-  <!-- ── RIGHT PANEL ── -->
+  <!-- RIGHT PANEL -->
   <div class="right">
     <div class="form-wrap">
 
-      <!-- TAB BAR -->
-      <div class="tabs" id="tabs">
-        <div class="tab-ink" id="tab-ink"></div>
+      <!-- TABS -->
+      <div class="tabs">
         <button class="tab-btn on" id="btn-in" onclick="switchTo('in')">Sign In</button>
         <button class="tab-btn" id="btn-reg" onclick="switchTo('reg')">Register</button>
       </div>
 
-      <!-- ══ SIGN IN ══ -->
+      <!-- SIGN IN -->
       <div class="panel on" id="p-in">
-        <div class="stagger">
-          <div><div class="form-title">Welcome <em>back.</em></div><p class="form-sub">Sign in to browse listings and unlock caretaker contacts.</p></div>
-          <div class="msg" id="in-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="in-msg-txt"></span></div>
-          <div class="field">
-            <label>Email Address</label>
-            <div class="field-inner">
-              <input type="email" id="in-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <div class="field-inner">
-              <input type="password" id="in-pass" placeholder="Your password" autocomplete="current-password"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('in-pass',this)" tabindex="-1" aria-label="Show password">
-                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-          <div class="forgot-row"><a href="#" class="forgot-link" onclick="showPanel('p-reset');return false">Forgot password?</a></div>
-          <div>
-            <button class="submit-btn" id="in-btn" onclick="doSignIn()">
-              <span id="in-btn-lbl">Sign In</span>
-              <svg id="in-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-            <div class="switch-row">New to NestFinder? <a href="#" onclick="switchTo('reg');return false">Create a free account →</a></div>
+        <div class="form-title">Welcome <em>back.</em></div>
+        <p class="form-sub">Sign in to browse listings and unlock caretaker contacts.</p>
+        <div class="msg" id="in-msg">
+          <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="in-msg-txt"></span>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="in-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
           </div>
         </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <input type="password" id="in-pass" placeholder="Your password" autocomplete="current-password"/>
+            <button class="eye-btn" type="button" onclick="toggleEye('in-pass',this)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="forgot-row"><a href="#" class="forgot-link" onclick="switchTo('reset');return false">Forgot password?</a></div>
+        <button class="submit-btn" id="in-btn" onclick="doLogin()">
+          Sign In
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="switch-row">New to NestFinder? <a href="#" onclick="switchTo('reg');return false">Create a free account</a></div>
       </div>
 
-      <!-- ══ REGISTER ══ -->
+      <!-- REGISTER -->
       <div class="panel" id="p-reg">
-        <div class="stagger">
-          <div><div class="form-title">Join <em>NestFinder.</em></div><p class="form-sub">Create your free student account and start browsing verified listings.</p></div>
-          <div class="msg" id="reg-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="reg-msg-txt"></span></div>
-          <div class="field">
-            <label>Full Name</label>
-            <div class="field-inner">
-              <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-          </div>
-          <div class="field">
-            <label>Email Address</label>
-            <div class="field-inner">
-              <input type="email" id="reg-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-            <div class="field-hint">A confirmation link will be sent to this address.</div>
-          </div>
-          <div class="field">
-            <label>Safaricom Number</label>
-            <div class="field-inner">
-              <input type="tel" id="reg-phone" placeholder="07XX XXX XXX" autocomplete="tel" inputmode="tel"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18" stroke-linecap="round" stroke-width="2.5"/></svg>
-            </div>
-            <div class="field-hint">Used for M-Pesa payments.</div>
-          </div>
-          <div class="field">
-            <label>Password</label>
-            <div class="field-inner">
-              <input type="password" id="reg-pass" placeholder="Min. 6 characters" autocomplete="new-password"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('reg-pass',this)" tabindex="-1">
-                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-          </div>
-          <div>
-            <button class="submit-btn" id="reg-btn" onclick="doRegister()">
-              <span id="reg-btn-lbl">Create Account</span>
-              <svg id="reg-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-            <div class="switch-row">Already have an account? <a href="#" onclick="switchTo('in');return false">Sign in →</a></div>
+        <div class="form-title">Join <em>NestFinder.</em></div>
+        <p class="form-sub">Create your free student account and start browsing verified listings.</p>
+        <div class="msg" id="reg-msg">
+          <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="reg-msg-txt"></span>
+        </div>
+        <div class="field">
+          <label>Full Name</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="reg-name" placeholder="Your full name" autocomplete="name"/>
           </div>
         </div>
+        <div class="field">
+          <label>Email Address</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="reg-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <input type="password" id="reg-pass" placeholder="Min 6 characters" autocomplete="new-password"/>
+            <button class="eye-btn" type="button" onclick="toggleEye('reg-pass',this)" tabindex="-1">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirm Password</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <input type="password" id="reg-pass2" placeholder="Repeat password" autocomplete="new-password"/>
+          </div>
+        </div>
+        <button class="submit-btn" id="reg-btn" onclick="doRegister()">
+          Create Account
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <div class="switch-row">Already have an account? <a href="#" onclick="switchTo('in');return false">Sign in</a></div>
       </div>
 
-      <!-- ══ FORGOT PASSWORD ══ -->
+      <!-- RESET PASSWORD -->
       <div class="panel" id="p-reset">
-        <div class="stagger">
-          <div>
-            <button onclick="switchTo('in')" style="background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:'DM Sans',sans-serif;font-size:.72rem;color:var(--muted);margin-bottom:1.25rem;padding:0;-webkit-tap-highlight-color:transparent">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back to Sign In
-            </button>
-            <div class="form-title">Reset <em>password.</em></div>
-            <p class="form-sub">Enter your email and we'll send you a reset link right away.</p>
-          </div>
-          <div class="msg" id="reset-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="reset-msg-txt"></span></div>
-          <div class="field">
-            <label>Email Address</label>
-            <div class="field-inner">
-              <input type="email" id="reset-email" placeholder="student@cuk.ac.ke" autocomplete="email" inputmode="email"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-          </div>
-          <div>
-            <button class="submit-btn" id="reset-btn" onclick="doReset()">
-              <span id="reset-btn-lbl">Send Reset Link</span>
-              <svg id="reset-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
+        <button class="back-link" onclick="switchTo('in')">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back to Sign In
+        </button>
+        <div class="form-title">Reset <em>Password.</em></div>
+        <p class="form-sub">Enter your email and we'll send you a reset link.</p>
+        <div class="msg" id="reset-msg">
+          <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="reset-msg-txt"></span>
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <div class="field-inner">
+            <svg class="field-ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="reset-email" placeholder="student@cuk.ac.ke" inputmode="email"/>
           </div>
         </div>
+        <button class="submit-btn" id="reset-btn" onclick="doReset()">
+          Send Reset Email
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
       </div>
 
-      <!-- ══ RESET EMAIL SENT ══ -->
-      <div class="panel" id="p-reset-sent">
-        <div class="special">
-          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-          <div class="special-t">Check your inbox.</div>
-          <p class="special-sub">A password reset link has been sent to<br/><span class="special-email" id="reset-sent-email">—</span></p>
-          <p class="special-sub" style="margin-top:-.5rem">Click the link in the email to set your new password.</p>
-          <button class="submit-btn" style="max-width:240px;margin:0 auto" onclick="switchTo('in')">
-            Back to Sign In <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- ══ NEW PASSWORD (after clicking email link) ══ -->
-      <div class="panel" id="p-newpass">
-        <div class="stagger">
-          <div><div class="form-title">New <em>password.</em></div><p class="form-sub">Choose a strong new password for your NestFinder account.</p></div>
-          <div class="msg" id="newpass-msg"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="newpass-msg-txt"></span></div>
-          <div class="field">
-            <label>New Password</label>
-            <div class="field-inner">
-              <input type="password" id="newpass-1" placeholder="Min. 6 characters" autocomplete="new-password"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('newpass-1',this)" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-            </div>
-          </div>
-          <div class="field">
-            <label>Confirm New Password</label>
-            <div class="field-inner">
-              <input type="password" id="newpass-2" placeholder="Repeat your new password" autocomplete="new-password"/>
-              <svg class="field-ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              <button class="eye-btn" type="button" onclick="toggleEye('newpass-2',this)" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-            </div>
-          </div>
-          <div>
-            <button class="submit-btn" id="newpass-btn" onclick="doNewPass()">
-              <span id="newpass-btn-lbl">Set New Password</span>
-              <svg id="newpass-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ EMAIL CONFIRM ══ -->
-      <div class="panel" id="p-email">
-        <div class="special">
-          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-          <div class="special-t">Check your inbox.</div>
-          <p class="special-sub">We sent a confirmation link to<br/><span class="special-email" id="conf-email">—</span></p>
-          <p class="special-sub" style="margin-top:-.5rem">Click the link to activate your account, then come back and sign in.</p>
-          <button class="submit-btn" style="max-width:240px;margin:0 auto" onclick="switchTo('in')">
-            Back to Sign In <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- ══ SUCCESS ══ -->
-      <div class="panel" id="p-done">
-        <div class="special">
-          <div class="special-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
-          <div class="special-t">You're in, <span id="done-name">Student</span>!</div>
-          <p class="special-sub">Your account is active. Let's find your perfect home near CUK.</p>
-          <a href="index.html" class="submit-btn" style="max-width:240px;margin:0 auto;text-decoration:none">
-            Browse Listings <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      </div>
-
-    </div><!-- /form-wrap -->
-  </div><!-- /right -->
-</div><!-- /split -->
+    </div>
+  </div>
+</div>
 
 <script>
-let _auth, _db;
-document.addEventListener("DOMContentLoaded", () => {
-  try { _auth = firebase.auth(); _db = firebase.firestore(); checkAlreadyLoggedIn(); } catch(e) { console.error("Firebase init failed:", e); }
-});
-function _getAuth(){ return _auth; }
-function _getDb(){ return _db; }
-
-async function getCurrentUser() {
-  return new Promise(resolve => {
-    _auth.onAuthStateChanged(async user => {
-      if (!user) { resolve(null); return; }
-      try {
-        const doc = await _db.collection('users').doc(user.uid).get();
-        resolve({ id: user.uid, email: user.email, ...(doc.exists ? doc.data() : {}) });
-      } catch(e) { resolve({ id: user.uid, email: user.email }); }
-    });
+// ── Tab switching ──
+function switchTo(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('on', b.id === 'btn-' + tab);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('on', p.id === 'p-' + tab);
   });
 }
 
-async function checkAlreadyLoggedIn() {
-  const user = await getCurrentUser();
-  if (!user) return;
-  window.location.href = (user.role === 'admin') ? 'admin.html' : 'index.html';
+// ── Eye toggle ──
+function toggleEye(id, btn) {
+  var inp = document.getElementById(id);
+  var isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
 }
 
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass  = document.getElementById('login-pass').value;
-  const btn   = document.getElementById('login-btn');
-  showMsg('in-msg', '');
-  if (!email || !pass) { showMsg('in-msg', 'Please enter email and password.'); return; }
-  btn.disabled = true; btn.textContent = 'Signing in…';
+// ── Show message ──
+function showMsg(id, txt, isOk) {
+  var el = document.getElementById(id);
+  var txtEl = document.getElementById(id + '-txt');
+  if (!el) return;
+  if (!txt) { el.classList.remove('show','ok-msg'); return; }
+  if (txtEl) txtEl.textContent = txt;
+  el.classList.add('show');
+  if (isOk) el.classList.add('ok-msg'); else el.classList.remove('ok-msg');
+}
+
+// ── Firebase init (deferred) ──
+var _auth = null, _db = null;
+
+function initFirebase() {
   try {
-    const cred = await _auth.signInWithEmailAndPassword(email, pass);
-    const doc  = await _db.collection('users').doc(cred.user.uid).get();
-    const role = doc.exists ? (doc.data().role || 'student') : 'student';
-    window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
+    _auth = firebase.auth();
+    _db = firebase.firestore();
+    // Check if already logged in
+    _auth.onAuthStateChanged(function(user) {
+      if (user) {
+        _db.collection('users').doc(user.uid).get().then(function(doc) {
+          var role = doc.exists ? (doc.data().role || 'student') : 'student';
+          window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
+        }).catch(function() {
+          window.location.href = 'index.html';
+        });
+      }
+    });
   } catch(e) {
-    showMsg('in-msg', e.message || 'Incorrect email or password.');
-    btn.disabled = false; btn.textContent = 'Sign In';
+    console.error('Firebase init error:', e);
   }
 }
 
-async function doRegister() {
-  const name  = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass  = document.getElementById('reg-pass').value;
-  const pass2 = document.getElementById('reg-pass2').value;
-  const btn   = document.getElementById('reg-btn');
+// ── Sign In ──
+function doLogin() {
+  var email = document.getElementById('in-email').value.trim();
+  var pass  = document.getElementById('in-pass').value;
+  var btn   = document.getElementById('in-btn');
+  showMsg('in-msg', '');
+  if (!email || !pass) { showMsg('in-msg', 'Please enter your email and password.'); return; }
+  if (!_auth) { showMsg('in-msg', 'Authentication not ready — please refresh.'); return; }
+  btn.disabled = true; btn.firstChild.textContent = 'Signing in… ';
+  _auth.signInWithEmailAndPassword(email, pass).then(function(cred) {
+    return _db.collection('users').doc(cred.user.uid).get();
+  }).then(function(doc) {
+    var role = doc.exists ? (doc.data().role || 'student') : 'student';
+    window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
+  }).catch(function(e) {
+    showMsg('in-msg', e.message || 'Incorrect email or password.');
+    btn.disabled = false; btn.firstChild.textContent = 'Sign In ';
+  });
+}
+
+// ── Register ──
+function doRegister() {
+  var name  = document.getElementById('reg-name').value.trim();
+  var email = document.getElementById('reg-email').value.trim();
+  var pass  = document.getElementById('reg-pass').value;
+  var pass2 = document.getElementById('reg-pass2').value;
+  var btn   = document.getElementById('reg-btn');
   showMsg('reg-msg', '');
   if (!name || !email || !pass) { showMsg('reg-msg', 'All fields are required.'); return; }
   if (pass !== pass2) { showMsg('reg-msg', 'Passwords do not match.'); return; }
   if (pass.length < 6) { showMsg('reg-msg', 'Password must be at least 6 characters.'); return; }
-  btn.disabled = true; btn.textContent = 'Creating account…';
-  try {
-    const cred = await _auth.createUserWithEmailAndPassword(email, pass);
-    await _db.collection('users').doc(cred.user.uid).set({
+  if (!_auth) { showMsg('reg-msg', 'Authentication not ready — please refresh.'); return; }
+  btn.disabled = true; btn.firstChild.textContent = 'Creating account… ';
+  _auth.createUserWithEmailAndPassword(email, pass).then(function(cred) {
+    return _db.collection('users').doc(cred.user.uid).set({
       uid: cred.user.uid,
       email: email,
       display_name: name,
       role: 'student',
       created_at: firebase.firestore.FieldValue.serverTimestamp()
     });
+  }).then(function() {
     window.location.href = 'index.html';
-  } catch(e) {
+  }).catch(function(e) {
     showMsg('reg-msg', e.message || 'Registration failed.');
-    btn.disabled = false; btn.textContent = 'Create Account';
-  }
+    btn.disabled = false; btn.firstChild.textContent = 'Create Account ';
+  });
 }
 
-async function doForgot() {
-  const email = document.getElementById('forgot-email').value.trim();
-  showMsg('forgot-msg', '');
-  if (!email) { showMsg('forgot-msg', 'Enter your email address.'); return; }
-  try {
-    await _auth.sendPasswordResetEmail(email);
-    showMsg('forgot-msg', 'Reset email sent — check your inbox.');
-  } catch(e) {
-    showMsg('forgot-msg', e.message || 'Could not send reset email.');
-  }
+// ── Password Reset ──
+function doReset() {
+  var email = document.getElementById('reset-email').value.trim();
+  var btn   = document.getElementById('reset-btn');
+  showMsg('reset-msg', '');
+  if (!email) { showMsg('reset-msg', 'Enter your email address.'); return; }
+  if (!_auth) { showMsg('reset-msg', 'Authentication not ready — please refresh.'); return; }
+  btn.disabled = true;
+  _auth.sendPasswordResetEmail(email).then(function() {
+    showMsg('reset-msg', 'Reset email sent — check your inbox.', true);
+    btn.disabled = false;
+  }).catch(function(e) {
+    showMsg('reset-msg', e.message || 'Could not send reset email.');
+    btn.disabled = false;
+  });
 }
 
-function showMsg(id, msg) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = msg;
-}
-
-function switchTo(tab){
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
-  document.querySelectorAll(".form-panel").forEach(p=>p.classList.toggle("active",p.id===tab+"-panel"));
-}
-function doSignIn(){doLogin();}
+// Init Firebase after scripts load
+window.addEventListener('load', initFirebase);
 </script>
 </body>
 </html>
