@@ -324,12 +324,8 @@ function initFirebase() {
     // Check if already logged in
     _auth.onAuthStateChanged(function(user) {
       if (user) {
-        _db.collection('users').doc(user.uid).get().then(function(doc) {
-          var role = doc.exists ? (doc.data().role || 'student') : 'student';
-          window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
-        }).catch(function() {
-          window.location.href = 'index.html';
-        });
+        // Skip Firestore check on login — handled by index.html
+      window.location.href = 'index.html';
       }
     });
   } catch(e) {
@@ -346,11 +342,8 @@ function doLogin() {
   if (!email || !pass) { showMsg('in-msg', 'Please enter your email and password.'); return; }
   if (!_auth) { showMsg('in-msg', 'Authentication not ready — please refresh.'); return; }
   btn.disabled = true; btn.firstChild.textContent = 'Signing in… ';
-  _auth.signInWithEmailAndPassword(email, pass).then(function(cred) {
-    return _db.collection('users').doc(cred.user.uid).get();
-  }).then(function(doc) {
-    var role = doc.exists ? (doc.data().role || 'student') : 'student';
-    window.location.href = role === 'admin' ? 'admin.html' : 'index.html';
+  _auth.signInWithEmailAndPassword(email, pass).then(function() {
+    window.location.href = 'index.html';
   }).catch(function(e) {
     showMsg('in-msg', e.message || 'Incorrect email or password.');
     btn.disabled = false; btn.firstChild.textContent = 'Sign In ';
