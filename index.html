@@ -1246,37 +1246,43 @@ window.addEventListener('scroll',()=>{document.getElementById('navbar').classLis
 
 
 async function initAuth(){
-  const t=localStorage.getItem('sb-token');if(!t)return;
+  firebase.auth().onAuthStateChanged(async function(fbUser){
+    if(!fbUser){return;}
+    user=fbUser;
+    try{
+      const doc=await firebase.firestore().collection("users").doc(fbUser.uid).get();
+      const prof=doc.exists?doc.data():{};
+      const name=(prof.display_name||fbUser.email||"Student").split(" ")[0];
+      const isAdmin=prof.role==="admin";
+      document.getElementById("nav-hello").textContent="Hi, "+name;
+      document.getElementById("nav-in").style.display="none";
+      document.getElementById("nav-out").style.display="";
+      document.getElementById("drawer-in").style.display="none";
+      document.getElementById("drawer-out").style.display="";
+      document.getElementById("drawer-user").textContent="Signed in as "+name;
+      ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+      if(isAdmin){
+        ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+        const ba=document.getElementById("bot-admin");if(ba)ba.style.display="";
+      }
+      user.display_name=prof.display_name||"";
+      user.role=prof.role||"student";
+    }catch(e){console.warn("initAuth err",e);}
+    refreshListings();
+  });
+}
+async function refreshListings(){
   try{
-    const ur=await Promise.resolve({ok:true,json:()=>Promise.resolve({})});
-    const u=await ur.json();
-    if(!u.id){localStorage.removeItem('sb-token');return;}
-    user=u;
-    const pr=await Promise.resolve({ok:true,json:()=>Promise.resolve({})});
-    const pd=await pr.json();
-    const prof=Array.isArray(pd)&&pd.length>0?pd[0]:null;
-    const name=prof?.full_name?.split(' ')[0]||'Student';
-    const isAdmin=prof?.role==='admin';
-    document.getElementById('nav-hello').textContent='Hi, '+name;
-    document.getElementById('nav-in').style.display='none';
-    document.getElementById('nav-out').style.display='';
-    document.getElementById('drawer-in').style.display='none';
-    document.getElementById('drawer-out').style.display='';
-    document.getElementById('drawer-user').textContent='Signed in as '+name;
-    ['nav-payments','drawer-payments','bot-payments'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
-    if(isAdmin){
-      ['nav-admin','drawer-admin'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
-      const ba=document.getElementById('bot-admin');if(ba)ba.style.display='';
-    }
-    const bi=document.getElementById('bot-in');
-    if(bi){bi.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+name;bi.href='payments.html';}
-  }catch(e){console.error('initAuth error',e);}
+    const snap=await firebase.firestore().collection("listings").get();
+    listings=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!listings.length){emptyState();return;}
+    render(listings);
+    if(typeof loadRatings==="function")loadRatings();
+  }catch(e){console.error("refreshListings",e);emptyState();}
 }
+initAuth();
 
-async function doSignOut(){
-  localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
-  localStorage.removeItem('nf-favs');user=null;location.reload();
-}
+async function doSignOut(){await firebase.auth().signOut();user=null;location.reload();}
 
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
