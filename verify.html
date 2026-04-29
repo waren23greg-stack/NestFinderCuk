@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0E0B07"/>
+<title>Host Verification — NestFinder CUK</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:    #0E0B07;
+    --ink2:   #1C1810;
+    --ink3:   #2E2920;
+    --gold:   #C09A5A;
+    --gold-l: #D8B97A;
+    --gold-d: #8B6B35;
+    --gold-gl:rgba(192,154,90,.12);
+    --sand:   #F7F2EA;
+    --sand2:  #EDE6D8;
+    --sand3:  #DDD4C0;
+    --muted:  #9C8E78;
+    --pale:   #FAF8F4;
+    --white:  #FFFFFF;
+    --err:    #C0392B;
+    --ok:     #2D6A4F;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--pale);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--ink);
+    padding: .9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(192,154,90,.2);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: 1.05rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+  }
+  .nav-logo-dot {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+  .nav-back {
+    font-size: .78rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.45);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    transition: color .2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+
+  /* ── HERO BAND ── */
+  .hero {
+    background: var(--ink2);
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% 100%, rgba(192,154,90,.08) 0%, transparent 70%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192,154,90,.4) 30%, rgba(192,154,90,.6) 50%, rgba(192,154,90,.4) 70%, transparent);
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .68rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .hero-eyebrow span { width: 24px; height: 1px; background: var(--gold); }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: .9rem;
+  }
+  .hero h1 em { color: var(--gold); font-style: italic; }
+  .hero-sub {
+    color: rgba(255,255,255,.45);
+    font-size: .9rem;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.65;
+  }
+
+  /* ── STATUS BANNERS ── */
+  .status-banner {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 1.4rem 1.8rem;
+    border-radius: 4px;
+    display: none;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .status-banner.show { display: flex; }
+  .status-banner.pending {
+    background: var(--gold-gl);
+    border: 1px solid rgba(192,154,90,.3);
+  }
+  .status-banner.approved {
+    background: rgba(45,106,79,.1);
+    border: 1px solid rgba(45,106,79,.3);
+  }
+  .status-banner.rejected {
+    background: rgba(192,57,43,.08);
+    border: 1px solid rgba(192,57,43,.25);
+  }
+  .status-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+  }
+  .pending .status-icon { background: var(--gold-gl); color: var(--gold); }
+  .approved .status-icon { background: rgba(45,106,79,.15); color: var(--ok); }
+  .rejected .status-icon { background: rgba(192,57,43,.12); color: var(--err); }
+  .status-body strong {
+    display: block;
+    font-size: .92rem;
+    margin-bottom: .25rem;
+  }
+  .pending .status-body strong { color: var(--gold-d); }
+  .approved .status-body strong { color: var(--ok); }
+  .rejected .status-body strong { color: var(--err); }
+  .status-body p { font-size: .84rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── STEPS ── */
+  .steps {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+    display: flex;
+    gap: .5rem;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .35rem;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 13px;
+    left: calc(50% + 13px);
+    right: calc(-50% + 13px);
+    height: 1px;
+    background: var(--sand3);
+  }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--sand2);
+    border: 1px solid var(--sand3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem;
+    font-weight: 500;
+    color: var(--muted);
+    position: relative;
+    z-index: 1;
+    transition: all .3s;
+  }
+  .step.active .step-num {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #fff;
+  }
+  .step.done .step-num {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: #fff;
+  }
+  .step-label {
+    font-size: .65rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+  .step.active .step-label { color: var(--gold-d); font-weight: 500; }
+  .step.done .step-label { color: var(--ok); }
+
+  /* ── MAIN FORM CARD ── */
+  .card {
+    max-width: 700px;
+    margin: 0 auto 4rem;
+    padding: 0 1.5rem;
+  }
+  .form-section {
+    background: var(--white);
+    border: 1px solid var(--sand2);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  .form-section.active { display: block; animation: fadeUp .35s ease both; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-head {
+    padding: 1.3rem 1.8rem;
+    border-bottom: 1px solid var(--sand2);
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+  }
+  .section-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--gold-gl);
+    border: 1px solid rgba(192,154,90,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: .95rem;
+    color: var(--gold-d);
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .section-sub {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-top: .15rem;
+  }
+  .section-body { padding: 1.8rem; }
+
+  /* ── FORM FIELDS ── */
+  .field { margin-bottom: 1.4rem; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: .75rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .45rem;
+    font-weight: 500;
+  }
+  input[type=text], input[type=tel], input[type=email] {
+    width: 100%;
+    padding: .75rem 1rem;
+    border: 1px solid var(--sand3);
+    border-radius: 4px;
+    background: var(--pale);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .92rem;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+  input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-gl);
+  }
+  .field-hint {
+    font-size: .75rem;
+    color: var(--muted);
+    margin-top: .4rem;
+  }
+
+  /* ── UPLOAD ZONES ── */
+  .upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 560px) { .upload-grid { grid-template-columns: 1fr; } }
+
+  .upload-zone {
+    border: 1.5px dashed var(--sand3);
+    border-radius: 6px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+    background: var(--pale);
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--gold);
+    background: var(--gold-gl);
+  }
+  .upload-zone.has-file {
+    border-color: var(--ok);
+    border-style: solid;
+    background: rgba(45,106,79,.05);
+  }
+  .upload-zone input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .upload-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--sand2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .upload-zone.has-file .upload-icon { background: rgba(45,106,79,.15); }
+  .upload-label {
+    font-size: .78rem;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+  .upload-hint {
+    font-size: .68rem;
+    color: var(--muted);
+  }
+  .upload-preview {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: none;
+  }
+  .upload-zone.has-file .upload-preview { display: block; }
+  .upload-zone.has-file .upload-icon,
+  .upload-zone.has-file .upload-label,
+  .upload-zone.has-file .upload-hint { display: none; }
+  .upload-check {
+    position: absolute;
+    top: .5rem; right: .5rem;
+    width: 20px; height: 20px;
+    background: var(--ok);
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: .6rem;
+    color: #fff;
+  }
+  .upload-zone.has-file .upload-check { display: flex; }
+
+  /* ── PROGRESS BAR ── */
+  .upload-progress {
+    height: 2px;
+    background: var(--sand2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: .5rem;
+    display: none;
+  }
+  .upload-progress.show { display: block; }
+  .upload-progress-bar {
+    height: 100%;
+    background: var(--gold);
+    width: 0;
+    transition: width .3s;
+  }
+
+  /* ── NAV BUTTONS ── */
+  .form-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+  .btn {
+    padding: .75rem 2rem;
+    border-radius: 4px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .85rem;
+    font-weight: 500;
+    letter-spacing: .04em;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--sand3);
+  }
+  .btn-ghost:hover { border-color: var(--gold); color: var(--gold-d); }
+  .btn-gold {
+    background: var(--gold);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(192,154,90,.3);
+  }
+  .btn-gold:hover { background: var(--gold-d); box-shadow: 0 4px 18px rgba(192,154,90,.4); }
+  .btn-gold:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
+
+  /* ── SUBMIT RESULT ── */
+  .submit-result {
+    text-align: center;
+    padding: 3rem 1.8rem;
+    display: none;
+  }
+  .submit-result.show { display: block; animation: fadeUp .4s ease both; }
+  .result-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+  .result-icon.ok { background: rgba(45,106,79,.12); }
+  .result-icon.err { background: rgba(192,57,43,.1); }
+  .result-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: .7rem;
+  }
+  .result-sub { font-size: .88rem; color: var(--muted); line-height: 1.65; max-width: 380px; margin: 0 auto; }
+
+  /* ── LOADING OVERLAY ── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(14,11,7,.7);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .loading-overlay.show { display: flex; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 2px solid rgba(192,154,90,.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    font-size: .95rem;
+  }
+
+  /* ── AUTH WALL ── */
+  .auth-wall {
+    max-width: 460px;
+    margin: 4rem auto;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: var(--white);
+    border: 1px solid var(--sand2);
+    border-radius: 6px;
+    display: none;
+  }
+  .auth-wall.show { display: block; }
+  .auth-wall h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-bottom: .7rem;
+  }
+  .auth-wall p { font-size: .88rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .msg-bar {
+    padding: .6rem 1rem;
+    border-radius: 4px;
+    font-size: .82rem;
+    margin-top: .8rem;
+    display: none;
+  }
+  .msg-bar.show { display: block; }
+  .msg-bar.err { background: rgba(192,57,43,.08); color: var(--err); border: 1px solid rgba(192,57,43,.2); }
+  .msg-bar.ok  { background: rgba(45,106,79,.08); color: var(--ok);  border: 1px solid rgba(45,106,79,.2); }
+
+  #page-content { display: none; }
+  #page-content.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    NestFinder <span style="color:var(--gold);margin-left:.2em">CUK</span>
+  </a>
+  <a href="index.html" class="nav-back">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6L8 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Back to listings
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow"><span></span>Host Verification<span></span></div>
+  <h1>Become a <em>Verified</em> Host</h1>
+  <p class="hero-sub">We verify all storage hosts to protect students. Upload your ID and a clear photo of yourself — it takes under 3 minutes.</p>
+</div>
+
+<!-- AUTH WALL (if not logged in) -->
+<div class="auth-wall" id="auth-wall">
+  <div style="font-size:2rem;margin-bottom:1rem">🔒</div>
+  <h2>Sign in to continue</h2>
+  <p>You need a NestFinder account to apply as a verified host.</p>
+  <a href="login.html" class="btn btn-gold" style="display:inline-block;text-decoration:none">Sign in / Register</a>
+</div>
+
+<!-- MAIN PAGE CONTENT -->
+<div id="page-content">
+
+  <!-- STATUS BANNERS -->
+  <div class="status-banner pending" id="banner-pending">
+    <div class="status-icon">⏳</div>
+    <div class="status-body">
+      <strong>Verification under review</strong>
+      <p>Your documents have been submitted and are being reviewed by our team. This usually takes 1–2 business days.</p>
+    </div>
+  </div>
+  <div class="status-banner approved" id="banner-approved">
+    <div class="status-icon">✓</div>
+    <div class="status-body">
+      <strong>Verified Host</strong>
+      <p>Your identity has been verified. You can now list your storage space for students.</p>
+    </div>
+  </div>
+  <div class="status-banner rejected" id="banner-rejected">
+    <div class="status-icon">✕</div>
+    <div class="status-body">
+      <strong>Verification unsuccessful</strong>
+      <p id="rejection-reason">Your application was not approved. Please re-submit with clearer photos.</p>
+    </div>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="steps-bar">
+    <div class="step active" id="step-1">
+      <div class="step-num">1</div>
+      <div class="step-label">Your Details</div>
+    </div>
+    <div class="step" id="step-2">
+      <div class="step-num">2</div>
+      <div class="step-label">Photo ID</div>
+    </div>
+    <div class="step" id="step-3">
+      <div class="step-num">3</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- SECTION 1 — Personal Info -->
+    <div class="form-section active" id="section-1">
+      <div class="section-head">
+        <div class="section-num">1</div>
+        <div>
+          <div class="section-title">Personal Information</div>
+          <div class="section-sub">These must match your national ID exactly</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Full Name (as on ID)</label>
+          <input type="text" id="full-name" placeholder="e.g. Alice Njeri Kamau" autocomplete="name"/>
+        </div>
+        <div class="field">
+          <label>National ID Number</label>
+          <input type="text" id="id-number" placeholder="e.g. 12345678" maxlength="20"/>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="phone" placeholder="+254 7XX XXX XXX"/>
+          <div class="field-hint">We'll use this number for storage booking queries.</div>
+        </div>
+        <div id="msg-1" class="msg-bar err"></div>
+        <div class="form-nav">
+          <div></div>
+          <button class="btn btn-gold" onclick="goStep(2)">Continue →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 — Photo Uploads -->
+    <div class="form-section" id="section-2">
+      <div class="section-head">
+        <div class="section-num">2</div>
+        <div>
+          <div class="section-title">Identity Photos</div>
+          <div class="section-sub">JPEG or PNG — clear, well-lit, under 5 MB each</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="upload-grid">
+
+          <!-- Face -->
+          <div>
+            <label>Selfie / Face Photo</label>
+            <div class="upload-zone" id="zone-face" ondragover="onDragOver(event,'zone-face')" ondragleave="onDragLeave('zone-face')" ondrop="onDrop(event,'face')">
+              <input type="file" id="file-face" accept="image/jpeg,image/png,image/webp" onchange="onFilePick('face',this)"/>
+              <div class="upload-icon">🤳</div>
+              <div class="upload-label">Your face, clearly visible</div>
+              <div class="upload-hint">No sunglasses or hats</div>
+              <img class="upload-preview" id="prev-face" alt="Face preview"/>
+              <div class="upload-check">✓</div>
+            </div>
+            <div class="upload-progress" id="prog-face"><div class="upload-progress-bar" id="progbar-face"></div></div>
+          </div>
+
+          <!-- ID Front -->
+          <div>
+            <label>ID Card — Front</label>
+            <div class="upload-zone" id="zone-id-front" ondragover="onDragOver(event,'zone-id-front')" ondragleave="onDragLeave('zone-id-front')" ondrop="onDrop(event,'id-front')">
+              <input type="file" id="file-id-front" accept="image/jpeg,image/png,image/webp" onchange="onFilePick('id-front',this)"/>
+              <div class="upload-icon">🪪</div>
+              <div class="upload-label">Front of national ID</div>
+              <div class="upload-hint">Flat, all text readable</div>
+              <img class="upload-preview" id="prev-id-front" alt="ID front preview"/>
+              <div class="upload-check">✓</div>
+            </div>
+            <div class="upload-progress" id="prog-id-front"><div class="upload-progress-bar" id="progbar-id-front"></div></div>
+          </div>
+
+          <!-- ID Back -->
+          <div>
+            <label>ID Card — Back</label>
+            <div class="upload-zone" id="zone-id-back" ondragover="onDragOver(event,'zone-id-back')" ondragleave="onDragLeave('zone-id-back')" ondrop="onDrop(event,'id-back')">
+              <input type="file" id="file-id-back" accept="image/jpeg,image/png,image/webp" onchange="onFilePick('id-back',this)"/>
+              <div class="upload-icon">🪪</div>
+              <div class="upload-label">Back of national ID</div>
+              <div class="upload-hint">Flat, all text readable</div>
+              <img class="upload-preview" id="prev-id-back" alt="ID back preview"/>
+              <div class="upload-check">✓</div>
+            </div>
+            <div class="upload-progress" id="prog-id-back"><div class="upload-progress-bar" id="progbar-id-back"></div></div>
+          </div>
+
+        </div>
+        <div id="msg-2" class="msg-bar err" style="margin-top:1rem"></div>
+        <div class="form-nav">
+          <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+          <button class="btn btn-gold" onclick="goStep(3)">Review →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3 — Review & Submit -->
+    <div class="form-section" id="section-3">
+      <div class="section-head">
+        <div class="section-num">3</div>
+        <div>
+          <div class="section-title">Review & Submit</div>
+          <div class="section-sub">Confirm your details are correct before submitting</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- Summary -->
+        <div style="background:var(--pale);border:1px solid var(--sand2);border-radius:4px;padding:1.2rem 1.4rem;margin-bottom:1.5rem">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem 1.5rem">
+            <div>
+              <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem">Full Name</div>
+              <div id="rev-name" style="font-size:.92rem;font-weight:500"></div>
+            </div>
+            <div>
+              <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem">National ID</div>
+              <div id="rev-id" style="font-size:.92rem;font-weight:500"></div>
+            </div>
+            <div>
+              <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem">Phone</div>
+              <div id="rev-phone" style="font-size:.92rem;font-weight:500"></div>
+            </div>
+            <div>
+              <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem">Photos</div>
+              <div id="rev-photos" style="font-size:.92rem;font-weight:500;color:var(--ok)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Privacy note -->
+        <div style="font-size:.78rem;color:var(--muted);line-height:1.6;padding:.9rem 1rem;background:var(--gold-gl);border-radius:4px;border-left:2px solid var(--gold);margin-bottom:1.5rem">
+          <strong style="color:var(--gold-d)">Privacy:</strong> Your photos and ID are stored securely and only visible to NestFinder admins for verification purposes. They are never shared with landlords or students.
+        </div>
+
+        <div id="msg-3" class="msg-bar err"></div>
+        <div class="form-nav">
+          <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+          <button class="btn btn-gold" id="submit-btn" onclick="submitVerification()">Submit Application</button>
+        </div>
+
+        <!-- Success / Error result -->
+        <div class="submit-result" id="submit-result">
+          <div class="result-icon ok">✓</div>
+          <div class="result-title">Application Submitted</div>
+          <p class="result-sub">Thank you, <span id="result-name"></span>. Our team will review your documents within 1–2 business days. We'll notify you by email.</p>
+          <div style="margin-top:2rem">
+            <a href="index.html" class="btn btn-ghost" style="text-decoration:none">Back to listings</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page-content -->
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Uploading documents…</div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="sb-client.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────
+const files = { face: null, 'id-front': null, 'id-back': null };
+let currentUser = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+firebase.auth().onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('auth-wall').classList.add('show');
+    return;
+  }
+  currentUser = user;
+  document.getElementById('page-content').classList.add('show');
+
+  // Check existing verification status
+  try {
+    const doc = await firebase.firestore()
+      .collection('host_verifications').doc(user.uid).get();
+
+    if (doc.exists) {
+      const data = doc.data();
+      const status = data.status || 'pending';
+      document.getElementById('steps-bar').style.display = 'none';
+      document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+
+      if (status === 'pending') {
+        document.getElementById('banner-pending').classList.add('show');
+      } else if (status === 'approved') {
+        document.getElementById('banner-approved').classList.add('show');
+      } else if (status === 'rejected') {
+        document.getElementById('banner-rejected').classList.add('show');
+        if (data.rejection_reason) {
+          document.getElementById('rejection-reason').textContent = data.rejection_reason;
+        }
+      }
+    }
+  } catch(e) {
+    // No existing doc — show form normally
+  }
+});
+
+// ── STEP NAVIGATION ───────────────────────────────────────────────────────
+function goStep(n) {
+  // Validate before advancing
+  if (n === 2 && !validateStep1()) return;
+  if (n === 3 && !validateStep2()) return;
+  if (n === 3) populateReview();
+
+  // Update sections
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + n).classList.add('active');
+
+  // Update steps bar
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step-' + i);
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep1() {
+  const name  = document.getElementById('full-name').value.trim();
+  const idNum = document.getElementById('id-number').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const msg   = document.getElementById('msg-1');
+
+  if (!name)  { showMsg(msg, 'Please enter your full name as it appears on your ID.'); return false; }
+  if (!idNum) { showMsg(msg, 'Please enter your national ID number.'); return false; }
+  if (!phone) { showMsg(msg, 'Please enter your phone number.'); return false; }
+  if (phone.replace(/\s/g,'').length < 10) { showMsg(msg, 'Please enter a valid phone number.'); return false; }
+  hideMsg(msg);
+  return true;
+}
+
+function validateStep2() {
+  const msg = document.getElementById('msg-2');
+  if (!files.face)        { showMsg(msg, 'Please upload a selfie photo.'); return false; }
+  if (!files['id-front']) { showMsg(msg, 'Please upload the front of your ID.'); return false; }
+  if (!files['id-back'])  { showMsg(msg, 'Please upload the back of your ID.'); return false; }
+  hideMsg(msg);
+  return true;
+}
+
+function populateReview() {
+  document.getElementById('rev-name').textContent  = document.getElementById('full-name').value.trim();
+  document.getElementById('rev-id').textContent    = document.getElementById('id-number').value.trim();
+  document.getElementById('rev-phone').textContent = document.getElementById('phone').value.trim();
+  document.getElementById('rev-photos').textContent = '3 photos ready ✓';
+}
+
+// ── FILE HANDLING ─────────────────────────────────────────────────────────
+function onFilePick(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  setFile(key, file);
+}
+
+function onDragOver(e, zoneId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.add('dragover');
+}
+
+function onDragLeave(zoneId) {
+  document.getElementById(zoneId).classList.remove('dragover');
+}
+
+function onDrop(e, key) {
+  e.preventDefault();
+  const zoneMap = { face: 'zone-face', 'id-front': 'zone-id-front', 'id-back': 'zone-id-back' };
+  document.getElementById(zoneMap[key]).classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Please upload an image file.'); return; }
+  setFile(key, file);
+}
+
+function setFile(key, file) {
+  if (file.size > 5 * 1024 * 1024) { alert('File must be under 5 MB.'); return; }
+  files[key] = file;
+
+  // Show preview
+  const zoneMap = { face: 'zone-face', 'id-front': 'zone-id-front', 'id-back': 'zone-id-back' };
+  const prevMap = { face: 'prev-face', 'id-front': 'prev-id-front', 'id-back': 'prev-id-back' };
+  const zone = document.getElementById(zoneMap[key]);
+  const prev = document.getElementById(prevMap[key]);
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    prev.src = e.target.result;
+    zone.classList.add('has-file');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────
+async function submitVerification() {
+  if (!currentUser) return;
+
+  const btn = document.getElementById('submit-btn');
+  const msg = document.getElementById('msg-3');
+  hideMsg(msg);
+  btn.disabled = true;
+  showLoading('Uploading documents…');
+
+  const uid = currentUser.uid;
+  const storage = firebase.storage();
+
+  try {
+    // Upload face photo
+    setLoadingText('Uploading selfie…');
+    const faceRef = storage.ref(`verifications/${uid}/face.jpg`);
+    await faceRef.put(files.face);
+    const faceUrl = await faceRef.getDownloadURL();
+
+    // Upload ID front
+    setLoadingText('Uploading ID front…');
+    const frontRef = storage.ref(`verifications/${uid}/id_front.jpg`);
+    await frontRef.put(files['id-front']);
+    const frontUrl = await frontRef.getDownloadURL();
+
+    // Upload ID back
+    setLoadingText('Uploading ID back…');
+    const backRef = storage.ref(`verifications/${uid}/id_back.jpg`);
+    await backRef.put(files['id-back']);
+    const backUrl = await backRef.getDownloadURL();
+
+    // Write Firestore record
+    setLoadingText('Saving application…');
+    await firebase.firestore()
+      .collection('host_verifications').doc(uid).set({
+        uid: uid,
+        email: currentUser.email,
+        full_name: document.getElementById('full-name').value.trim(),
+        national_id_number: document.getElementById('id-number').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        face_photo_url: faceUrl,
+        id_front_url: frontUrl,
+        id_back_url: backUrl,
+        status: 'pending',
+        submitted_at: firebase.firestore.FieldValue.serverTimestamp(),
+        reviewed_at: null,
+        reviewed_by: null,
+        rejection_reason: null
+      });
+
+    hideLoading();
+
+    // Show success
+    document.getElementById('result-name').textContent =
+      document.getElementById('full-name').value.trim().split(' ')[0];
+    document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
+    document.getElementById('steps-bar').style.display = 'none';
+
+    const resultEl = document.getElementById('submit-result');
+    resultEl.classList.add('show');
+
+    // Re-show section 3 card as container
+    const sec3 = document.getElementById('section-3');
+    sec3.style.display = 'block';
+    sec3.querySelector('.section-head').style.display = 'none';
+    sec3.querySelector('.section-body').innerHTML = '';
+    sec3.querySelector('.section-body');
+    document.getElementById('submit-result').style.display = 'block';
+
+  } catch(err) {
+    hideLoading();
+    btn.disabled = false;
+    showMsg(msg, 'Upload failed: ' + (err.message || 'Please try again.'));
+    console.error(err);
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function showMsg(el, text) {
+  el.textContent = text;
+  el.classList.add('show');
+}
+function hideMsg(el) {
+  el.textContent = '';
+  el.classList.remove('show');
+}
+function showLoading(text) {
+  document.getElementById('loading-text').textContent = text;
+  document.getElementById('loading').classList.add('show');
+}
+function setLoadingText(text) {
+  document.getElementById('loading-text').textContent = text;
+}
+function hideLoading() {
+  document.getElementById('loading').classList.remove('show');
+}
+</script>
+</body>
+</html>
