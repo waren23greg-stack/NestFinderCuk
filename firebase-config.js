@@ -1,6 +1,6 @@
 // firebase-config.js
 const firebaseConfig = {
-  apiKey: 'AIzaSyB_9MvliXbsjsIh52kMSMlInckTa0kXGOY',
+  apiKey: 'AIzaSyB_9MvliXbsjsIh52kMSMlInkcTa0kXGOY',
   authDomain: 'nestfinder-cuk.firebaseapp.com',
   databaseURL: 'https://nestfinder-cuk-default-rtdb.firebaseio.com',
   projectId: 'nestfinder-cuk',
