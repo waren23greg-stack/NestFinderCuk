@@ -2,7 +2,7 @@
 const _reqMap = {};
 function rateLimit(ip, max=10, windowMs=60000){
   const now = Date.now();
-  _reqMap[ip] = _reqMap[ip].filter(t => now - t < windowMs);
+  _reqMap[ip] = (_reqMap[ip] || []).filter(t => now - t < windowMs);
   if(_reqMap[ip].length >= max) return false;
   _reqMap[ip].push(now);
   return true;
@@ -18,8 +18,16 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  if (!rateLimit(ip)) return res.status(429).json({ error: 'Too many requests. Try again in a minute.' });
+
   try {
     const { phone, listing_id, user_id, amount = 250 } = req.body;
+
+    const parsedAmount = Number(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0 || parsedAmount > 100000) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
 
     if (!phone || !listing_id || !user_id) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -79,7 +87,7 @@ module.exports = async function handler(req, res) {
         Password: password,
         Timestamp: timestamp,
         TransactionType: 'CustomerPayBillOnline',
-        Amount: amount,
+        Amount: parsedAmount,
         PartyA: formattedPhone,
         PartyB: SHORTCODE,
         PhoneNumber: formattedPhone,

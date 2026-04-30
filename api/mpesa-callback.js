@@ -2,7 +2,7 @@
 const _reqMap = {};
 function rateLimit(ip, max=10, windowMs=60000){
   const now = Date.now();
-  _reqMap[ip] = _reqMap[ip].filter(t => now - t < windowMs);
+  _reqMap[ip] = (_reqMap[ip] || []).filter(t => now - t < windowMs);
   if(_reqMap[ip].length >= max) return false;
   _reqMap[ip].push(now);
   return true;
@@ -15,6 +15,9 @@ const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
+
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  if (!rateLimit(ip, 30)) return res.status(429).end();
 
   try {
     const result = req.body?.Body?.stkCallback;
