@@ -1269,7 +1269,7 @@ async function saveListing(){
   const urls=[...existingPhotos];
   for(const f of pendingPhotos){
     const fd=new FormData();fd.append('file',f);fd.append('upload_preset','nestfinder_unsigned');fd.append('folder','nestfinder');
-    const ur=await fetch('https://api.cloudinary.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
+    const ur=await fetch('https://api.cloudinary.com https://media-storage-advanced.onrender.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
     const cd=await ur.json();
     if(!cd.secure_url){showFErr('Photo upload failed.');resetSave();return;}
     urls.push(cd.secure_url);
@@ -2729,7 +2729,7 @@ async function saveListing(){
   const urls=[...existingPhotos];
   for(const f of pendingPhotos){
     const fd=new FormData();fd.append('file',f);fd.append('upload_preset','nestfinder_unsigned');fd.append('folder','nestfinder');
-    const ur=await fetch('https://api.cloudinary.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
+    const ur=await fetch('https://api.cloudinary.com https://media-storage-advanced.onrender.com/v1_1/dlms1aqkv/image/upload',{method:'POST',body:fd});
     const cd=await ur.json();
     if(!cd.secure_url){showFErr('Photo upload failed.');resetSave();return;}
     urls.push(cd.secure_url);
