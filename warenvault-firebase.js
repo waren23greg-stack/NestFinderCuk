@@ -189,6 +189,9 @@
   // ── Install as window.firebase ─────────────────────────────────────────────
 
   window.firebase = {
+    apps: [true],
+    app: () => ({}),
+
     initializeApp: () => {},
     auth: () => _auth,
     firestore: () => _firestore,
