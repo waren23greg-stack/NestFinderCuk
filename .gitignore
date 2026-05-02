@@ -7,3 +7,6 @@ package-lock.json
 node_modules/
 .env.local
 serviceAccountKey.json
+
+.vercel
+.env*.local
