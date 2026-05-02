@@ -1277,7 +1277,7 @@ async function initAuth(){
 }
 async function refreshListings(){
   try{
-    const resp2=await fetch("/api/nest/listings");const snapDocs2=await resp2.json();const snap={docs:snapDocs2.map(d=>({id:d.id,data:()=>d})),empty:snapDocs2.length===0};
+    const resp2=await fetch("/api/proxy/nest/listings");const snapDocs2=await resp2.json();const snap={docs:snapDocs2.map(d=>({id:d.id,data:()=>d})),empty:snapDocs2.length===0};
     listings=snap.docs.map(d=>({id:d.id,...d.data()}));
     if(!listings.length){emptyState();return;}
     render(listings);
@@ -1327,7 +1327,7 @@ async function load(){
   }
 let data;
 try{
-  const resp=await fetch('/api/nest/listings');const snapDocs=await resp.json();const snap={docs:snapDocs.map(d=>({id:d.id,data:()=>d})),empty:snapDocs.length===0};
+  const resp=await fetch('/api/proxy/nest/listings');const snapDocs=await resp.json();const snap={docs:snapDocs.map(d=>({id:d.id,data:()=>d})),empty:snapDocs.length===0};
   data=snap.docs.map(d=>({id:d.id,...d.data()}));
 }catch(e){emptyState();return;}
 if(!data||!data.length){emptyState();return;}
