@@ -3,7 +3,7 @@
 // Uses WarenVault REST API. No Firebase SDKs needed.
 
 (function () {
-  const API = 'https://media-storage-advanced.onrender.com';
+  const API = window.location.origin; // Use local proxy for /nest calls, backend for /auth
   const TOKEN_KEY = 'wv_token';
   const USER_KEY = 'wv_user';
 
@@ -22,7 +22,8 @@
     }
     const opts = { method, headers };
     if (body) opts.body = JSON.stringify(body);
-    const r = await fetch(API + path, opts);
+    const url = path.startsWith('/nest/') ? API + '/api' + path : 'https://media-storage-advanced.onrender.com' + path;
+  const r = await fetch(url, opts);
     const data = await r.json();
     if (!r.ok) throw { code: data.error || 'unknown', message: data.error || 'Request failed' };
     return data;
