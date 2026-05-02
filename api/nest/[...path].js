@@ -1,37 +1,34 @@
 export default async function handler(req, res) {
-  const { method, headers, query } = req;
-  
-  // Extract the dynamic path from [...path]
-  const pathSegments = query.path || [];
-  const path = '/' + pathSegments.join('/');
-  
-  // Rebuild query string if present
-  const queryString = new URLSearchParams(req.query).toString();
-  const fullPath = queryString ? `${path}?${queryString}` : path;
-  
-  const backendUrl = `https://media-storage-advanced.onrender.com/nest${fullPath}`;
-  
   try {
+    const pathSegments = req.query.path || [];
+    const path = '/' + pathSegments.join('/');
+    
+    const queryString = new URLSearchParams(req.query).toString();
+    const fullPath = queryString ? `${path}?${queryString}` : path;
+    
+    const backendUrl = `https://media-storage-advanced.onrender.com/nest${fullPath}`;
+    
     const fetchOptions = {
-      method,
+      method: req.method,
       headers: {
         'Content-Type': 'application/json',
       }
     };
     
-    if (headers.authorization) {
-      fetchOptions.headers['Authorization'] = headers.authorization;
+    if (req.headers.authorization) {
+      fetchOptions.headers['Authorization'] = req.headers.authorization;
     }
     
-    if (req.body) {
+    if (req.body && Object.keys(req.body).length > 0) {
       fetchOptions.body = JSON.stringify(req.body);
     }
     
     const response = await fetch(backendUrl, fetchOptions);
     const data = await response.json();
     
-    return res.status(response.status).json(data);
+    res.status(response.status).json(data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('Proxy error:', error);
+    res.status(500).json({ error: error.message });
   }
 }
