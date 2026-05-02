@@ -22,7 +22,7 @@
     }
     const opts = { method, headers };
     if (body) opts.body = JSON.stringify(body);
-    const url = path.startsWith('/nest/') ? API + '/api' + path : 'https://media-storage-advanced.onrender.com' + path;
+  const url = API + "/api" + path;  // Route ALL calls through proxy
   const r = await fetch(url, opts);
     const data = await r.json();
     if (!r.ok) throw { code: data.error || 'unknown', message: data.error || 'Request failed' };
