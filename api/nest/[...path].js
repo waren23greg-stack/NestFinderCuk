@@ -1,9 +1,15 @@
 export default async function handler(req, res) {
-  const { method, headers } = req;
+  const { method, headers, query } = req;
   
-  // Extract the path after /api/nest (e.g., /listings, /listings?filters)
-  const pathWithQuery = req.url.replace('/api/nest', '') || '/';
-  const backendUrl = `https://media-storage-advanced.onrender.com/nest${pathWithQuery}`;
+  // Extract the dynamic path from [...path]
+  const pathSegments = query.path || [];
+  const path = '/' + pathSegments.join('/');
+  
+  // Rebuild query string if present
+  const queryString = new URLSearchParams(req.query).toString();
+  const fullPath = queryString ? `${path}?${queryString}` : path;
+  
+  const backendUrl = `https://media-storage-advanced.onrender.com/nest${fullPath}`;
   
   try {
     const fetchOptions = {
@@ -13,12 +19,10 @@ export default async function handler(req, res) {
       }
     };
     
-    // Forward Authorization header if present
     if (headers.authorization) {
       fetchOptions.headers['Authorization'] = headers.authorization;
     }
     
-    // Forward request body for POST/PATCH/PUT
     if (req.body) {
       fetchOptions.body = JSON.stringify(req.body);
     }
