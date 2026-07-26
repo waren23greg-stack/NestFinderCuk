@@ -1617,7 +1617,6 @@ async function submitManualPay(){
   const _pd={id:_prRef.id};
   const pmnt={id:_prRef.id};
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
-  if(!_pr.ok){sec('pay');toast('Could not submit: '+(pmnt.message||'Error'),'err');return;}
   payId=pmnt.id;sec('wait');toast('Code submitted! Admin will confirm shortly.');
 
   try{
