@@ -1632,7 +1632,8 @@ async function submitManualPay(){
     attempts++;if(attempts>60){clearInterval(poll);return;}
     const _pr2snap=await firebase.firestore().collection('payments').doc(pmnt.id).get();
     const data=_pr2snap.exists?_pr2snap.data():null;
-    if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
+    if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;}
+    else if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
   },5000);
 }
 
