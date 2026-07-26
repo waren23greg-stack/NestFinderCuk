@@ -1697,16 +1697,12 @@ async function showContact(lid,showSuccSec=true){
 
 async function generateAndShowPromo_banner(){
   try{
-    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-    const t=localStorage.getItem('sb-token')||K;
     const _promoSnap=await firebase.firestore().collection('promo_codes').where('owner_id','==',user.uid||user.id).where('used_by','==',null).limit(1).get().catch(()=>({empty:true,docs:[]}));
     const d=!_promoSnap.empty?[_promoSnap.docs[0].data()]:[];
     let code=Array.isArray(d)&&d[0]?d[0].code:null;
     if(!code){
-      // generate one
-      const cr=await fetch('/api/generate-promo',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_id:user.id})});
-      const cd=await cr.json().catch(()=>({}));
-      code=cd.code||null;
+      code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
+      await firebase.firestore().collection('promo_codes').add({owner_id:user.uid||user.id,code,used_by:null,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
     }
     if(!code)return;
     const msg='Use my NestFinder CUK code '+code+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks';
@@ -1908,9 +1904,13 @@ async function applyPromo(){
 async function generateAndShowPromo(payment_id){
   if(!payment_id)return;
   try{
-    const r=await fetch("/api/generate-promo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({payment_id})});
-    const d=await r.json();
-    if(d.code){document.getElementById("promo-reward-code").textContent=d.code;document.getElementById("promo-reward-box").style.display="";}
+    const _existSnap=await firebase.firestore().collection('promo_codes').where('owner_id','==',user.uid||user.id).where('used_by','==',null).limit(1).get().catch(()=>({empty:true,docs:[]}));
+    let code=!_existSnap.empty?_existSnap.docs[0].data().code:null;
+    if(!code){
+      code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
+      await firebase.firestore().collection('promo_codes').add({owner_id:user.uid||user.id,code,payment_id,used_by:null,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+    }
+    if(code){document.getElementById("promo-reward-code").textContent=code;document.getElementById("promo-reward-box").style.display="";}
   }catch(e){console.warn("Promo generation failed silently:",e);}
 }
 function copyPromoCode(){
