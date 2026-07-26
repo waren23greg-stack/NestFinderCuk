@@ -1924,10 +1924,8 @@ initAuth();load();loadRatings();
     firebase.firestore().collection('payments').where('status','==','confirmed').get().then(s=>({ok:true,json:()=>Promise.resolve([]),count:s.size})),
     firebase.firestore().collection('listings').get().then(s=>({ok:true,json:()=>Promise.resolve([]),count:s.size}))
   ]);
-const pc=pr.headers.get('content-range');
-    const lc=lr.headers.get('content-range');
-    const students=pc?pc.split('/')[1]:null;
-    const listings=lc?lc.split('/')[1]:null;
+const students=pr.count;
+    const listings=lr.count;
     const se=document.getElementById('stat-students');
     const le=document.getElementById('stat-listings');
     if(se&&students)se.textContent=parseInt(students).toLocaleString()+'+';
