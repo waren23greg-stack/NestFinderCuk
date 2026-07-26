@@ -1894,7 +1894,7 @@ async function applyPromo(){
   const code=document.getElementById("promo-inp").value.trim().toUpperCase();
   if(code.length<9){toast("Enter a valid promo code (e.g. NEST-A3X9K2)","err");return;}
   const btn=document.getElementById("promo-apply-btn");
-  btn.disabled=true;btn.textContent="Checkingu2026";
+  btn.disabled=true;btn.textContent="Checking…";
   try{
     const r=await fetch("/api/redeem-promo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,user_id:user.id,listing_id:cur.id})});
     const d=await r.json();
