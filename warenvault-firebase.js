@@ -100,7 +100,13 @@
     },
 
     async sendPasswordResetEmail(email) {
-      console.warn('Password reset not implemented in WarenVault yet');
+      const r=await fetch('/api/auth/reset-request',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email})
+      });
+      const data=await r.json().catch(()=>({}));
+      if(!r.ok) throw{code:'reset/failed',message:data.error||'Could not send reset email'};
     }
   };
 
