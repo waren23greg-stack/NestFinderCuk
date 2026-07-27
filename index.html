@@ -1612,9 +1612,7 @@ async function submitManualPay(){
   }
 
   const fee=cur.contact_fee||250;
-  const _pt=localStorage.getItem('sb-token');
   const _prRef=await firebase.firestore().collection('payments').add({uid:user.uid||user.id,listing_id:cur.id,phone:user.phone||"",amount:fee,status:"pending",mpesa_ref:ref,checkin_date:checkin||null,checkout_date:checkout||null,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  const _pd={id:_prRef.id};
   const pmnt={id:_prRef.id};
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
   payId=pmnt.id;sec('wait');toast('Code submitted! Admin will confirm shortly.');
