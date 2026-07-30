@@ -1654,9 +1654,8 @@ function waShareCard(id,title){
 }
 
 async function showContact(lid,showSuccSec=true){
-  const _t=localStorage.getItem('sb-token');
-  const _cSnap=await firebase.firestore().collection('caretaker_contacts').where('listing_id','==',lid).get();
-  const data=!_cSnap.empty?_cSnap.docs[0].data():null;
+  const {data:cRows}=await sb.from('caretaker_contacts').select('*').eq('listing_id',lid);
+  const data=cRows&&cRows.length?cRows[0]:null;
 
   // Reset to show contact box (not denied)
   const deniedBox=document.getElementById('denied-contact-box');
@@ -1686,10 +1685,13 @@ async function showContact(lid,showSuccSec=true){
     setWhatsApp(data.phone,data.caretaker_name);
     if(showSuccSec)sec('succ');
     toast('Contact unlocked!');
+    // NOTE: /api/notify-student has no matching serverless function in
+    // this repo — this call 404s silently (caught below), same as the
+    // /api/notify call in submitManualPay. Left as-is; building it is
+    // separate work. Uses curListing (already fetched above for the map)
+    // instead of a second network round-trip for title/location.
     try{
-      const _lstDoc=await firebase.firestore().collection('listings').doc(lid).get();
-      const lst=_lstDoc.exists?_lstDoc.data():null;
-      await fetch('/api/notify-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user?.id,listing_title:lst?.title||'Listing',listing_location:lst?.location||'',caretaker_name:data.caretaker_name,caretaker_phone:data.phone})}).catch(()=>{});
+      await fetch('/api/notify-student',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user?.id,listing_title:curListing?.title||'Listing',listing_location:curListing?.location||'',caretaker_name:data.caretaker_name,caretaker_phone:data.phone})}).catch(()=>{});
     }catch(e){}
     loadReviews(lid);pickedStar=0;
     document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
