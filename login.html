@@ -316,6 +316,20 @@ var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 function initSupabase() {
   try {
     _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Bridge: payments.html (and other pages) read the session as plain
+    // localStorage['sb-token']/'sb-refresh' via raw REST, not through the
+    // SDK's own storage format. Keep both in sync on every relevant event
+    // (sign-in, sign-out, and the SDK's automatic background token refresh)
+    // so a session created here is recognized everywhere else too.
+    _sb.auth.onAuthStateChange(function(event, session) {
+      if (session) {
+        localStorage.setItem('sb-token', session.access_token);
+        if (session.refresh_token) localStorage.setItem('sb-refresh', session.refresh_token);
+      } else {
+        localStorage.removeItem('sb-token');
+        localStorage.removeItem('sb-refresh');
+      }
+    });
     // Check if already logged in
     _sb.auth.getSession().then(function(res) {
       if (res.data && res.data.session) {

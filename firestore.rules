@@ -62,7 +62,20 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
-
+// ── promo_codes ────────────────────────────────────────────────────────
+    // Students can read their own promo codes. Admin can read all.
+    // Client can create their own code (mirrors payments/reviews pattern),
+    // but cannot redeem it — used_by only ever gets set by admin/server,
+    // since /api/redeem-promo needs a trusted rebuild before any client
+    // write should be able to flip that field.
+    match /promo_codes/{promoId} {
+      allow read: if isAdmin() ||
+        (isAuth() && resource.data.owner_id == request.auth.uid);
+      allow create: if isAuth() &&
+        request.resource.data.owner_id == request.auth.uid &&
+        request.resource.data.used_by == null;
+      allow update, delete: if isAdmin();
+    }
     // ── favourites ─────────────────────────────────────────────────────────
     // Students can only read/write their own favourites.
     match /favourites/{favId} {

@@ -1242,6 +1242,18 @@ window.addEventListener('scroll',()=>{document.getElementById('navbar').classLis
 const SUPABASE_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+// Bridge: keep legacy raw-REST pages (payments.html etc.) in sync with
+// the real SDK's session — covers sign-in, sign-out, and automatic
+// background token refresh, all in one place.
+sb.auth.onAuthStateChange(function(event,session){
+  if(session){
+    localStorage.setItem('sb-token',session.access_token);
+    if(session.refresh_token)localStorage.setItem('sb-refresh',session.refresh_token);
+  }else{
+    localStorage.removeItem('sb-token');
+    localStorage.removeItem('sb-refresh');
+  }
+});
 
 async function initAuth(){
   const {data:{session}}=await sb.auth.getSession();
@@ -1702,12 +1714,17 @@ async function showContact(lid,showSuccSec=true){
 
 async function generateAndShowPromo_banner(){
   try{
-    const _promoSnap=await firebase.firestore().collection('promo_codes').where('owner_id','==',user.uid||user.id).where('used_by','==',null).limit(1).get().catch(()=>({empty:true,docs:[]}));
-    const d=!_promoSnap.empty?[_promoSnap.docs[0].data()]:[];
-    let code=Array.isArray(d)&&d[0]?d[0].code:null;
+    const {data:promoRows}=await sb.from('promo_codes').select('*').eq('owner_user_id',user.id).is('used_by_user_id',null).limit(1);
+    let code=promoRows&&promoRows.length?promoRows[0].code:null;
     if(!code){
       code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
-      await firebase.firestore().collection('promo_codes').add({owner_id:user.uid||user.id,code,used_by:null,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+      // NOTE: promo_codes has RLS enabled with no INSERT policy yet, so
+      // this insert is denied until that policy is added — same known
+      // gap flagged during the security pass. Fails silently, matching
+      // the original intent; the banner just won't show a new code
+      // until the policy exists.
+      const {error:promoErr}=await sb.from('promo_codes').insert({owner_user_id:user.id,code,used_by_user_id:null});
+      if(promoErr){console.warn('Promo insert blocked (expected until INSERT policy exists):',promoErr.message);code=null;}
     }
     if(!code)return;
     const msg='Use my NestFinder CUK code '+code+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks';
@@ -1803,8 +1820,8 @@ document.getElementById('gallery-stage').addEventListener('wheel',e=>{e.preventD
 /* RATINGS */
 let ratings={};
 async function loadRatings(){
-  const _rratSnap=await firebase.firestore().collection('reviews').get();
-  const data=_rratSnap.docs.map(d=>d.data());if(!data)return;
+  const {data}=await sb.from('reviews').select('listing_id,rating');
+  if(!data)return;
   ratings={};
   data.forEach(r=>{if(!ratings[r.listing_id])ratings[r.listing_id]={sum:0,count:0};ratings[r.listing_id].sum+=r.rating;ratings[r.listing_id].count++;});
   Object.keys(ratings).forEach(id=>{ratings[id].avg=ratings[id].sum/ratings[id].count;});
@@ -1849,9 +1866,7 @@ let pickedStar=0;
 function pickStar(v){pickedStar=v;document.querySelectorAll('.star-pick').forEach((el,i)=>{el.classList.toggle('on',i<v);});}
 function escapeHtml(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 async function loadReviews(lid){
-  const _t=localStorage.getItem('sb-token');
-  const _rrSnap=await firebase.firestore().collection('reviews').where('listing_id','==',lid).orderBy('created_at','desc').get();
-  const data=_rrSnap.docs.map(d=>({...d.data(),id:d.id}));
+  const {data}=await sb.from('reviews').select('*, profiles(full_name)').eq('listing_id',lid).order('created_at',{ascending:false});
   const list=document.getElementById('review-list');const avgEl=document.getElementById('avg-rating');
   if(!data||!data.length){list.innerHTML='<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.75rem">No reviews yet — be the first!</div>';avgEl.style.display='none';return;}
   const avg=data.reduce((s,r)=>s+r.rating,0)/data.length;
@@ -1866,9 +1881,8 @@ async function submitReview(){
   if(!user){toast('Sign in to leave a review','err');return;}
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
-  await firebase.firestore().collection('reviews').add({listing_id:cur.id,uid:user.uid||user.id,rating:pickedStar,comment,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  const _rs={ok:true};
-  if(!_rs.ok){toast('Review failed ('+_rs.status+')','err');return;}
+  const {error}=await sb.from('reviews').insert({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment});
+  if(error){toast('Review failed: '+error.message,'err');return;}
   toast('Review submitted — thank you!');
   document.getElementById('review-txt').value='';pickedStar=0;
   document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
@@ -1909,11 +1923,16 @@ async function applyPromo(){
 async function generateAndShowPromo(payment_id){
   if(!payment_id)return;
   try{
-    const _existSnap=await firebase.firestore().collection('promo_codes').where('owner_id','==',user.uid||user.id).where('used_by','==',null).limit(1).get().catch(()=>({empty:true,docs:[]}));
-    let code=!_existSnap.empty?_existSnap.docs[0].data().code:null;
+    const {data:existRows}=await sb.from('promo_codes').select('*').eq('owner_user_id',user.id).is('used_by_user_id',null).limit(1);
+    let code=existRows&&existRows.length?existRows[0].code:null;
     if(!code){
       code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
-      await firebase.firestore().collection('promo_codes').add({owner_id:user.uid||user.id,code,payment_id,used_by:null,created_at:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
+      // NOTE: promo_codes has no payment_id column — dropped, it was never
+      // storable even before this migration. Insert is also currently
+      // denied by RLS (no INSERT policy yet), same known gap as the other
+      // promo function above — fails silently, doesn't break the flow.
+      const {error:promoErr2}=await sb.from('promo_codes').insert({owner_user_id:user.id,code,used_by_user_id:null});
+      if(promoErr2){console.warn('Promo insert blocked (expected until INSERT policy exists):',promoErr2.message);code=null;}
     }
     if(code){document.getElementById("promo-reward-code").textContent=code;document.getElementById("promo-reward-box").style.display="";}
   }catch(e){console.warn("Promo generation failed silently:",e);}
@@ -1926,12 +1945,11 @@ initAuth();load();loadRatings();
 // Live trust stats
 (async()=>{
   try{
-    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
     const [pr,lr]=await Promise.all([
-    firebase.firestore().collection('payments').where('status','==','confirmed').get().then(s=>({ok:true,json:()=>Promise.resolve([]),count:s.size})),
-    firebase.firestore().collection('listings').get().then(s=>({ok:true,json:()=>Promise.resolve([]),count:s.size}))
-  ]);
-const students=pr.count;
+      sb.from('payments').select('*',{count:'exact',head:true}).eq('status','confirmed'),
+      sb.from('listings').select('*',{count:'exact',head:true})
+    ]);
+    const students=pr.count;
     const listings=lr.count;
     const se=document.getElementById('stat-students');
     const le=document.getElementById('stat-listings');
