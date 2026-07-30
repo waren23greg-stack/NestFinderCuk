@@ -624,9 +624,7 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
 .promo-divider{display:flex;align-items:center;gap:.75rem;margin:.9rem 0;font-size:.65rem;color:var(--muted);letter-spacing:.08em}
 .promo-divider::before,.promo-divider::after{content:"";flex:1;height:1px;background:var(--border)}
 </style>
-<script src="sb-client.js"></script>
-
-<script src="warenvault-firebase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -1241,44 +1239,48 @@ window.addEventListener('scroll',()=>{document.getElementById('navbar').classLis
 // Firebase handles token refresh automatically
 
 
+const SUPABASE_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
 async function initAuth(){
-  firebase.auth().onAuthStateChanged(async function(fbUser){
-    if(!fbUser){return;}
-    user=fbUser;
-    // Show UI immediately from Auth data (no Firestore needed)
-    const name=(fbUser.displayName||fbUser.email||"Student").split(" ")[0];
-    document.getElementById("nav-hello").textContent="Hi, "+name;
-    document.getElementById("nav-in").style.display="none";
-    document.getElementById("nav-out").style.display="";
-    document.getElementById("drawer-in").style.display="none";
-    document.getElementById("drawer-out").style.display="";
-    document.getElementById("drawer-user").textContent="Signed in as "+name;
-    ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
-    user.display_name=name;
-    user.role="student";
-    // Try Firestore for admin check (non-blocking)
-    try{
-      const doc=await firebase.firestore().collection("users").doc(fbUser.uid).get();
-      const prof=doc.exists?doc.data():{};
-      if(prof.display_name){
-        const n=prof.display_name.split(" ")[0];
-        document.getElementById("nav-hello").textContent="Hi, "+n;
-        document.getElementById("drawer-user").textContent="Signed in as "+n;
-        user.display_name=prof.display_name;
-      }
-      user.role=prof.role||"student";
-      if(prof.role==="admin"){
-        ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
-        const ba=document.getElementById("bot-admin");if(ba)ba.style.display="";
-      }
-    }catch(e){console.warn("Firestore profile load failed (offline?)",e);}
-    refreshListings();
-  });
+  const {data:{session}}=await sb.auth.getSession();
+  const sbUser=session?session.user:null;
+  if(!sbUser){return;}
+  user=sbUser;
+  // Show UI immediately from Auth data (no profile fetch needed)
+  const name=(sbUser.user_metadata?.full_name||sbUser.email||"Student").split(" ")[0];
+  document.getElementById("nav-hello").textContent="Hi, "+name;
+  document.getElementById("nav-in").style.display="none";
+  document.getElementById("nav-out").style.display="";
+  document.getElementById("drawer-in").style.display="none";
+  document.getElementById("drawer-out").style.display="";
+  document.getElementById("drawer-user").textContent="Signed in as "+name;
+  ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+  user.display_name=name;
+  user.role="student";
+  // Try profiles table for admin check (non-blocking)
+  try{
+    const {data:prof}=await sb.from("profiles").select("*").eq("id",sbUser.id).single();
+    if(prof&&prof.full_name){
+      const n=prof.full_name.split(" ")[0];
+      document.getElementById("nav-hello").textContent="Hi, "+n;
+      document.getElementById("drawer-user").textContent="Signed in as "+n;
+      user.display_name=prof.full_name;
+    }
+    user.role=(prof&&prof.role)||"student";
+    if(prof&&prof.role==="admin"){
+      ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+      const ba=document.getElementById("bot-admin");if(ba)ba.style.display="";
+    }
+  }catch(e){console.warn("Profile load failed",e);}
+  refreshListings();
 }
 async function refreshListings(){
   try{
-    const resp2=await fetch("/api/proxy/nest/listings");const snapDocs2=await resp2.json();const snap={docs:snapDocs2.map(d=>({id:d.id,data:()=>d})),empty:snapDocs2.length===0};
-    listings=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const {data,error}=await sb.from("listings").select("*").order("created_at",{ascending:false});
+    if(error)throw error;
+    listings=data||[];
     if(!listings.length){emptyState();return;}
     render(listings);
     if(typeof loadRatings==="function")loadRatings();
@@ -1286,7 +1288,7 @@ async function refreshListings(){
 }
 initAuth();
 
-async function doSignOut(){await firebase.auth().signOut();user=null;location.reload();}
+async function doSignOut(){await sb.auth.signOut();user=null;location.reload();}
 
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
@@ -1327,8 +1329,9 @@ async function load(){
   }
 let data;
 try{
-  const resp=await fetch('/api/proxy/nest/listings');const snapDocs=await resp.json();const snap={docs:snapDocs.map(d=>({id:d.id,data:()=>d})),empty:snapDocs.length===0};
-  data=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const {data:rows,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
+  if(error)throw error;
+  data=rows;
 }catch(e){emptyState();return;}
 if(!data||!data.length){emptyState();return;}
   // Save fresh data to cache
@@ -1603,8 +1606,8 @@ async function submitManualPay(){
   btn.disabled=true;btn.textContent='Submitting…';sec('wait');
 
   // Check duplicate ref
-  const _ceSnap=await firebase.firestore().collection('payments').where('mpesa_ref','==',ref).get();
-  const existing=!_ceSnap.empty?{...(_ceSnap.docs[0].data()),id:_ceSnap.docs[0].id}:null;
+  const {data:existingRows}=await sb.from('payments').select('*').eq('mpesa_ref',ref);
+  const existing=existingRows&&existingRows.length?existingRows[0]:null;
   if(existing){
     if(existing.status==='confirmed'){await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;return;}
     if(existing.status==='denied'){showDenied();sec('succ');toast('This payment was marked invalid.','err');btn.disabled=false;return;}
@@ -1612,24 +1615,26 @@ async function submitManualPay(){
   }
 
   const fee=cur.contact_fee||250;
-  const _prRef=await firebase.firestore().collection('payments').add({uid:user.uid||user.id,listing_id:cur.id,phone:user.phone||"",amount:fee,status:"pending",mpesa_ref:ref,checkin_date:checkin||null,checkout_date:checkout||null,created_at:firebase.firestore.FieldValue.serverTimestamp()});
-  const pmnt={id:_prRef.id};
+  const {data:pmnt,error:payErr}=await sb.from('payments').insert({user_id:user.id,listing_id:cur.id,phone:user.phone||"",amount:fee,status:"pending",mpesa_ref:ref,checkin_date:checkin||null,checkout_date:checkout||null}).select().single();
+  if(payErr){toast('Could not submit payment — try again','err');btn.disabled=false;btn.textContent="I've Paid — Submit Code";sec('pay');return;}
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
   payId=pmnt.id;sec('wait');toast('Code submitted! Admin will confirm shortly.');
 
   try{
     const [{data:prof},{data:lst}]=await Promise.all([
-      firebase.firestore().collection('users').doc(user.uid||user.id).get().then(d=>({data:d.exists?d.data():{}})),
-      firebase.firestore().collection('listings').doc(cur.id).get().then(d=>({data:d.exists?d.data():{}}))
+      sb.from('profiles').select('*').eq('id',user.id).single(),
+      sb.from('listings').select('*').eq('id',cur.id).single()
     ]);
+    // NOTE: /api/notify has no matching serverless function in this repo —
+    // this call 404s silently (caught below) the same way it already did
+    // before this migration. Left as-is; building it is separate work.
     fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({student_name:prof?.full_name||'Student',listing_title:lst?.title||'Listing',mpesa_ref:ref,amount:fee,payment_id:pmnt.id})}).catch(()=>{});
   }catch(e){}
 
   let attempts=0;
   poll=setInterval(async()=>{
     attempts++;if(attempts>60){clearInterval(poll);return;}
-    const _pr2snap=await firebase.firestore().collection('payments').doc(pmnt.id).get();
-    const data=_pr2snap.exists?_pr2snap.data():null;
+    const {data}=await sb.from('payments').select('*').eq('id',pmnt.id).single();
     if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;}
     else if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
   },5000);
