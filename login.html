@@ -124,8 +124,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--pale);color:var(--ink);di
   .tab-btn{flex:1;text-align:center}
 }
 </style>
-<script src="sb-client.js"></script>
-<script src="warenvault-firebase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="split">
@@ -309,22 +308,22 @@ function showMsg(id, txt, isOk) {
   if (isOk) el.classList.add('ok-msg'); else el.classList.remove('ok-msg');
 }
 
-// ── Firebase init (deferred) ──
-var _auth = null, _db = null;
+// ── Supabase init (deferred) ──
+var _sb = null;
+var SUPABASE_URL = 'https://mtycapgbtvpczvswpjpo.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
 
-function initFirebase() {
+function initSupabase() {
   try {
-    _auth = firebase.auth();
-    _db = firebase.firestore();
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     // Check if already logged in
-    _auth.onAuthStateChanged(function(user) {
-      if (user) {
-        // Skip Firestore check on login — handled by index.html
-      window.location.href = 'index.html';
+    _sb.auth.getSession().then(function(res) {
+      if (res.data && res.data.session) {
+        window.location.href = 'index.html';
       }
     });
   } catch(e) {
-    console.error('Firebase init error:', e);
+    console.error('Supabase init error:', e);
   }
 }
 
@@ -335,9 +334,10 @@ function doLogin() {
   var btn   = document.getElementById('in-btn');
   showMsg('in-msg', '');
   if (!email || !pass) { showMsg('in-msg', 'Please enter your email and password.'); return; }
-  if (!_auth) { showMsg('in-msg', 'Authentication not ready — please refresh.'); return; }
+  if (!_sb) { showMsg('in-msg', 'Authentication not ready — please refresh.'); return; }
   btn.disabled = true; btn.firstChild.textContent = 'Signing in… ';
-  _auth.signInWithEmailAndPassword(email, pass).then(function() {
+  _sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) {
+    if (res.error) throw res.error;
     window.location.href = 'index.html';
   }).catch(function(e) {
     showMsg('in-msg', e.message || 'Incorrect email or password.');
@@ -356,16 +356,21 @@ function doRegister() {
   if (!name || !email || !pass) { showMsg('reg-msg', 'All fields are required.'); return; }
   if (pass !== pass2) { showMsg('reg-msg', 'Passwords do not match.'); return; }
   if (pass.length < 6) { showMsg('reg-msg', 'Password must be at least 6 characters.'); return; }
-  if (!_auth) { showMsg('reg-msg', 'Authentication not ready — please refresh.'); return; }
+  if (!_sb) { showMsg('reg-msg', 'Authentication not ready — please refresh.'); return; }
   btn.disabled = true; btn.firstChild.textContent = 'Creating account… ';
-  _auth.createUserWithEmailAndPassword(email, pass).then(function(cred) {
-    return _db.collection('users').doc(cred.user.uid).set({
-      uid: cred.user.uid,
-      email: email,
-      display_name: name,
-      role: 'student',
-      created_at: firebase.firestore.FieldValue.serverTimestamp()
-    });
+  _sb.auth.signUp({
+    email: email,
+    password: pass,
+    options: { data: { full_name: name } }
+  }).then(function(res) {
+    if (res.error) throw res.error;
+    var uid = res.data.user && res.data.user.id;
+    if (!uid) return;
+    // Best-effort profile row — harmless no-op if a DB trigger already creates one
+    return _sb.from('profiles').upsert({ id: uid, full_name: name }, { onConflict: 'id' })
+      .then(function(pr) {
+        if (pr.error) console.warn('Profile upsert warning:', pr.error.message);
+      });
   }).then(function() {
     window.location.href = 'index.html';
   }).catch(function(e) {
@@ -380,9 +385,12 @@ function doReset() {
   var btn   = document.getElementById('reset-btn');
   showMsg('reset-msg', '');
   if (!email) { showMsg('reset-msg', 'Enter your email address.'); return; }
-  if (!_auth) { showMsg('reset-msg', 'Authentication not ready — please refresh.'); return; }
+  if (!_sb) { showMsg('reset-msg', 'Authentication not ready — please refresh.'); return; }
   btn.disabled = true;
-  _auth.sendPasswordResetEmail(email).then(function() {
+  _sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-confirm.html'
+  }).then(function(res) {
+    if (res.error) throw res.error;
     showMsg('reset-msg', 'Reset email sent — check your inbox.', true);
     btn.disabled = false;
   }).catch(function(e) {
@@ -391,8 +399,8 @@ function doReset() {
   });
 }
 
-// Init Firebase after scripts load
-window.addEventListener('load', initFirebase);
+// Init Supabase after script loads
+window.addEventListener('load', initSupabase);
 </script>
 </body>
 </html>
