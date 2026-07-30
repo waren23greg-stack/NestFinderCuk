@@ -527,9 +527,7 @@
 
   #page-content { display: none; }
   #page-content.show { display: block; }
-</style>
-<script src="warenvault-firebase.js"></script>
-</head>
+</style></head>
 <body>
 
 <!-- NAV -->
@@ -764,7 +762,7 @@
 </div>
 
 <!-- FIREBASE SDK -->
-<script src="sb-client.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 // ── STATE ─────────────────────────────────────────────────────────────────
@@ -772,40 +770,50 @@ const files = { face: null, 'id-front': null, 'id-back': null };
 let currentUser = null;
 
 // ── INIT ──────────────────────────────────────────────────────────────────
-firebase.auth().onAuthStateChanged(async user => {
-  if (!user) {
+const SUPABASE_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+// Bridge: keep legacy raw-REST pages (payments.html etc.) in sync with
+// the real SDK's session, same as login.html/index.html.
+sb.auth.onAuthStateChange(function(event,session){
+  if(session){
+    localStorage.setItem('sb-token',session.access_token);
+    if(session.refresh_token)localStorage.setItem('sb-refresh',session.refresh_token);
+  }else{
+    localStorage.removeItem('sb-token');
+    localStorage.removeItem('sb-refresh');
+  }
+});
+
+(async function initVerify(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){
     document.getElementById('auth-wall').classList.add('show');
     return;
   }
-  currentUser = user;
+  currentUser=session.user;
   document.getElementById('page-content').classList.add('show');
 
   // Check existing verification status
-  try {
-    const doc = await firebase.firestore()
-      .collection('host_verifications').doc(user.uid).get();
+  const {data}=await sb.from('host_verifications').select('*').eq('user_id',session.user.id).maybeSingle();
+  if(data){
+    const status = data.status || 'pending';
+    document.getElementById('steps-bar').style.display = 'none';
+    document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
 
-    if (doc.exists) {
-      const data = doc.data();
-      const status = data.status || 'pending';
-      document.getElementById('steps-bar').style.display = 'none';
-      document.querySelectorAll('.form-section').forEach(s => s.style.display = 'none');
-
-      if (status === 'pending') {
-        document.getElementById('banner-pending').classList.add('show');
-      } else if (status === 'approved') {
-        document.getElementById('banner-approved').classList.add('show');
-      } else if (status === 'rejected') {
-        document.getElementById('banner-rejected').classList.add('show');
-        if (data.rejection_reason) {
-          document.getElementById('rejection-reason').textContent = data.rejection_reason;
-        }
+    if (status === 'pending') {
+      document.getElementById('banner-pending').classList.add('show');
+    } else if (status === 'approved') {
+      document.getElementById('banner-approved').classList.add('show');
+    } else if (status === 'rejected') {
+      document.getElementById('banner-rejected').classList.add('show');
+      if (data.rejection_reason) {
+        document.getElementById('rejection-reason').textContent = data.rejection_reason;
       }
     }
-  } catch(e) {
-    // No existing doc — show form normally
   }
-});
+  // No existing row (data is null) — show form normally
+})();
 
 // ── STEP NAVIGATION ───────────────────────────────────────────────────────
 function goStep(n) {
@@ -913,46 +921,48 @@ async function submitVerification() {
   btn.disabled = true;
   showLoading('Uploading documents…');
 
-  const uid = currentUser.uid;
-  const storage = firebase.storage();
+  const uid = currentUser.id;
 
   try {
     // Upload face photo
     setLoadingText('Uploading selfie…');
-    const faceRef = storage.ref(`verifications/${uid}/face.jpg`);
-    await faceRef.put(files.face);
-    const faceUrl = await faceRef.getDownloadURL();
+    const {error: faceErr} = await sb.storage.from('verifications').upload(`${uid}/face.jpg`, files.face, {upsert:true});
+    if (faceErr) throw faceErr;
 
     // Upload ID front
     setLoadingText('Uploading ID front…');
-    const frontRef = storage.ref(`verifications/${uid}/id_front.jpg`);
-    await frontRef.put(files['id-front']);
-    const frontUrl = await frontRef.getDownloadURL();
+    const {error: frontErr} = await sb.storage.from('verifications').upload(`${uid}/id_front.jpg`, files['id-front'], {upsert:true});
+    if (frontErr) throw frontErr;
 
     // Upload ID back
     setLoadingText('Uploading ID back…');
-    const backRef = storage.ref(`verifications/${uid}/id_back.jpg`);
-    await backRef.put(files['id-back']);
-    const backUrl = await backRef.getDownloadURL();
+    const {error: backErr} = await sb.storage.from('verifications').upload(`${uid}/id_back.jpg`, files['id-back'], {upsert:true});
+    if (backErr) throw backErr;
 
-    // Write Firestore record
+    // Write record. NOTE: 'verifications' is a private bucket (correctly —
+    // these are ID documents), so there's no public download URL like
+    // Firebase Storage gave us. These columns now store the storage PATH;
+    // whatever reviews these later needs a signed URL via
+    // sb.storage.from('verifications').createSignedUrl(path, expirySeconds).
+    // upsert (not insert) so resubmitting after a rejection updates the
+    // same row instead of erroring on the unique user_id constraint.
     setLoadingText('Saving application…');
-    await firebase.firestore()
-      .collection('host_verifications').doc(uid).set({
-        uid: uid,
-        email: currentUser.email,
-        full_name: document.getElementById('full-name').value.trim(),
-        national_id_number: document.getElementById('id-number').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        face_photo_url: faceUrl,
-        id_front_url: frontUrl,
-        id_back_url: backUrl,
-        status: 'pending',
-        submitted_at: firebase.firestore.FieldValue.serverTimestamp(),
-        reviewed_at: null,
-        reviewed_by: null,
-        rejection_reason: null
-      });
+    const {error: dbErr} = await sb.from('host_verifications').upsert({
+      user_id: uid,
+      email: currentUser.email,
+      full_name: document.getElementById('full-name').value.trim(),
+      national_id_number: document.getElementById('id-number').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      face_photo_url: `${uid}/face.jpg`,
+      id_front_url: `${uid}/id_front.jpg`,
+      id_back_url: `${uid}/id_back.jpg`,
+      status: 'pending',
+      submitted_at: new Date().toISOString(),
+      reviewed_at: null,
+      reviewed_by: null,
+      rejection_reason: null
+    }, {onConflict: 'user_id'});
+    if (dbErr) throw dbErr;
 
     hideLoading();
 
