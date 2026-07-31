@@ -485,7 +485,7 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   :root{--px:2rem;--nav-h:60px}
   .nav-mid{display:none}
   .ham{display:flex}
-  #nav-hello,#nav-in,#nav-out,#nav-admin{display:none !important}
+  #nav-hello,#nav-in,#nav-out{display:none !important}
   .hero-img{width:100%;opacity:.2}
   .hero-overlay{background:linear-gradient(135deg,rgba(22,19,14,.95) 0%,rgba(22,19,14,.7) 100%)}
   .hero h1{font-size:clamp(2.2rem,5vw,3.4rem)}
@@ -505,7 +505,7 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   :root{--px:1.25rem;--nav-h:54px}
   .nav-mid{display:none}
   .ham{display:flex}
-  #nav-hello,#nav-in,#nav-out,#nav-admin{display:none !important}
+  #nav-hello,#nav-in,#nav-out{display:none !important}
   nav{padding:0 1.25rem}
   .hero{min-height:92svh;align-items:center;padding-bottom:3vh}
   .hero-img{width:100%;opacity:.15}
@@ -547,7 +547,7 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
   :root{--px:1rem;--nav-h:52px}
   nav{padding:0 1rem}
   .nav-mid{display:none}
-  #nav-hello,#nav-in,#nav-out,#nav-admin{display:none !important}
+  #nav-hello,#nav-in,#nav-out{display:none !important}
   .ham{display:flex}
   .logo-ring{width:30px;height:30px}
   .logo-text{font-size:.96rem}
@@ -1287,7 +1287,7 @@ async function initAuth(){
   document.getElementById("drawer-in").style.display="none";
   document.getElementById("drawer-out").style.display="";
   document.getElementById("drawer-user").textContent="Signed in as "+name;
-  ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+  ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=(id==="nav-admin"?"flex":"");});
   user.display_name=name;
   user.role="student";
   // Try profiles table for admin check (non-blocking)
@@ -1301,7 +1301,7 @@ async function initAuth(){
     }
     user.role=(prof&&prof.role)||"student";
     if(prof&&prof.role==="admin"){
-      ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="";});
+      ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=(id==="nav-admin"?"flex":"");});
       const ba=document.getElementById("bot-admin");if(ba)ba.style.display="";
     }
   }catch(e){console.warn("Profile load failed",e);}
