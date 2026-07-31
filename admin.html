@@ -644,19 +644,38 @@ function exportCSV() {
 async function loadStudents() {
   const {data} = await sb.from('profiles').select('*').order('created_at',{ascending:false});
   const tb = document.getElementById('studentsBody');
-  if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="5">No students yet.</td></tr>'; return; }
+  if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="6">No students yet.</td></tr>'; return; }
   tb.innerHTML = data.map(u => `<tr>
     <td style="font-family:'Cormorant Garamond',serif;font-size:1rem;">${u.full_name||'—'}</td>
+    <td style="font-size:.78rem;">${u.email||'—'}</td>
     <td>${u.phone||'—'}</td>
     <td><span class="badge badge-${u.role==='admin'?'admin':'student'}">${u.role}</span></td>
     <td style="font-size:.75rem;">${new Date(u.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
-    <td>${u.role!=='admin'?`<button class="act act-edit" onclick="makeAdmin('${u.id}')">Make Admin</button>`:'<span style="font-size:.72rem;color:var(--muted);">Admin</span>'}</td>
+    <td><div class="actions-cell">
+      ${u.role!=='admin'?`<button class="act act-edit" onclick="makeAdmin('${u.id}')">Make Admin</button>`:''}
+      ${u.email?`<button class="act act-confirm" onclick="resetStudentPassword('${u.email}')"><svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset</button>`:''}
+      ${u.role!=='admin'?`<button class="act act-del" onclick="removeStudent('${u.id}','${(u.full_name||'').replace(/'/g,'')}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Remove</button>`:''}
+    </div></td>
   </tr>`).join('');
 }
 async function makeAdmin(id) {
   if (!confirm('Grant admin access to this user?')) return;
   await sb.from('profiles').update({role:'admin'}).eq('id',id);
   toast('User is now an admin'); loadStudents();
+}
+async function removeStudent(id, name) {
+  if (!confirm(`Remove ${name} from the platform? They will lose access but can re-register.`)) return;
+  const {error} = await sb.from('profiles').delete().eq('id',id);
+  if (error) { toast('Remove failed: '+error.message, true); return; }
+  toast(name+' removed'); loadStudents();
+}
+async function resetStudentPassword(email) {
+  if (!confirm(`Send password reset email to ${email}?`)) return;
+  const r = await fetch('/api/auth/reset-request', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({email})
+  });
+  toast(r.ok ? 'Reset email sent to '+email : 'Failed to send reset email', !r.ok);
 }
 
 /* ── REPORTS ── */

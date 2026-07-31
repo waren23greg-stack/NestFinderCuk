@@ -381,7 +381,7 @@ function doRegister() {
     var uid = res.data.user && res.data.user.id;
     if (!uid) return;
     // Best-effort profile row — harmless no-op if a DB trigger already creates one
-    return _sb.from('profiles').upsert({ id: uid, full_name: name }, { onConflict: 'id' })
+    return _sb.from('profiles').upsert({ id: uid, full_name: name, email: email }, { onConflict: 'id' })
       .then(function(pr) {
         if (pr.error) console.warn('Profile upsert warning:', pr.error.message);
       });
