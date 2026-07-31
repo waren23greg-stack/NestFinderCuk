@@ -643,10 +643,27 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
     <a href="movers.html" style="display:inline-flex;align-items:center;gap:.35rem;color:var(--gold)!important;border:1px solid rgba(184,149,90,.3);padding:.25rem .75rem;border-radius:2px;transition:all .2s;font-size:.72rem;letter-spacing:.06em" onmouseover="this.style.background='rgba(184,149,90,.1)'" onmouseout="this.style.background='transparent'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h5l2 4v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Movers</a> <a href="landlord.html" style="display:inline-flex;align-items:center;gap:.35rem;color:rgba(255,255,255,.7)!important;background:var(--gold);padding:.25rem .75rem;border-radius:2px;transition:all .2s;font-size:.72rem;letter-spacing:.06em;text-decoration:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9.5L12 3l9 6.5V21H3z"/><path d="M9 21v-7h6v7"/></svg>List Property</a>
   </div>
   <div class="nav-right">
-    <span id="nav-hello"></span>
+    <!-- Guest: show Sign In -->
     <a href="login.html" id="nav-in" class="btn btn-ghost btn-sm">Sign In</a>
-    <button id="nav-out" class="btn btn-ghost btn-sm" style="display:none" onclick="doSignOut()">Sign Out</button>
-    <a href="admin.html" id="nav-admin" class="btn btn-ghost btn-sm" style="display:none">Admin</a>
+    <!-- Logged in: user dropdown -->
+    <div id="nav-user-menu" style="display:none;position:relative">
+      <button onclick="toggleUserMenu()" style="display:flex;align-items:center;gap:.5rem;background:none;border:1px solid rgba(184,149,90,.3);padding:.3rem .75rem .3rem .5rem;cursor:pointer;border-radius:2px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(184,149,90,.3)'">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16130E" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span id="nav-hello" style="font-size:.75rem;color:var(--cream);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--muted)"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="user-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1C1810;border:1px solid rgba(184,149,90,.2);min-width:160px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4)">
+        <a href="payments.html" id="nav-payments" style="display:flex;align-items:center;gap:.6rem;padding:.65rem 1rem;font-size:.75rem;color:rgba(255,255,255,.7);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(184,149,90,.08)'" onmouseout="this.style.background=''">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>My Payments</a>
+        <a href="admin.html" id="nav-admin" style="display:none;align-items:center;gap:.6rem;padding:.65rem 1rem;font-size:.75rem;color:var(--gold);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(184,149,90,.08)'" onmouseout="this.style.background=''">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Admin Panel</a>
+        <div style="border-top:1px solid rgba(184,149,90,.12);margin:.25rem 0"></div>
+        <button id="nav-out" onclick="doSignOut()" style="display:flex;align-items:center;gap:.6rem;width:100%;padding:.65rem 1rem;font-size:.75rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;text-align:left;transition:background .15s;font-family:inherit" onmouseover="this.style.background='rgba(192,57,43,.08)'" onmouseout="this.style.background=''">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+      </div>
+    </div>
     <button class="ham" id="ham-btn" onclick="toggleDrawer()" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
@@ -1262,7 +1279,9 @@ async function initAuth(){
   user=sbUser;
   // Show UI immediately from Auth data (no profile fetch needed)
   const name=(sbUser.user_metadata?.full_name||sbUser.email||"Student").split(" ")[0];
-  document.getElementById("nav-hello").textContent="Hi, "+name;
+  document.getElementById("nav-hello").textContent=name;
+  document.getElementById('nav-user-menu').style.display='';
+  document.getElementById('nav-in').style.display='none';
   document.getElementById("nav-in").style.display="none";
   document.getElementById("nav-out").style.display="";
   document.getElementById("drawer-in").style.display="none";
@@ -1302,6 +1321,14 @@ initAuth();
 
 async function doSignOut(){await sb.auth.signOut();user=null;location.reload();}
 
+function toggleUserMenu(){
+  const d=document.getElementById('user-dropdown');
+  d.style.display=d.style.display==='none'?'block':'none';
+}
+document.addEventListener('click',function(e){
+  const m=document.getElementById('nav-user-menu');
+  if(m&&!m.contains(e.target)) document.getElementById('user-dropdown').style.display='none';
+});
 function toggleDrawer(){document.getElementById('drawer').classList.toggle('open');}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');}
 
