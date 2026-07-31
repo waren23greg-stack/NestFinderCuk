@@ -509,7 +509,7 @@ async function loadDashboard() {
     sb.from('listings').select('id,available', {count:'exact'}),
     sb.from('payments').select('id,status,amount,created_at', {count:'exact'}),
     sb.from('profiles').select('id', {count:'exact'}).eq('role','student'),
-    sb.from('moving_requests').select('price,status,created_at').catch(() => ({data:[]}))
+    sb.from('moving_requests').select('price,status,created_at')
   ]);
   const avail = (l.data||[]).filter(x => x.available).length;
   const confirmed = (p.data||[]).filter(x => x.status==='confirmed');
