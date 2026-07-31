@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_TURBOPACK=1 next dev --webpack",
-    "build": "next build",
+    "build": "echo Static site - no build needed",
     "start": "next start",
     "electron": "cross-env NODE_ENV=development electron .",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
