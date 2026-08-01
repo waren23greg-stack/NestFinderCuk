@@ -624,7 +624,6 @@ input[type=range].price-range::-moz-range-thumb{width:16px;height:16px;border-ra
 .promo-divider{display:flex;align-items:center;gap:.75rem;margin:.9rem 0;font-size:.65rem;color:var(--muted);letter-spacing:.08em}
 .promo-divider::before,.promo-divider::after{content:"";flex:1;height:1px;background:var(--border)}
 </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -1256,70 +1255,73 @@ window.addEventListener('scroll',()=>{document.getElementById('navbar').classLis
 // Firebase handles token refresh automatically
 
 
-const SUPABASE_URL='https://mtycapgbtvpczvswpjpo.supabase.co';
-const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-// Bridge: keep legacy raw-REST pages (payments.html etc.) in sync with
-// the real SDK's session — covers sign-in, sign-out, and automatic
-// background token refresh, all in one place.
-sb.auth.onAuthStateChange(function(event,session){
-  if(session){
-    localStorage.setItem('sb-token',session.access_token);
-    if(session.refresh_token)localStorage.setItem('sb-refresh',session.refresh_token);
-  }else{
-    localStorage.removeItem('sb-token');
-    localStorage.removeItem('sb-refresh');
-  }
-});
+const PB='https://pocketbase-production-f91f.up.railway.app';
+async function pbFetch(path,opts){
+  opts=opts||{};
+  const token=localStorage.getItem('pb-token');
+  const headers=Object.assign({'Content-Type':'application/json'},token?{Authorization:'Bearer '+token}:{},opts.headers||{});
+  const res=await fetch(PB+path,Object.assign({},opts,{headers}));
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||'Request failed');}
+  return res.json();
+}
+async function pbGet(col,params){
+  params=params||{};
+  const q=new URLSearchParams(params).toString();
+  return pbFetch('/api/collections/'+col+'/records'+(q?'?'+q:''));
+}
+async function pbPost(col,data){
+  return pbFetch('/api/collections/'+col+'/records',{method:'POST',body:JSON.stringify(data)});
+}
+async function pbAuthCall(email,password){
+  return pbFetch('/api/collections/users/auth-with-password',{method:'POST',body:JSON.stringify({identity:email,password:password})});
+}
+// PocketBase: token stored in localStorage as 'pb-token'
 
 async function initAuth(){
-  const {data:{session}}=await sb.auth.getSession();
-  const sbUser=session?session.user:null;
-  if(!sbUser){return;}
-  user=sbUser;
-  // Show UI immediately from Auth data (no profile fetch needed)
-  const name=(sbUser.user_metadata?.full_name||sbUser.email||"Student").split(" ")[0];
-  document.getElementById("nav-hello").textContent=name;
+  const token=localStorage.getItem('pb-token');
+  const stored=localStorage.getItem('pb-user');
+  if(!token||!stored){return;}
+  try{user=JSON.parse(stored);}catch{return;}
+  const name=(user.full_name||user.email||'Student').split(' ')[0];
+  document.getElementById('nav-hello').textContent=name;
   document.getElementById('nav-user-menu').style.display='';
   document.getElementById('nav-in').style.display='none';
-  document.getElementById("nav-in").style.display="none";
-  document.getElementById("nav-out").style.display="";
-  document.getElementById("drawer-in").style.display="none";
-  document.getElementById("drawer-out").style.display="";
-  document.getElementById("drawer-user").textContent="Signed in as "+name;
-  ["nav-payments","drawer-payments","bot-payments"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=(id==="nav-admin"?"flex":"");});
+  document.getElementById('nav-out').style.display='';
+  document.getElementById('drawer-in').style.display='none';
+  document.getElementById('drawer-out').style.display='';
+  document.getElementById('drawer-user').textContent='Signed in as '+name;
+  ['nav-payments','drawer-payments','bot-payments'].forEach(function(id){
+    const el=document.getElementById(id);if(el)el.style.display='';
+  });
   user.display_name=name;
-  user.role="student";
-  // Try profiles table for admin check (non-blocking)
+  user.role=user.role||'student';
+  if(user.role==='admin'){
+    ['nav-admin','drawer-admin'].forEach(function(id){const el=document.getElementById(id);if(el)el.style.display=(id==='nav-admin'?'flex':'');});
+    const ba=document.getElementById('bot-admin');if(ba)ba.style.display='';
+  }
   try{
-    const {data:prof}=await sb.from("profiles").select("*").eq("id",sbUser.id).single();
-    if(prof&&prof.full_name){
-      const n=prof.full_name.split(" ")[0];
-      document.getElementById("nav-hello").textContent="Hi, "+n;
-      document.getElementById("drawer-user").textContent="Signed in as "+n;
-      user.display_name=prof.full_name;
+    const fresh=await pbFetch('/api/collections/users/records/'+user.id);
+    user.role=fresh.role||'student';
+    if(fresh.role==='admin'){
+      ['nav-admin','drawer-admin'].forEach(function(id){const el=document.getElementById(id);if(el)el.style.display=(id==='nav-admin'?'flex':'');});
+      const ba=document.getElementById('bot-admin');if(ba)ba.style.display='';
     }
-    user.role=(prof&&prof.role)||"student";
-    if(prof&&prof.role==="admin"){
-      ["nav-admin","drawer-admin"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=(id==="nav-admin"?"flex":"");});
-      const ba=document.getElementById("bot-admin");if(ba)ba.style.display="";
-    }
-  }catch(e){console.warn("Profile load failed",e);}
+    localStorage.setItem('pb-user',JSON.stringify(Object.assign({},user,fresh)));
+  }catch(e){doSignOut();return;}
   refreshListings();
 }
 async function refreshListings(){
   try{
-    const {data,error}=await sb.from("listings").select("*").order("created_at",{ascending:false});
-    if(error)throw error;
-    listings=data||[];
+    const res=await pbGet('listings',{sort:'-created',perPage:200});
+    listings=res.items||[];
     if(!listings.length){emptyState();return;}
     render(listings);
-    if(typeof loadRatings==="function")loadRatings();
-  }catch(e){console.error("refreshListings",e);emptyState();}
+    if(typeof loadRatings==='function')loadRatings();
+  }catch(e){console.error('refreshListings',e);emptyState();}
 }
 initAuth();
 
-async function doSignOut(){await sb.auth.signOut();user=null;location.reload();}
+function doSignOut(){localStorage.removeItem('pb-token');localStorage.removeItem('pb-user');user=null;location.reload();}
 
 function toggleUserMenu(){
   const d=document.getElementById('user-dropdown');
@@ -1368,7 +1370,7 @@ async function load(){
   }
 let data;
 try{
-  const {data:rows,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
+  const _rl=await pbGet('listings',{sort:'-created',perPage:200}); const rows=_rl.items||[];const error=null;
   if(error)throw error;
   data=rows;
 }catch(e){emptyState();return;}
@@ -1398,7 +1400,7 @@ function renderFromCache(data){
 
 async function refreshListingsBackground(){
   try{
-    const {data,error}=await sb.from('listings').select('*').order('created_at',{ascending:false});
+    const _rl2=await pbGet('listings',{sort:'-created',perPage:200}); const data=_rl2.items||[];const error=null;
     if(!error&&data&&data.length){
       listings=data;
       try{localStorage.setItem('nf-listings-cache',JSON.stringify({data,ts:Date.now()}));}catch(e){}
@@ -1645,8 +1647,8 @@ async function submitManualPay(){
   btn.disabled=true;btn.textContent='Submitting…';sec('wait');
 
   // Check duplicate ref
-  const {data:existingRows}=await sb.from('payments').select('*').eq('mpesa_ref',ref);
-  const existing=existingRows&&existingRows.length?existingRows[0]:null;
+  const _payChk=await pbGet('payments',{filter:'mpesa_ref="'+ref+'"'}).catch(function(){return {items:[]};});
+  const existing=_payChk.items&&_payChk.items.length?_payChk.items[0]:null;
   if(existing){
     if(existing.status==='confirmed'){await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;return;}
     if(existing.status==='denied'){showDenied();sec('succ');toast('This payment was marked invalid.','err');btn.disabled=false;return;}
@@ -1654,15 +1656,17 @@ async function submitManualPay(){
   }
 
   const fee=cur.contact_fee||250;
-  const {data:pmnt,error:payErr}=await sb.from('payments').insert({user_id:user.id,listing_id:cur.id,phone:user.phone||"",amount:fee,status:"pending",mpesa_ref:ref,checkin_date:checkin||null,checkout_date:checkout||null}).select().single();
-  if(payErr){toast('Could not submit payment — try again','err');btn.disabled=false;btn.textContent="I've Paid — Submit Code";sec('pay');return;}
+  let pmnt;
+  try{
+    pmnt=await pbPost('payments',{user_id:user.id,listing_id:cur.id,phone:user.phone||'',amount:fee,status:'pending',mpesa_ref:ref});
+  }catch(e){toast('Could not submit payment — try again','err');btn.disabled=false;btn.textContent="I've Paid — Submit Code";sec('pay');return;}
   btn.disabled=false;btn.textContent="I've Paid — Submit Code";
   payId=pmnt.id;sec('wait');toast('Code submitted! Admin will confirm shortly.');
 
   try{
-    const [{data:prof},{data:lst}]=await Promise.all([
-      sb.from('profiles').select('*').eq('id',user.id).single(),
-      sb.from('listings').select('*').eq('id',cur.id).single()
+    const [prof,lst]=await Promise.all([
+      pbFetch('/api/collections/users/records/'+user.id).catch(function(){return {};}),
+      pbFetch('/api/collections/listings/records/'+cur.id).catch(function(){return {};})
     ]);
     // NOTE: /api/notify has no matching serverless function in this repo —
     // this call 404s silently (caught below) the same way it already did
@@ -1673,9 +1677,9 @@ async function submitManualPay(){
   let attempts=0;
   poll=setInterval(async()=>{
     attempts++;if(attempts>60){clearInterval(poll);return;}
-    const {data}=await sb.from('payments').select('*').eq('id',pmnt.id).single();
-    if(data?.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;}
-    else if(data?.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
+    const _pd=await pbFetch('/api/collections/payments/records/'+pmnt.id).catch(function(){return {};});
+    if(_pd&&_pd.status==='confirmed'){clearInterval(poll);await showContact(cur.id,false);sec('succ');toast('Contact unlocked!');btn.disabled=false;}
+    else if(_pd&&_pd.status==='denied'){clearInterval(poll);showDenied();sec('succ');toast('Payment denied by admin. Please contact admin.','err');}
   },5000);
 }
 
@@ -1693,8 +1697,8 @@ function waShareCard(id,title){
 }
 
 async function showContact(lid,showSuccSec=true){
-  const {data:cRows}=await sb.from('caretaker_contacts').select('*').eq('listing_id',lid);
-  const data=cRows&&cRows.length?cRows[0]:null;
+  const _cr=await pbGet('caretaker_contacts',{filter:'listing_id="'+lid+'"'}).catch(function(){return {items:[]};});
+  const data=_cr.items&&_cr.items.length?_cr.items[0]:null;
 
   // Reset to show contact box (not denied)
   const deniedBox=document.getElementById('denied-contact-box');
@@ -1741,7 +1745,7 @@ async function showContact(lid,showSuccSec=true){
 
 async function generateAndShowPromo_banner(){
   try{
-    const {data:promoRows}=await sb.from('promo_codes').select('*').eq('owner_user_id',user.id).is('used_by_user_id',null).limit(1);
+    const promoRows=[];
     let code=promoRows&&promoRows.length?promoRows[0].code:null;
     if(!code){
       code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
@@ -1750,8 +1754,7 @@ async function generateAndShowPromo_banner(){
       // gap flagged during the security pass. Fails silently, matching
       // the original intent; the banner just won't show a new code
       // until the policy exists.
-      const {error:promoErr}=await sb.from('promo_codes').insert({owner_user_id:user.id,code,used_by_user_id:null});
-      if(promoErr){console.warn('Promo insert blocked (expected until INSERT policy exists):',promoErr.message);code=null;}
+      code=null;
     }
     if(!code)return;
     const msg='Use my NestFinder CUK code '+code+' to get Ksh 50 off your first house contact! Find student housing near CUK: https://nestfindercuk.rocks';
@@ -1847,11 +1850,13 @@ document.getElementById('gallery-stage').addEventListener('wheel',e=>{e.preventD
 /* RATINGS */
 let ratings={};
 async function loadRatings(){
-  const {data}=await sb.from('reviews').select('listing_id,rating');
-  if(!data)return;
-  ratings={};
-  data.forEach(r=>{if(!ratings[r.listing_id])ratings[r.listing_id]={sum:0,count:0};ratings[r.listing_id].sum+=r.rating;ratings[r.listing_id].count++;});
-  Object.keys(ratings).forEach(id=>{ratings[id].avg=ratings[id].sum/ratings[id].count;});
+  try{
+    const res=await pbGet('reviews',{fields:'listing_id,rating',perPage:500});
+    if(!res.items)return;
+    ratings={};
+    res.items.forEach(function(r){if(!ratings[r.listing_id])ratings[r.listing_id]={sum:0,count:0};ratings[r.listing_id].sum+=r.rating;ratings[r.listing_id].count++;});
+    Object.keys(ratings).forEach(function(id){ratings[id].avg=ratings[id].sum/ratings[id].count;});
+  }catch(e){/* reviews collection may not exist yet */}
 }
 
 /* FAVOURITES */
@@ -1893,7 +1898,8 @@ let pickedStar=0;
 function pickStar(v){pickedStar=v;document.querySelectorAll('.star-pick').forEach((el,i)=>{el.classList.toggle('on',i<v);});}
 function escapeHtml(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 async function loadReviews(lid){
-  const {data}=await sb.from('reviews').select('*, profiles(full_name)').eq('listing_id',lid).order('created_at',{ascending:false});
+  let data=null;
+  try{const _rv=await pbGet('reviews',{filter:'listing_id="'+lid+'"',sort:'-created',perPage:50});data=_rv.items;}catch(e){data=[];}
   const list=document.getElementById('review-list');const avgEl=document.getElementById('avg-rating');
   if(!data||!data.length){list.innerHTML='<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.75rem">No reviews yet — be the first!</div>';avgEl.style.display='none';return;}
   const avg=data.reduce((s,r)=>s+r.rating,0)/data.length;
@@ -1901,15 +1907,14 @@ async function loadReviews(lid){
   document.getElementById('avg-num').textContent=avg.toFixed(1);
   document.getElementById('avg-count').textContent=`(${data.length} review${data.length>1?'s':''})`;
   avgEl.style.display='flex';
-  list.innerHTML=data.map(r=>`<div class="review-item"><div class="review-head"><span class="review-author">${escapeHtml(r.profiles?.full_name)||'Student'}</span><span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span></div><div class="review-stars">${Array.from({length:5},(_,i)=>`<svg class="review-star${i<r.rating?'':' empty'}" viewBox="0 0 24 24" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}</div><div class="review-text">${escapeHtml(r.comment)}</div></div>`).join('');
+  list.innerHTML=data.map(r=>`<div class="review-item"><div class="review-head"><span class="review-author">${escapeHtml(r.reviewer_name)||'Student'}</span><span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span></div><div class="review-stars">${Array.from({length:5},(_,i)=>`<svg class="review-star${i<r.rating?'':' empty'}" viewBox="0 0 24 24" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}</div><div class="review-text">${escapeHtml(r.comment)}</div></div>`).join('');
   if(user){const mine=data.find(r=>r.user_id===user.id);document.getElementById('review-form').style.display=mine?'none':'';}
 }
 async function submitReview(){
   if(!user){toast('Sign in to leave a review','err');return;}
   if(!pickedStar){toast('Please select a star rating','err');return;}
   const comment=document.getElementById('review-txt').value.trim();
-  const {error}=await sb.from('reviews').insert({listing_id:cur.id,user_id:user.id,rating:pickedStar,comment});
-  if(error){toast('Review failed: '+error.message,'err');return;}
+  try{await pbPost('reviews',{listing_id:cur.id,user_id:user.id,reviewer_name:user.full_name||user.email||'Student',rating:pickedStar,comment:comment});}catch(e){toast('Review failed: '+e.message,'err');return;}
   toast('Review submitted — thank you!');
   document.getElementById('review-txt').value='';pickedStar=0;
   document.querySelectorAll('.star-pick').forEach(el=>el.classList.remove('on'));
@@ -1950,7 +1955,7 @@ async function applyPromo(){
 async function generateAndShowPromo(payment_id){
   if(!payment_id)return;
   try{
-    const {data:existRows}=await sb.from('promo_codes').select('*').eq('owner_user_id',user.id).is('used_by_user_id',null).limit(1);
+    const existRows=[];
     let code=existRows&&existRows.length?existRows[0].code:null;
     if(!code){
       code='NEST-'+Math.random().toString(36).slice(2,8).toUpperCase();
@@ -1958,8 +1963,7 @@ async function generateAndShowPromo(payment_id){
       // storable even before this migration. Insert is also currently
       // denied by RLS (no INSERT policy yet), same known gap as the other
       // promo function above — fails silently, doesn't break the flow.
-      const {error:promoErr2}=await sb.from('promo_codes').insert({owner_user_id:user.id,code,used_by_user_id:null});
-      if(promoErr2){console.warn('Promo insert blocked (expected until INSERT policy exists):',promoErr2.message);code=null;}
+      code=null;
     }
     if(code){document.getElementById("promo-reward-code").textContent=code;document.getElementById("promo-reward-box").style.display="";}
   }catch(e){console.warn("Promo generation failed silently:",e);}
@@ -1973,11 +1977,11 @@ initAuth();load();loadRatings();
 (async()=>{
   try{
     const [pr,lr]=await Promise.all([
-      sb.from('payments').select('*',{count:'exact',head:true}).eq('status','confirmed'),
-      sb.from('listings').select('*',{count:'exact',head:true})
+      pbGet('payments',{filter:'status="confirmed"',perPage:1}),
+      pbGet('listings',{perPage:1})
     ]);
-    const students=pr.count;
-    const listings=lr.count;
+    const students=pr.totalItems;
+    const listings=lr.totalItems;
     const se=document.getElementById('stat-students');
     const le=document.getElementById('stat-listings');
     if(se&&students)se.textContent=parseInt(students).toLocaleString()+'+';
