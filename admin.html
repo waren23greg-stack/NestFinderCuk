@@ -211,7 +211,6 @@ tr:hover td{background:var(--linen);}
 .ham-btn:hover{border-color:var(--gold);}
 .ham-btn svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.8;}
 </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -435,26 +434,44 @@ tr:hover td{background:var(--linen);}
 
 <script>
 /* ── Supabase client ── */
-const sb = supabase.createClient('https://mtycapgbtvpczvswpjpo.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM');
+const PB='https://pocketbase-production-f91f.up.railway.app';
+async function pbFetch(path,opts){
+  opts=opts||{};
+  const token=localStorage.getItem('pb-token');
+  const headers=Object.assign({'Content-Type':'application/json'},token?{Authorization:'Bearer '+token}:{},opts.headers||{});
+  const res=await fetch(PB+path,Object.assign({},opts,{headers}));
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||'Request failed');}
+  return res.json();
+}
+async function pbGet(col,params){
+  params=params||{};
+  const q=new URLSearchParams(params).toString();
+  return pbFetch('/api/collections/'+col+'/records'+(q?'?'+q:''));
+}
+async function pbPost(col,data){return pbFetch('/api/collections/'+col+'/records',{method:'POST',body:JSON.stringify(data)});}
+async function pbPatch(col,id,data){return pbFetch('/api/collections/'+col+'/records/'+id,{method:'PATCH',body:JSON.stringify(data)});}
+async function pbDelete(col,id){return pbFetch('/api/collections/'+col+'/records/'+id,{method:'DELETE'});}
 
 let pendingPhotos = [], existingPhotos = [];
 
 /* ── AUTH GATE ── */
 async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) { window.location.href = 'login.html'; return; }
-  try {
-    const { data: profile } = await sb.from('profiles').select('role,full_name').eq('id', session.user.id).single();
+  const token=localStorage.getItem('pb-token');
+  const stored=localStorage.getItem('pb-user');
+  if(!token||!stored){window.location.href='login.html';return;}
+  const pbUser=JSON.parse(stored);
+  try{
+    const profile=await pbFetch('/api/collections/users/records/'+pbUser.id);
     document.getElementById('loading').classList.add('hide');
-    if (!profile || profile.role !== 'admin') { document.getElementById('denied').classList.add('show'); return; }
-    document.getElementById('adminName').textContent = (profile.full_name || 'Admin').split(' ')[0];
+    if(!profile||profile.role!=='admin'){document.getElementById('denied').classList.add('show');return;}
+    document.getElementById('adminName').textContent=(profile.full_name||'Admin').split(' ')[0];
     loadDashboard();
-  } catch(e) { console.error(e); window.location.href = 'login.html'; }
+  }catch(e){console.error(e);window.location.href='login.html';}
 }
 
 async function doSignOut() {
-  await sb.auth.signOut();
-  window.location.href = 'login.html';
+  localStorage.removeItem('pb-token');localStorage.removeItem('pb-user');
+  window.location.href='login.html';
 }
 
 /* ── SIDEBAR (mobile) ── */
@@ -506,24 +523,31 @@ function toast(msg, err=false) {
 /* ── DASHBOARD ── */
 async function loadDashboard() {
   const [l, p, u, mv] = await Promise.all([
-    sb.from('listings').select('id,available', {count:'exact'}),
-    sb.from('payments').select('id,status,amount,created_at', {count:'exact'}),
-    sb.from('profiles').select('id', {count:'exact'}).eq('role','student'),
-    sb.from('moving_requests').select('price,status,created_at')
+    pbGet('listings',{perPage:200}),
+    pbGet('payments',{perPage:200}),
+    pbGet('users',{filter:'role="student"',perPage:1}),
+    pbGet('moving_requests',{perPage:200}).catch(function(){return {items:[]};})
   ]);
-  const avail = (l.data||[]).filter(x => x.available).length;
-  const confirmed = (p.data||[]).filter(x => x.status==='confirmed');
+  const avail = (l.items||[]).filter(x => x.available).length;
+  const confirmed = (p.items||[]).filter(x => x.status==='confirmed');
   const listingsRev = confirmed.reduce((s,x) => s+(x.amount||250), 0);
-  const moverData = mv.data||[];
+  const moverData = mv.items||[];
   const moverConfirmed = moverData.filter(x => x.status==='confirmed'||x.status==='done');
   const moversRev = moverConfirmed.reduce((s,x) => s+(parseInt(x.price)||0), 0);
-  document.getElementById('s-listings').textContent = l.count ?? 0;
+  document.getElementById('s-listings').textContent = l.totalItems ?? 0;
   document.getElementById('s-avail').textContent = avail;
-  document.getElementById('s-students').textContent = u.count ?? 0;
+  document.getElementById('s-students').textContent = u.totalItems ?? 0;
   document.getElementById('s-revenue').textContent = 'Ksh '+(listingsRev+moversRev).toLocaleString();
   if (document.getElementById('s-movers')) document.getElementById('s-movers').textContent = moverConfirmed.length;
-  buildChart(confirmed, moverConfirmed);
-  const {data:rp} = await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false}).limit(8);
+  buildChart(confirmed,moverConfirmed);
+  const _rp=await pbGet('payments',{sort:'-created',perPage:8}).catch(function(){return{items:[]};});
+  const rp=_rp.items||[];
+  // Enrich with user/listing names
+  const _allU=await pbGet('users',{perPage:200}).catch(function(){return{items:[]};});
+  const _allL=await pbGet('listings',{perPage:200}).catch(function(){return{items:[]};});
+  const _uMap={}; (_allU.items||[]).forEach(function(u){_uMap[u.id]=u;});
+  const _lMap={}; (_allL.items||[]).forEach(function(l){_lMap[l.id]=l;});
+  rp.forEach(function(p){p.profiles={full_name:(_uMap[p.user_id]||{}).full_name||p.user_id};p.listings={title:(_lMap[p.listing_id]||{}).title||p.listing_id};});
   const rb = document.getElementById('recentBody');
   if (!rp?.length) { rb.innerHTML='<tr class="empty-row"><td colspan="6">No payments yet.</td></tr>'; return; }
   rb.innerHTML = rp.map(p => `<tr>
@@ -558,7 +582,8 @@ function buildChart(confirmed, moverConfirmed) {
 
 /* ── LISTINGS ── */
 async function loadListings() {
-  const {data} = await sb.from('listings').select('*').order('created_at',{ascending:false});
+  const _lr=await pbGet('listings',{sort:'-created',perPage:200});
+  const data=_lr.items||[];
   document.getElementById('listingCount').textContent = (data?.length||0)+' total listings';
   const tb = document.getElementById('listingsBody');
   if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="7">No listings yet. Add your first one.</td></tr>'; return; }
@@ -577,7 +602,7 @@ async function loadListings() {
 }
 
 async function toggleAvail(id, newVal, label) {
-  await sb.from('listings').update({available:newVal}).eq('id',id);
+  await pbPatch('listings',id,{available:newVal});
   label.querySelector('.toggle-track').classList.toggle('on',newVal);
   label.querySelector('span').textContent = newVal ? 'Available' : 'Taken';
   toast(newVal ? 'Marked as available' : 'Marked as taken');
@@ -585,15 +610,22 @@ async function toggleAvail(id, newVal, label) {
 
 async function delListing(id, title) {
   if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-  await sb.from('payments').delete().eq('listing_id',id);
-  const {error} = await sb.from('listings').delete().eq('id',id);
+  await pbFetch('/api/collections/payments/records?filter=listing_id="'+id+'"',{method:'GET'}).catch(function(){});
+  let error=null;
+  try{await pbDelete('listings',id);}catch(e){error=e;}
   if (error) { toast('Delete failed: '+error.message, true); return; }
   toast('Listing deleted'); loadListings();
 }
 
 /* ── PAYMENTS ── */
 async function loadPayments() {
-  const {data} = await sb.from('payments').select('*,profiles(full_name),listings(title)').order('created_at',{ascending:false});
+  const _pRes=await pbGet('payments',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const _pAllU=await pbGet('users',{perPage:200}).catch(function(){return{items:[]};});
+  const _pAllL=await pbGet('listings',{perPage:200}).catch(function(){return{items:[]};});
+  const _puMap={}; (_pAllU.items||[]).forEach(function(u){_puMap[u.id]=u;});
+  const _plMap={}; (_pAllL.items||[]).forEach(function(l){_plMap[l.id]=l;});
+  const data=(_pRes.items||[]);
+  data.forEach(function(p){p.profiles={full_name:(_puMap[p.user_id]||{}).full_name||'—'};p.listings={title:(_plMap[p.listing_id]||{}).title||'—'};});
   const tb = document.getElementById('paymentsBody');
   if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="8">No payments yet.</td></tr>'; return; }
   tb.innerHTML = data.map(p => `<tr>
@@ -615,18 +647,18 @@ async function loadPayments() {
 }
 
 async function confirmPay(id) {
-  await sb.from('payments').update({status:'confirmed'}).eq('id',id);
+  await pbPatch('payments',id,{status:'confirmed'});
   toast('Payment confirmed — contact access granted ✓'); loadPayments();
 }
 async function denyPay(id, studentName, listingTitle) {
   const reason = studentName ? `Mark payment by ${studentName} for "${listingTitle}" as FAKE and revoke their contact access?` : 'Mark this payment as fake and revoke contact access?';
   if (!confirm(reason+'\n\nThis will prevent the student from viewing caretaker contacts.')) return;
-  await sb.from('payments').update({status:'denied'}).eq('id',id);
+  await pbPatch('payments',id,{status:'denied'});
   toast('Payment denied — contact access revoked', true); loadPayments();
 }
 async function restorePay(id) {
   if (!confirm('Restore this payment and re-grant contact access?')) return;
-  await sb.from('payments').update({status:'confirmed'}).eq('id',id);
+  await pbPatch('payments',id,{status:'confirmed'});
   toast('Payment restored — contact access re-granted ✓'); loadPayments();
 }
 
@@ -642,7 +674,8 @@ function exportCSV() {
 
 /* ── STUDENTS ── */
 async function loadStudents() {
-  const {data} = await sb.from('profiles').select('*').order('created_at',{ascending:false});
+  const _sRes=await pbGet('users',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const data=_sRes.items||[];
   const tb = document.getElementById('studentsBody');
   if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="6">No students yet.</td></tr>'; return; }
   tb.innerHTML = data.map(u => `<tr>
@@ -660,27 +693,32 @@ async function loadStudents() {
 }
 async function makeAdmin(id) {
   if (!confirm('Grant admin access to this user?')) return;
-  await sb.from('profiles').update({role:'admin'}).eq('id',id);
+  await pbPatch('users',id,{role:'admin'});
   toast('User is now an admin'); loadStudents();
 }
 async function removeStudent(id, name) {
   if (!confirm(`Remove ${name} from the platform? They will lose access but can re-register.`)) return;
-  const {error} = await sb.from('profiles').delete().eq('id',id);
-  if (error) { toast('Remove failed: '+error.message, true); return; }
+  let error=null;
+  try{await pbDelete('users',id);}catch(e){error=e;}
+  if(error){toast('Remove failed: '+error.message,true);return;}
   toast(name+' removed'); loadStudents();
 }
 async function resetStudentPassword(email) {
   if (!confirm(`Send password reset email to ${email}?`)) return;
   const r = await fetch('/api/auth/reset-request', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({email})
+    body: JSON.stringify({email:email})
   });
   toast(r.ok ? 'Reset email sent to '+email : 'Failed to send reset email', !r.ok);
 }
 
 /* ── REPORTS ── */
 async function loadReports() {
-  const {data} = await sb.from('reports').select('*,listings(title)').order('created_at',{ascending:false});
+  const _repRes=await pbGet('reports',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const _repL=await pbGet('listings',{perPage:200}).catch(function(){return{items:[]};});
+  const _repLMap={}; (_repL.items||[]).forEach(function(l){_repLMap[l.id]=l;});
+  const data=(_repRes.items||[]);
+  data.forEach(function(r){r.listings={title:(_repLMap[r.listing_id]||{}).title||r.listing_title||'—'};});
   const tb = document.getElementById('reportsBody');
   if (!data?.length) { tb.innerHTML='<tr class="empty-row"><td colspan="6">No reports yet.</td></tr>'; return; }
   tb.innerHTML = data.map(r => `<tr>
@@ -697,7 +735,7 @@ async function loadReports() {
   </tr>`).join('');
 }
 async function updateReport(id, status) {
-  await sb.from('reports').update({status}).eq('id',id);
+  await pbPatch('reports',id,{status:status});
   toast(status==='resolved'?'Report resolved ✓':'Marked as reviewed'); loadReports();
 }
 
@@ -706,7 +744,9 @@ async function loadMovers() {
   const tbody = document.getElementById('movers-tbody');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">Loading...</td></tr>';
-  const {data, error} = await sb.from('moving_requests').select('*').order('created_at',{ascending:false});
+  const _mvRes=await pbGet('moving_requests',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const data=_mvRes.items||[];
+  const error=null;
   if (error || !data?.length) {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:2rem">No bookings yet</td></tr>';
     return;
@@ -728,7 +768,7 @@ async function loadMovers() {
   </tr>`).join('');
 }
 async function updateMover(id, status) {
-  await sb.from('moving_requests').update({status}).eq('id',id);
+  await pbPatch('moving_requests',id,{status:status});
   toast(status==='confirmed'?'Booking confirmed':status==='done'?'Marked as done':'Booking cancelled');
   loadMovers();
 }
@@ -753,9 +793,11 @@ function openModal() {
 }
 
 async function editListing(id) {
-  const {data:h} = await sb.from('listings').select('*').eq('id',id).single();
+  let h=null;
+  try{h=await pbFetch('/api/collections/listings/records/'+id);}catch(e){}
   if (!h) { toast('Could not load listing',true); return; }
-  const {data:ctList} = await sb.from('caretaker_contacts').select('*').eq('listing_id',id).limit(1);
+  const _ctRes=await pbGet('caretaker_contacts',{filter:'listing_id="'+id+'"',perPage:1}).catch(function(){return{items:[]};});
+  const ctList=_ctRes.items||[];
   const ct = ctList && ctList.length ? ctList[0] : null;
   document.getElementById('editId').value=id;
   document.getElementById('fTitle').value=h.title||'';
@@ -848,20 +890,20 @@ async function saveListing() {
   let lid=editId;
 
   if(editId){
-    const {error:ue}=await sb.from('listings').update(payload).eq('id',editId);
-    if(ue){showFErr('Update failed: '+ue.message);resetSave();return;}
+    try{await pbPatch('listings',editId,payload);}catch(ue){showFErr('Update failed: '+ue.message);resetSave();return;}
   } else {
-    const {data:nd,error:ie}=await sb.from('listings').insert(payload).select().single();
-    if(ie){showFErr('Insert failed: '+ie.message);resetSave();return;}
+    let nd=null;
+    try{nd=await pbPost('listings',payload);}catch(ie){showFErr('Insert failed: '+ie.message);resetSave();return;}
     lid=nd.id;
   }
 
   // Caretaker upsert
-  const {data:crList}=await sb.from('caretaker_contacts').select('id').eq('listing_id',lid).limit(1);
-  if(crList&&crList.length){
-    await sb.from('caretaker_contacts').update({caretaker_name:ctName,phone:ctPhone}).eq('id',crList[0].id);
+  const _ctCheck=await pbGet('caretaker_contacts',{filter:'listing_id="'+lid+'"',perPage:1}).catch(function(){return{items:[]};});
+  const _ctExist=_ctCheck.items&&_ctCheck.items.length?_ctCheck.items[0]:null;
+  if(_ctExist){
+    await pbPatch('caretaker_contacts',_ctExist.id,{caretaker_name:ctName,phone:ctPhone});
   } else {
-    await sb.from('caretaker_contacts').insert({listing_id:lid,caretaker_name:ctName,phone:ctPhone});
+    await pbPost('caretaker_contacts',{listing_id:lid,caretaker_name:ctName,phone:ctPhone});
   }
 
   resetSave();
@@ -938,7 +980,9 @@ function initAdminMap(lat,lng) {
 
 /* ── SUBMISSIONS ── */
 async function loadSubmissions() {
-  const {data:subs,error}=await sb.from('listing_submissions').select('*').order('created_at',{ascending:false});
+  const _subRes=await pbGet('listing_submissions',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const subs=_subRes.items||[];
+  const error=null;
   const list=document.getElementById('submissions-list');
   const empty=document.getElementById('submissions-empty');
   if(error||!subs?.length){empty.style.display='block';list.innerHTML='';return;}
@@ -992,19 +1036,25 @@ async function loadSubmissions() {
 
 async function approveSubmission(id, waUrl) {
   const fee=parseInt(document.getElementById('fee-'+id)?.value||250);
-  const {error}=await sb.from('listing_submissions').update({status:'approved',contact_fee:fee}).eq('id',id);
+  let error=null;
+  try{await pbPatch('listing_submissions',id,{status:'approved',contact_fee:fee});}catch(e){error=e;}
   if(!error){window.open(waUrl,'_blank');setTimeout(loadSubmissions,1000);}
   else{toast('Update failed: '+error.message,true);}
 }
 async function rejectSubmission(id) {
   if(!confirm('Reject this submission?')) return;
-  await sb.from('listing_submissions').update({status:'rejected'}).eq('id',id);
+  await pbPatch('listing_submissions',id,{status:'rejected'}).catch(function(){});
   setTimeout(loadSubmissions,600);
 }
 
 /* ── REFERRALS ── */
 async function loadReferrals() {
-  const {data:rows,error}=await sb.from('referral_earnings').select('*,profiles(full_name)').order('created_at',{ascending:false});
+  const _refRes=await pbGet('referral_earnings',{sort:'-created',perPage:200}).catch(function(){return{items:[]};});
+  const _refU=await pbGet('users',{perPage:200}).catch(function(){return{items:[]};});
+  const _refUMap={}; (_refU.items||[]).forEach(function(u){_refUMap[u.id]=u;});
+  const rows=(_refRes.items||[]);
+  rows.forEach(function(r){r.profiles={full_name:(_refUMap[r.user_id]||{}).full_name||'Student'};});
+  const error=null;
   const stats=document.getElementById('ref-stats');
   const list=document.getElementById('ref-list');
   const empty=document.getElementById('ref-empty');
@@ -1042,7 +1092,7 @@ async function loadReferrals() {
   }).join('');
 }
 async function markRefPaid(id) {
-  await sb.from('referral_earnings').update({status:'paid'}).eq('id',id);
+  await pbPatch('referral_earnings',id,{status:'paid'}).catch(function(){});
   loadReferrals();
 }
 
