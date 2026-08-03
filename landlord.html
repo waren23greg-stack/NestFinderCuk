@@ -337,7 +337,7 @@ async function submitListing(){
   btn.disabled=true;btn.textContent='Submitting...';
   let photoUrls=[];
   if(photoFiles.length){toast('Uploading photos...');for(const f of photoFiles){const url=await uploadPhoto(f);if(url)photoUrls.push(url);}}
-  const payload={owner_name:name,owner_phone:phone,owner_email:email||null,owner_role:role,title,room_type:type,price:parseInt(price),location,landmark:landmark||null,description:desc,vacants:parseInt(document.getElementById('f-vacants').value||1),contact_number:document.getElementById('f-contact').value.trim(),amenities,photos:photoUrls,notes:notes||null,status:'pending',night_price:type==='airbnb'?parseInt(document.getElementById('f-night-price').value||0):null,min_nights:type==='airbnb'?parseInt(document.getElementById('f-min-nights').value||1):null,created_at:new Date().toISOString()};
+  const payload={owner_name:name,owner_phone:phone,owner_email:email||null,owner_role:role,title,room_type:type,price:parseInt(price),location,landmark:landmark||null,description:desc,vacants:parseInt(document.getElementById('f-vacants').value||1),contact_number:document.getElementById('f-contact').value.trim(),amenities,photos:photoUrls,notes:notes||null,status:'pending',night_price:type==='airbnb'?parseInt(document.getElementById('f-night-price').value||0):null,min_nights:type==='airbnb'?parseInt(document.getElementById('f-min-nights').value||1):null};
   try{
     const r=await fetch(SB_URL+'/rest/v1/listing_submissions',{method:'POST',headers:Object.assign({},SBH,{'Prefer':'return=minimal'}),body:JSON.stringify(payload)});
     if(!r.ok){const err=await r.text();throw new Error(err);}
