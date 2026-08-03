@@ -549,8 +549,8 @@ function cardHTML(p,contacts){
   const h=p.listings||{};
   const photo=(h.photos||[])[0];
   const ct=contacts[p.listing_id];
-  const date=new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'long',year:'numeric'});
-  const shortDate=new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+  const date=new Date(p.created).toLocaleDateString('en-KE',{day:'numeric',month:'long',year:'numeric'});
+  const shortDate=new Date(p.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
 
   const thumbHTML=photo
     ?`<img src="${photo}" alt="${h.title||''}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
@@ -729,7 +729,7 @@ async function loadReferrals(){
       <div style="margin-top:1rem">
         <div style="font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;color:#B8955A;margin-bottom:.75rem">Earnings History</div>
         ${earnings.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid rgba(184,149,90,.08);font-size:.75rem">
-          <span style="color:#4A4438">${new Date(e.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</span>
+          <span style="color:#4A4438">${new Date(e.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</span>
           <span style="color:#1D9E75;font-weight:500">+Ksh ${e.amount||50}</span>
           <span style="font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:${e.status==='paid'?'#1D9E75':'#B8955A'}">${e.status}</span>
         </div>`).join('')}

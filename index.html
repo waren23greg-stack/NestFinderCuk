@@ -1907,7 +1907,7 @@ async function loadReviews(lid){
   document.getElementById('avg-num').textContent=avg.toFixed(1);
   document.getElementById('avg-count').textContent=`(${data.length} review${data.length>1?'s':''})`;
   avgEl.style.display='flex';
-  list.innerHTML=data.map(r=>`<div class="review-item"><div class="review-head"><span class="review-author">${escapeHtml(r.reviewer_name)||'Student'}</span><span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span></div><div class="review-stars">${Array.from({length:5},(_,i)=>`<svg class="review-star${i<r.rating?'':' empty'}" viewBox="0 0 24 24" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}</div><div class="review-text">${escapeHtml(r.comment)}</div></div>`).join('');
+  list.innerHTML=data.map(r=>`<div class="review-item"><div class="review-head"><span class="review-author">${escapeHtml(r.reviewer_name)||'Student'}</span><span class="review-date">${new Date(r.created).toLocaleDateString()}</span></div><div class="review-stars">${Array.from({length:5},(_,i)=>`<svg class="review-star${i<r.rating?'':' empty'}" viewBox="0 0 24 24" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`).join('')}</div><div class="review-text">${escapeHtml(r.comment)}</div></div>`).join('');
   if(user){const mine=data.find(r=>r.user_id===user.id);document.getElementById('review-form').style.display=mine?'none':'';}
 }
 async function submitReview(){

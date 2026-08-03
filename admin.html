@@ -556,7 +556,7 @@ async function loadDashboard() {
     <td>Ksh ${(p.amount||250).toLocaleString()}</td>
     <td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td>
     <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='denied'?'denied':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
-    <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+    <td style="font-size:.75rem;">${new Date(p.created).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
   </tr>`).join('');
 }
 
@@ -565,8 +565,8 @@ function buildChart(confirmed, moverConfirmed) {
   const days = []; for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d);}
   const totals = days.map(d => {
     const ds = d.toDateString();
-    const lRev = confirmed.filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(p.amount||250),0);
-    const mRev = (moverConfirmed||[]).filter(p=>new Date(p.created_at).toDateString()===ds).reduce((s,p)=>s+(parseInt(p.price)||0),0);
+    const lRev = confirmed.filter(p=>new Date(p.created).toDateString()===ds).reduce((s,p)=>s+(p.amount||250),0);
+    const mRev = (moverConfirmed||[]).filter(p=>new Date(p.created).toDateString()===ds).reduce((s,p)=>s+(parseInt(p.price)||0),0);
     return {total:lRev+mRev,listings:lRev,movers:mRev};
   });
   const max = Math.max(...totals.map(t=>t.total), 250);
@@ -635,7 +635,7 @@ async function loadPayments() {
     <td>Ksh ${(p.amount||250).toLocaleString()}</td>
     <td style="font-family:monospace;font-size:.72rem;">${p.mpesa_ref||'—'}</td>
     <td><span class="badge badge-${p.status==='confirmed'?'ok':p.status==='denied'?'denied':p.status==='pending'?'pending':'failed'}">${p.status}</span></td>
-    <td style="font-size:.75rem;">${new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+    <td style="font-size:.75rem;">${new Date(p.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
     <td><div class="actions-cell">
       ${p.status==='pending'?`<button class="act act-confirm" onclick="confirmPay('${p.id}')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Confirm</button>`:''}
       ${p.status==='pending'||p.status==='confirmed'?`<button class="act act-deny" onclick="denyPay('${p.id}','${(p.profiles?.full_name||'').replace(/'/g,'')}','${(p.listings?.title||'').replace(/'/g,'')}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Deny</button>`:''}
@@ -683,7 +683,7 @@ async function loadStudents() {
     <td style="font-size:.78rem;">${u.email||'—'}</td>
     <td>${u.phone||'—'}</td>
     <td><span class="badge badge-${u.role==='admin'?'admin':'student'}">${u.role}</span></td>
-    <td style="font-size:.75rem;">${new Date(u.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+    <td style="font-size:.75rem;">${new Date(u.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
     <td><div class="actions-cell">
       ${u.role!=='admin'?`<button class="act act-edit" onclick="makeAdmin('${u.id}')">Make Admin</button>`:''}
       ${u.email?`<button class="act act-confirm" onclick="resetStudentPassword('${u.email}')"><svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset</button>`:''}
@@ -726,7 +726,7 @@ async function loadReports() {
     <td><span class="badge ${r.reason.includes('Scam')||r.reason.includes('fraud')?'badge-failed':'badge-pending'}">${r.reason}</span></td>
     <td style="font-size:.78rem;color:var(--muted);max-width:200px;">${r.details||'—'}</td>
     <td><span class="badge ${r.status==='resolved'?'badge-ok':r.status==='reviewed'?'badge-pending':'badge-failed'}">${r.status}</span></td>
-    <td style="font-size:.75rem;">${new Date(r.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+    <td style="font-size:.75rem;">${new Date(r.created).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
     <td><div class="actions-cell">
       ${r.status==='open'?`<button class="act act-edit" onclick="updateReport('${r.id}','reviewed')">Review</button>`:''}
       ${r.status!=='resolved'?`<button class="act act-confirm" onclick="updateReport('${r.id}','resolved')">Resolve</button>`:''}
@@ -994,7 +994,7 @@ async function loadSubmissions() {
     const photos=(s.photos||[]);
     const amens=(s.amenities||[]).join(', ')||'None listed';
     const sc=s.status==='approved'?'#1D9E75':s.status==='rejected'?'#C0392B':'#B8955A';
-    const dt=new Date(s.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+    const dt=new Date(s.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
     const rawPhone=(s.owner_phone||'').replace(/[^0-9]/g,'').replace(/^0/,'254');
     const waAdmin='https://wa.me/'+rawPhone+'?text='+encodeURIComponent('Hi '+s.owner_name+', NestFinder CUK admin here regarding your listing: '+s.title+'. ');
     const approveMsg='Hello '+s.owner_name+' ✅\n\nYour listing *\"'+s.title+'\"* has been reviewed and is now *LIVE* on NestFinder CUK.\n\nStudents can now find and contact you after a small verification fee.\n\nView it at: https://nestfindercuk.rocks\n\nThank you!\n- NestFinder CUK Admin';
@@ -1078,7 +1078,7 @@ async function loadReferrals() {
     </div>`;
   list.innerHTML=rows.map(row=>{
     const name=row.profiles?.full_name||'Student';
-    const dt=new Date(row.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
+    const dt=new Date(row.created).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'});
     const sc=row.status==='paid'?'#1D9E75':'#B8955A';
     return `<div style="background:#fff;border:1px solid rgba(184,149,90,.12);padding:.85rem 1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
       <div style="flex:1;min-width:120px">
