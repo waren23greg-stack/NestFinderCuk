@@ -317,8 +317,10 @@ nav{
 </style>
 <script>
 (function(){
-var _B='https://mtycapgbtvpczvswpjpo.supabase.co',_K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-function _h(t){return{'apikey':_K,'Authorization':'Bearer '+(t||localStorage.getItem('sb-token')||_K),'Content-Type':'application/json'};}
+var _B='https://pocketbase-production-f91f.up.railway.app';
+function _h(t){var tok=t||localStorage.getItem('pb-token')||'';return{'Authorization':'Bearer '+tok,'Content-Type':'application/json'};}
+function _pbGet(col,params){var q=new URLSearchParams(params||{}).toString();return fetch(_B+'/api/collections/'+col+'/records'+(q?'?'+q:''),{headers:_h()}).then(function(r){return r.json();});}
+function _pbUser(){try{return JSON.parse(localStorage.getItem('pb-user'));}catch(e){return null;}}
 function _q(table){
   var _f=[],_s='*',_ord=null,_lim=null,_cnt=false;
   var q={
@@ -332,7 +334,7 @@ function _q(table){
     maybeSingle:function(){return q._run(false,true);},
     then:function(res,rej){return q._run(false,false).then(res,rej);},
     _run:function(single,maybe){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       var url=_B+'/rest/v1/'+table+'?select='+encodeURIComponent(_s);
       _f.forEach(function(f){url+='&'+f;});
       if(_ord)url+='&order='+_ord;
@@ -350,7 +352,7 @@ function _q(table){
       }).catch(function(e){return{data:null,error:e};}); 
     },
     insert:function(data){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       var pref='return=representation';
       return{
         select:function(){return{single:function(){
@@ -369,7 +371,7 @@ function _q(table){
       };
     },
     upsert:function(data,opts){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       var pref='resolution=merge-duplicates,return=representation';
       return fetch(_B+'/rest/v1/'+table,{method:'POST',headers:Object.assign({},_h(t),{'Prefer':pref}),body:JSON.stringify(data)})
         .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
@@ -377,7 +379,7 @@ function _q(table){
     },
     update:function(data){
       return{eq:function(c,v){
-        var t=localStorage.getItem('sb-token');
+        var t=localStorage.getItem('pb-token');
         var url=_B+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
         return fetch(url,{method:'PATCH',headers:Object.assign({},_h(t),{'Prefer':'return=representation'}),body:JSON.stringify(data)})
           .then(function(r){return r.json();}).then(function(d){return{data:d,error:null};
@@ -386,7 +388,7 @@ function _q(table){
     },
     delete:function(){
       return{eq:function(c,v){
-        var t=localStorage.getItem('sb-token');
+        var t=localStorage.getItem('pb-token');
         var url=_B+'/rest/v1/'+table+'?'+c+'=eq.'+encodeURIComponent(v);
         return fetch(url,{method:'DELETE',headers:_h(t)})
           .then(function(r){return r.ok?{data:null,error:null}:r.json().then(function(e){return{data:null,error:e};});})
@@ -400,7 +402,7 @@ window.sb={
   from:function(t){return _q(t);},
   auth:{
     getUser:function(){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       if(!t)return Promise.resolve({data:{user:null},error:null});
       return fetch(_B+'/auth/v1/user',{headers:_h(t)})
         .then(function(r){return r.json();})
@@ -408,7 +410,7 @@ window.sb={
       }).catch(function(){return{data:{user:null},error:null};});
     },
     getSession:function(){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       if(!t)return Promise.resolve({data:{session:null},error:null});
       return fetch(_B+'/auth/v1/user',{headers:_h(t)})
         .then(function(r){return r.json();})
@@ -416,11 +418,11 @@ window.sb={
       }).catch(function(){return{data:{session:null},error:null};});
     },
     setSession:function(o){
-      if(o.access_token){localStorage.setItem('sb-token',o.access_token);if(o.refresh_token)localStorage.setItem('sb-refresh',o.refresh_token);}
+      // PocketBase: token already stored on login
       return Promise.resolve({data:{},error:null});
     },
     updateUser:function(attrs){
-      var t=localStorage.getItem('sb-token');
+      var t=localStorage.getItem('pb-token');
       return fetch(_B+'/auth/v1/user',{method:'PUT',headers:_h(t),body:JSON.stringify(attrs)})
         .then(function(r){return r.json();}).then(function(d){return d.id?{data:{user:d},error:null}:{data:{},error:d};
       }).catch(function(e){return{data:{},error:e};});
@@ -428,7 +430,7 @@ window.sb={
     signInWithPassword:function(o){
       return fetch(_B+'/auth/v1/token?grant_type=password',{method:'POST',headers:_h(),body:JSON.stringify({email:o.email,password:o.password})})
         .then(function(r){return r.json();}).then(function(d){
-          if(d.access_token){localStorage.setItem('sb-token',d.access_token);if(d.refresh_token)localStorage.setItem('sb-refresh',d.refresh_token);}
+          // PocketBase: token already stored on login
           return d.access_token?{data:{user:d.user,session:d},error:null}:{data:{user:null},error:d};
         });
     },
@@ -437,7 +439,7 @@ window.sb={
         .then(function(r){return r.json();}).then(function(d){return d.id||d.user?{data:{user:d.user||d},error:null}:{data:{},error:d};});
     },
     signOut:function(){
-      localStorage.removeItem('sb-token');localStorage.removeItem('sb-refresh');
+      localStorage.removeItem('pb-token');localStorage.removeItem('pb-user');
       return Promise.resolve({error:null});
     },
     resetPasswordForEmail:function(email,opts){
@@ -450,7 +452,7 @@ window.sb={
     from:function(bucket){
       return{
         upload:function(path,file){
-          var t=localStorage.getItem('sb-token');
+          var t=localStorage.getItem('pb-token');
           return fetch(_B+'/storage/v1/object/'+bucket+'/'+path,{method:'POST',headers:{'apikey':_K,'Authorization':'Bearer '+(t||_K)},body:file})
             .then(function(r){return r.ok?{data:{path:path},error:null}:r.json().then(function(e){return{data:null,error:e};});});
         },
@@ -617,7 +619,8 @@ function cardHTML(p,contacts){
 
 async function load(){
   const root=document.getElementById('root');
-  const {data:{session}}=await sb.auth.getSession();
+  const _pbSess=localStorage.getItem('pb-token');
+  const session=_pbSess?{user:_pbUser()}:null;
 
   if(!session){
     root.innerHTML=`
@@ -657,7 +660,8 @@ async function load(){
   const ids=confirmed.map(p=>p.listing_id).filter(Boolean);
   let contacts={};
   if(ids.length){
-    const {data:ctk}=await sb.from('caretaker_contacts').select('listing_id,caretaker_name,phone').in('listing_id',ids);
+    const _ctkRes=await _pbGet('caretaker_contacts',{filter:ids.map(function(id){return 'listing_id="'+id+'"';}).join('||'),perPage:200}).catch(function(){return{items:[]};});
+    const ctk=_ctkRes.items||[];
     (ctk||[]).forEach(c=>{contacts[c.listing_id]=c;});
   }
 
@@ -673,19 +677,15 @@ async function load(){
 
 async function loadReferrals(){
   try{
-    const t=localStorage.getItem('sb-token');
+    const t=localStorage.getItem('pb-token');
     if(!t)return;
-    const K='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10eWNhcGdidHZwY3p2c3dwanBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjQxNDgsImV4cCI6MjA4OTYwMDE0OH0.owJeYO2kHs1F82kPQeML6uHUarchKT_ybe79OBBV6wM';
-    // Get user id from token
-    const ur=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/auth/v1/user',{headers:{'apikey':K,'Authorization':'Bearer '+t}});
-    const u=await ur.json();
+    const u=_pbUser()||{};
     if(!u.id)return;
-    // Get promo code owned by user
-    const pr=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/promo_codes?select=code,used_by,discount&owner_id=eq.'+u.id,{headers:{'apikey':K,'Authorization':'Bearer '+t}});
-    const promos=await pr.json();
+    // Get promo codes (not in PocketBase yet)
+    const promos=[];
     // Get referral earnings
-    const er=await fetch('https://mtycapgbtvpczvswpjpo.supabase.co/rest/v1/referral_earnings?select=amount,status,created_at&referrer_id=eq.'+u.id+'&order=created_at.desc',{headers:{'apikey':K,'Authorization':'Bearer '+t}});
-    const earnings=await er.json();
+    const _erRes=await _pbGet('referral_earnings',{filter:'user_id="'+u.id+'"',sort:'-created',perPage:50}).catch(function(){return{items:[]};});
+    const earnings=_erRes.items||[];
     const code=Array.isArray(promos)&&promos[0]?promos[0].code:null;
     const total=Array.isArray(earnings)?earnings.reduce((s,e)=>s+(e.amount||50),0):0;
     const pending=Array.isArray(earnings)?earnings.filter(e=>e.status==='pending').length:0;
