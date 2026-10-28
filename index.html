@@ -1394,7 +1394,7 @@ function render(list,g){
     if(l.wifi_available)amen.push(`<div class="pill"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1" fill="var(--gold)" stroke="none"/></svg>WiFi</div>`);
     return `<div class="lcard${l.listing_type==="airbnb"?" airbnb-card":""}" style="animation:fadeUp .42s ${i*.055}s both">
   <div class="lcard-img" onclick="openGallery('${l.id}')" style="cursor:zoom-in">
-    <img src="${ph}" alt="${escapeHtml(l.title)}" loading="lazy" decoding="async"/>
+    ${ph?`<img src="${escapeHtml(ph)}" alt="${escapeHtml(l.title)}" loading="lazy" decoding="async"/>`:'<div class="lcard-noimg" aria-hidden="true">No photos yet</div>'}
     <div class="lcard-badge ${l.available?"avail":""}">${l.available?"Available":"Taken"}</div>${l.listing_type==="airbnb"?"<div class=\"lcard-badge\" style=\"left:auto;right:10px;top:10px;background:var(--gold)\">Short stay</div>":""}
     <div class="lcard-pcnt"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>${cnt}</div>
     <div class="share-btn" onclick="shareCard(event,'${l.id}')" role="button" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div>
